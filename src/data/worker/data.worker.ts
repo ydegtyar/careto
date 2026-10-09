@@ -57,7 +57,7 @@ class LocalDbService {
 
     this.syncEngine.queueOp(vehicle.id, 'vehicle', vehicle.id, vehicle);
     this.broadcast(['vehicle']);
-    this.syncEngine.push(vehicle.id).catch(() => {});
+    await this.syncEngine.push(vehicle.id).catch(() => {});
   }
 
   async deleteVehicle(id: string): Promise<void> {

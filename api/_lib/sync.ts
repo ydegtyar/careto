@@ -93,6 +93,26 @@ export async function handlePush(req: VercelRequest, res: VercelResponse) {
         LIMIT 1
       `;
 
+      if (op.tbl === 'vehicle') {
+        const p = op.patch;
+        await sql`
+          UPDATE vehicles
+          SET 
+            name = COALESCE(${p.name}, name),
+            make = COALESCE(${p.make}, make),
+            model = COALESCE(${p.model}, model),
+            year = COALESCE(${p.year ? Number(p.year) : null}, year),
+            powertrain = COALESCE(${p.powertrain}, powertrain),
+            initial_odometer_m = COALESCE(${p.initial_odometer_m ? Number(p.initial_odometer_m) : null}, initial_odometer_m),
+            distance_unit = COALESCE(${p.distance_unit}, distance_unit),
+            efficiency_unit = COALESCE(${p.efficiency_unit}, efficiency_unit),
+            tanks = COALESCE(${p.tanks ? JSON.stringify(p.tanks) : null}::jsonb, tanks),
+            fuel_grades = COALESCE(${p.fuel_grades ? JSON.stringify(p.fuel_grades) : null}::jsonb, fuel_grades),
+            updated_at = now()
+          WHERE id = ${vehicleId}::uuid
+        `;
+      }
+
       if (existingRec.length === 0) {
         const colHlc = op.colHlc || {};
         if (Object.keys(colHlc).length === 0) {
