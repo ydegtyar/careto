@@ -1,17 +1,8 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { MonthlyTrendItem } from '../../lib/analytics-math';
 
-const defaultData: MonthlyTrendItem[] = [
-  { month: 'Dec', fuel: 140, service: 60, admin: 40 },
-  { month: 'Jan', fuel: 160, service: 80, admin: 50 },
-  { month: 'Feb', fuel: 130, service: 50, admin: 30 },
-  { month: 'Mar', fuel: 180, service: 120, admin: 60 },
-  { month: 'Apr', fuel: 150, service: 70, admin: 40 },
-  { month: 'May', fuel: 170, service: 90, admin: 50 },
-];
-
-export function MonthlyBars({ data = defaultData }: { data?: MonthlyTrendItem[] }) {
-  const chartData = data.length > 0 ? data : defaultData;
+export function MonthlyBars({ data = [] }: { data?: MonthlyTrendItem[] }) {
+  const chartData = data;
 
   return (
     <div style={{ width: '100%', height: 210 }}>

@@ -6,15 +6,8 @@ export interface CostSlice {
   color: string;
 }
 
-const defaultData: CostSlice[] = [
-  { name: 'Fuel & Energy', value: 142.5, color: '#7dd3fc' },
-  { name: 'Maintenance', value: 82.0, color: '#c8a0f0' },
-  { name: 'Insurance & Tax', value: 68.0, color: '#88b4cc' },
-  { name: 'Parking & Tolls', value: 48.0, color: '#fbbf24' },
-];
-
-export function CostDonut({ data = defaultData }: { data?: CostSlice[] }) {
-  const chartData = data.length > 0 ? data : defaultData;
+export function CostDonut({ data = [] }: { data?: CostSlice[] }) {
+  const chartData = data;
 
   return (
     <div style={{ width: '100%', height: 200 }}>

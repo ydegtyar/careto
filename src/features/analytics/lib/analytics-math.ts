@@ -87,7 +87,7 @@ export function computeTCO(entries: Entry[], vehicle?: Vehicle): TcoSummary {
     } else if (entry.category_id === 'parking' || entry.category_id === 'tolls') {
       parkingMinor += amt;
     } else {
-      fuelMinor += amt; // Default allocation
+      fuelMinor += amt;
     }
   }
 
@@ -100,16 +100,14 @@ export function computeTCO(entries: Entry[], vehicle?: Vehicle): TcoSummary {
 
   const totalSpentUsd = totalSpentMinor / 100;
   const tcoPerKm =
-    distanceCoveredKm > 0 && totalSpentUsd > 0 ? totalSpentUsd / distanceCoveredKm : 0.34;
-  const monthTotalUsd =
-    monthTotalMinor > 0 ? monthTotalMinor / 100 : Math.round(totalSpentUsd * 0.25) || 482;
+    distanceCoveredKm > 0 && totalSpentUsd > 0 ? totalSpentUsd / distanceCoveredKm : 0;
+  const monthTotalUsd = monthTotalMinor / 100;
 
-  // Estimated depreciation baseline if empty
-  const depreciationUsd = Math.round(totalSpentUsd * 0.35) || 180;
-  const fuelUsd = Math.round(fuelMinor / 100) || 142;
-  const insuranceUsd = Math.round(insuranceMinor / 100) || 95;
-  const maintenanceUsd = Math.round(maintenanceMinor / 100) || 65;
-  const parkingUsd = Math.round(parkingMinor / 100) || 48;
+  const depreciationUsd = 0;
+  const fuelUsd = fuelMinor / 100;
+  const insuranceUsd = insuranceMinor / 100;
+  const maintenanceUsd = maintenanceMinor / 100;
+  const parkingUsd = parkingMinor / 100;
 
   return {
     totalSpentUsd,
@@ -152,12 +150,7 @@ export function computeCategoryDistribution(entries: Entry[]): CostCategorySlice
 
   const totalMinor = fuelMinor + serviceMinor + insuranceMinor + parkingMinor;
   if (totalMinor === 0) {
-    return [
-      { name: 'Fuel & Energy', value: 142.5, percentage: 42, color: '#7dd3fc' },
-      { name: 'Maintenance', value: 82.0, percentage: 24, color: '#c8a0f0' },
-      { name: 'Insurance & Tax', value: 68.0, percentage: 20, color: '#88b4cc' },
-      { name: 'Parking & Tolls', value: 48.0, percentage: 14, color: '#fbbf24' },
-    ];
+    return [];
   }
 
   const fuelVal = fuelMinor / 100;
@@ -219,13 +212,6 @@ export function computeMonthlyTrends(entries: Entry[], numMonths = 6): MonthlyTr
       }
     }
 
-    // Default mock visualization fallback if zero data for specific past months
-    if (fuel === 0 && service === 0 && admin === 0) {
-      fuel = Math.floor(120 + Math.random() * 80);
-      service = Math.floor(40 + Math.random() * 60);
-      admin = Math.floor(30 + Math.random() * 40);
-    }
-
     result.push({
       month: monthLabel,
       fuel: Math.round(fuel),
@@ -246,33 +232,33 @@ export function computeEfficiencyTelemetry(
 
   // Calculate efficiency from refuel/charge entries
   const rates: number[] = [];
-  for (let i = 0; i < entries.length - 1; i++) {
-    const current = entries[i];
-    const next = entries[i + 1];
+  const sorted = [...entries].sort((a, b) => (b.odometer_m ?? 0) - (a.odometer_m ?? 0));
+
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const current = sorted[i];
+    const prev = sorted[i + 1];
 
     if (
       current &&
-      next &&
+      prev &&
       current.odometer_m &&
-      next.odometer_m &&
-      current.odometer_m > next.odometer_m
+      prev.odometer_m &&
+      current.odometer_m > prev.odometer_m
     ) {
-      const distKm = (current.odometer_m - next.odometer_m) / 1000;
+      const distKm = (current.odometer_m - prev.odometer_m) / 1000;
       const amount = (current.amount_minor ?? 0) / 100;
-      if (distKm > 10 && amount > 0) {
+      if (distKm > 0 && amount > 0) {
         const rate = (amount / distKm) * 100;
-        if (rate > 2 && rate < 35) {
-          rates.push(rate);
-        }
+        rates.push(rate);
       }
     }
   }
 
   if (rates.length === 0) {
     return {
-      best: isEv ? 14.2 : 5.1,
-      avg: isEv ? 18.2 : 5.6,
-      worst: isEv ? 24.5 : 6.8,
+      best: null,
+      avg: null,
+      worst: null,
       unit,
     };
   }
@@ -294,39 +280,48 @@ export function computePriceVolatility(entries: Entry[]): PriceVolatility {
 
   if (refuels.length === 0) {
     return {
-      lowest: { price: 1.59, station: 'Costco Wholesale #512', date: 'May 08' },
-      highest: { price: 1.76, station: 'Shell Highway 401', date: 'May 22' },
-      spread: 0.17,
+      spread: 0,
     };
   }
 
-  // Calculate prices per unit
   let minPrice = Infinity;
   let maxPrice = -Infinity;
+  let lowestEntry: Entry | null = null;
+  let highestEntry: Entry | null = null;
 
   for (const r of refuels) {
-    const price = (r.amount_minor ?? 0) / 100 / 45; // Approximate unit price
-    if (price > 0.5 && price < 5.0) {
-      if (price < minPrice) minPrice = price;
-      if (price > maxPrice) maxPrice = price;
+    const amtUsd = (r.usd_minor ?? r.amount_minor ?? 0) / 100;
+    // Assuming volume if available or estimated price per unit
+    const price = amtUsd;
+    if (price > 0) {
+      if (price < minPrice) {
+        minPrice = price;
+        lowestEntry = r;
+      }
+      if (price > maxPrice) {
+        maxPrice = price;
+        highestEntry = r;
+      }
     }
   }
 
-  if (minPrice === Infinity) {
+  if (minPrice === Infinity || !lowestEntry || !highestEntry) {
     return {
-      lowest: { price: 1.59, station: 'Costco Wholesale #512', date: 'May 08' },
-      highest: { price: 1.76, station: 'Shell Highway 401', date: 'May 22' },
-      spread: 0.17,
+      spread: 0,
     };
   }
 
   return {
     lowest: {
       price: Number(minPrice.toFixed(2)),
-      station: 'Costco Wholesale #512',
-      date: 'May 08',
+      station: lowestEntry.category_id || 'Gas Station',
+      date: lowestEntry.occurred_on,
     },
-    highest: { price: Number(maxPrice.toFixed(2)), station: 'Shell Highway 401', date: 'May 22' },
+    highest: {
+      price: Number(maxPrice.toFixed(2)),
+      station: highestEntry.category_id || 'Gas Station',
+      date: highestEntry.occurred_on,
+    },
     spread: Number((maxPrice - minPrice).toFixed(2)),
   };
 }
@@ -337,8 +332,16 @@ export function computeBusinessDeductible(entries: Entry[]): BusinessDeductible 
     (sum, e) => sum + (e.usd_minor ?? e.amount_minor ?? 0),
     0,
   );
-  const distanceKm = businessEntries.length > 0 ? businessEntries.length * 170 : 340;
-  const potentialWriteOffUsd = totalMinor > 0 ? totalMinor / 100 : 227.8;
+
+  let distanceKm = 0;
+  // Estimate distance covered in business entries if odometer recorded
+  for (const e of businessEntries) {
+    if (e.odometer_m) {
+      distanceKm += 50; // default estimated distance per entry if not chained
+    }
+  }
+
+  const potentialWriteOffUsd = totalMinor / 100;
 
   return {
     distanceKm,

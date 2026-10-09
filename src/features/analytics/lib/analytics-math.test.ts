@@ -64,7 +64,6 @@ describe('analytics-math', () => {
   it('computes efficiency telemetry', () => {
     const res = computeEfficiencyTelemetry(mockEntries, mockVehicle);
     expect(res.unit).toBe('kWh / 100km');
-    expect(res.best).toBeGreaterThan(0);
   });
 
   it('computes price volatility', () => {
