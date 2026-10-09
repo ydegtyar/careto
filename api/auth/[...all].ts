@@ -4,14 +4,21 @@ const NEON_AUTH_BASE = process.env.NEON_AUTH_BASE_URL || 'https://ep-old-queen-b
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const rawUrl = req.url || '';
-    // Strip /api/auth prefix to get the path
+    let rawUrl = (req.headers['x-forwarded-uri'] as string) || (req.headers['x-original-url'] as string) || req.url || '';
+    if (rawUrl.includes('[...all]')) {
+      const allParam = req.query.all;
+      const subpath = Array.isArray(allParam) ? allParam.join('/') : (allParam || '');
+      const queryString = req.url?.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+      rawUrl = `/api/auth/${subpath}${queryString}`;
+    }
     const path = rawUrl.replace(/^\/api\/auth/, '');
     const targetUrl = `${NEON_AUTH_BASE}${path}`;
 
+    const reqOrigin = (req.headers['origin'] as string) || (req.headers['referer'] ? new URL(req.headers['referer'] as string).origin : 'https://careto.vercel.app');
+
     const headers: Record<string, string> = {
       'content-type': req.headers['content-type'] || 'application/json',
-      'origin': 'https://careto.vercel.app',
+      'origin': reqOrigin,
     };
 
     if (req.headers['cookie']) {

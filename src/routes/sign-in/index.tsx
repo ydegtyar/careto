@@ -131,8 +131,16 @@ function SignInPage() {
             variant="outlined"
             fullWidth
             startIcon={<GoogleLogo />}
-            onClick={() => {
-              window.location.href = '/api/auth/sign-in/social?provider=google';
+            onClick={async () => {
+              try {
+                const { signIn } = await import('@/lib/auth-client');
+                await signIn.social({
+                  provider: 'google',
+                  callbackURL: `${window.location.origin}/garage`,
+                });
+              } catch {
+                window.location.href = `/api/auth/sign-in/social?provider=google&callbackURL=${encodeURIComponent(`${window.location.origin}/garage`)}`;
+              }
             }}
             className={styles.googleBtn}
             aria-label="Continue with Google"
