@@ -1,0 +1,43 @@
+@use "mixins" as *;
+
+.container {
+  width: 100%;
+  overflow-x: auto;
+  padding: 4px 0 12px;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scrollList {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.chip {
+  @include glass(12px, 0.5);
+  font-weight: 600 !important;
+  color: var(--mui-palette-text-secondary, #a0b4c4) !important;
+  border-radius: 9999px !important;
+  height: 36px !important;
+  padding: 0 4px;
+  transition: all 0.2s ease;
+
+  &.active {
+    background: rgba(125, 211, 252, 0.15) !important;
+    color: var(--mui-palette-primary-main, #7dd3fc) !important;
+    border-color: rgba(125, 211, 252, 0.4) !important;
+    box-shadow: 0 0 12px rgba(125, 211, 252, 0.2);
+  }
+}
+
+.addChip {
+  height: 36px !important;
+  border-radius: 9999px !important;
+  border-color: rgba(125, 211, 252, 0.2) !important;
+  color: var(--mui-palette-primary-main, #7dd3fc) !important;
+}

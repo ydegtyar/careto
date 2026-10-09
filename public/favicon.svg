@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="46%" r="58%">
+      <stop offset="0%" stop-color="#0b1e36" />
+      <stop offset="65%" stop-color="#040b14" />
+      <stop offset="100%" stop-color="#010408" />
+    </radialGradient>
+    <linearGradient id="cyanStreak" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe" />
+      <stop offset="35%" stop-color="#7dd3fc" />
+      <stop offset="85%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="bodyAccent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#bae6fd" />
+    </linearGradient>
+    <filter id="iceGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="sparkleBloom" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="bloom" />
+      <feMerge>
+        <feMergeNode in="bloom" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bgGlow)" />
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="none" stroke="#7dd3fc" stroke-width="2" stroke-opacity="0.18" />
+  <circle cx="256" cy="225" r="135" fill="#7dd3fc" filter="url(#iceGlow)" opacity="0.2" />
+  <path d="M 330 118 C 300 102 265 96 230 98 C 155 104 96 165 96 240 C 96 318 158 382 236 382 C 285 382 328 358 352 322" fill="none" stroke="url(#cyanStreak)" stroke-width="20" stroke-linecap="round" filter="url(#iceGlow)" />
+  <path d="M 338 108 L 382 132 L 358 152" fill="none" stroke="#e0f2fe" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+  <g id="carEmblem">
+    <path d="M 160 252 C 176 218 206 186 244 178 C 278 170 326 174 372 222 L 396 248 L 378 252 C 340 232 300 220 252 222 C 214 224 186 238 160 252 Z" fill="url(#bodyAccent)" />
+    <path d="M 218 228 C 234 204 258 196 288 194 C 320 194 346 208 366 226 L 348 232 C 324 220 298 214 268 216 C 246 218 230 224 218 228 Z" fill="#061220" />
+    <path d="M 144 264 C 180 256 220 254 264 254 C 316 254 366 260 404 274 C 414 277 420 285 418 293 C 415 301 405 306 392 305 C 356 302 322 298 280 298 C 232 298 190 304 152 312 C 142 314 134 308 132 299 C 130 290 135 282 144 264 Z" fill="#ffffff" filter="url(#sparkleBloom)" />
+    <circle cx="348" cy="304" r="28" fill="#040a12" stroke="#7dd3fc" stroke-width="9" />
+    <circle cx="348" cy="304" r="10" fill="#bae6fd" />
+    <circle cx="196" cy="304" r="28" fill="#040a12" stroke="#7dd3fc" stroke-width="9" />
+    <circle cx="196" cy="304" r="10" fill="#bae6fd" />
+    <g>
+      <polygon points="404,272 432,274 416,282 396,280" fill="#7dd3fc" filter="url(#sparkleBloom)" />
+      <line x1="416" y1="274" x2="446" y2="276" stroke="#e0f2fe" stroke-width="4" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

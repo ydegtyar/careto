@@ -1,0 +1,152 @@
+@use "mixins" as *;
+
+.root {
+  @include glass(20px, 0.92);
+  background: color-mix(in srgb, var(--mui-palette-background-paper, #0f1524) 92%, #0a0e1a) !important;
+  border-bottom: none;
+  color: var(--mui-palette-text-primary, #e0e8f0) !important;
+  z-index: 1100;
+}
+
+.toolbar {
+  display: flex;
+  min-height: 56px !important;
+}
+
+.title {
+  font-weight: 700 !important;
+  font-size: 1.15rem !important;
+  letter-spacing: -0.3px !important;
+  text-align: center;
+  color: var(--mui-palette-text-primary, #e0e8f0);
+}
+
+.side {
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.carSelectorContainer {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-start;
+  margin-left: 12px;
+}
+
+.carSelectorButton {
+  flex: 0 1 auto;
+  max-width: 440px;
+  background: rgba(15, 21, 36, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  border-radius: 20px;
+  padding: 6px 14px 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #e0e8f0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: rgba(15, 21, 36, 0.85);
+    border-color: rgba(125, 211, 252, 0.4);
+    box-shadow: 0 0 16px rgba(125, 211, 252, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.avatarBox {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(15, 25, 45, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.carIcon {
+  font-size: 18px !important;
+}
+
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.carName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.carSubtext {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-family: monospace;
+  line-height: 1.1;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrowIcon {
+  font-size: 16px !important;
+  color: #a0b4c4;
+  transition: transform 0.2s ease;
+}
+
+.carMenuPaper {
+  background-color: rgba(11, 16, 28, 0.92) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(125, 211, 252, 0.2) !important;
+  border-radius: 20px !important;
+  color: #e0e8f0 !important;
+  //width: 100%;
+  min-width: 320px !important;
+  //max-width: 440px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(125, 211, 252, 0.08) !important;
+}
+
+.badgeOnline {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badgeTag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}

@@ -1,0 +1,149 @@
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import type React from 'react';
+import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
+
+export interface EditableSubItem {
+  id: string;
+  name: string;
+  cost: string;
+  partNumber?: string;
+}
+
+export interface Props {
+  subItems: EditableSubItem[];
+  onChange: (items: EditableSubItem[]) => void;
+  onAutoSum: (totalCost: number) => void;
+}
+
+export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum }) => {
+  const handleAddItem = () => {
+    const newItem: EditableSubItem = {
+      id: crypto.randomUUID(),
+      name: '',
+      cost: '',
+    };
+    onChange([...subItems, newItem]);
+  };
+
+  const handleUpdateItem = (id: string, field: keyof EditableSubItem, value: string) => {
+    const updated = subItems.map((item) => (item.id === id ? { ...item, [field]: value } : item));
+    onChange(updated);
+  };
+
+  const handleRemoveItem = (id: string) => {
+    onChange(subItems.filter((item) => item.id !== id));
+  };
+
+  const calculatedTotal = subItems.reduce((acc, item) => {
+    const val = parseFloat(item.cost);
+    return acc + (isNaN(val) ? 0 : val);
+  }, 0);
+
+  return (
+    <GlassCard style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography
+          variant="caption"
+          sx={{
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+            color: 'text.secondary',
+            fontWeight: 700,
+          }}
+        >
+          Itemized Service Breakdown
+        </Typography>
+        {calculatedTotal > 0 && (
+          <Button
+            size="small"
+            onClick={() => onAutoSum(calculatedTotal)}
+            sx={{
+              fontSize: '0.75rem',
+              textTransform: 'none',
+              borderRadius: 2,
+              px: 1.5,
+              py: 0.25,
+              backgroundColor: 'rgba(125, 211, 252, 0.15)',
+              color: 'primary.main',
+              fontWeight: 600,
+            }}
+          >
+            Apply Sum ({calculatedTotal.toFixed(2)})
+          </Button>
+        )}
+      </div>
+
+      {subItems.length === 0 ? (
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
+          No itemized costs added yet. Break down oil change, filters, labor, etc.
+        </Typography>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {subItems.map((item) => (
+            <div key={item.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <TextField
+                placeholder="Item / Service Name (e.g. Oil Filter)"
+                value={item.name}
+                onChange={(e) => handleUpdateItem(item.id, 'name', e.target.value)}
+                fullWidth
+                size="small"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    backgroundColor: 'rgba(15, 21, 36, 0.6)',
+                  },
+                }}
+              />
+              <TextField
+                placeholder="Cost"
+                type="number"
+                value={item.cost}
+                onChange={(e) => handleUpdateItem(item.id, 'cost', e.target.value)}
+                size="small"
+                sx={{
+                  width: 110,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    backgroundColor: 'rgba(15, 21, 36, 0.6)',
+                  },
+                }}
+              />
+              <IconButton
+                size="small"
+                onClick={() => handleRemoveItem(item.id)}
+                aria-label="remove sub-item"
+                sx={{ color: 'error.main' }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Button
+        type="button"
+        variant="outlined"
+        size="small"
+        startIcon={<AddIcon />}
+        onClick={handleAddItem}
+        sx={{
+          borderRadius: 2.5,
+          mt: 0.5,
+          textTransform: 'none',
+          borderColor: 'rgba(125, 211, 252, 0.25)',
+          color: 'primary.main',
+          fontWeight: 600,
+          alignSelf: 'flex-start',
+        }}
+      >
+        Add Sub-service Item
+      </Button>
+    </GlassCard>
+  );
+};

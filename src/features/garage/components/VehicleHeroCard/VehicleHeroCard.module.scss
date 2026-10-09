@@ -1,0 +1,61 @@
+@use "mixins" as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px !important;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.powertrainChip {
+  background: rgba(125, 211, 252, 0.12) !important;
+  color: var(--mui-palette-primary-main, #7dd3fc) !important;
+  border: 1px solid rgba(125, 211, 252, 0.25) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+}
+
+.imageWell {
+  height: 120px;
+  background: radial-gradient(circle at center, rgba(125, 211, 252, 0.08) 0%, rgba(15, 21, 36, 0.6) 80%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(125, 211, 252, 0.08);
+}
+
+.energySection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.energyLabels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progressBar {
+  height: 8px !important;
+  border-radius: 9999px !important;
+  background: rgba(32, 44, 66, 0.6) !important;
+
+  :global(.MuiLinearProgress-bar) {
+    background: linear-gradient(90deg, #7dd3fc, #c8a0f0) !important;
+    border-radius: 9999px;
+  }
+}
+
+.rangeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

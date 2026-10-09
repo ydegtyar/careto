@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.env.local
+.DS_Store
+*.log
+design/ref/
+design/context/
+scripts/.seed-ids.json
+.vercel
+.env*
+*.tsbuildinfo
+test-results/
+playwright-report/

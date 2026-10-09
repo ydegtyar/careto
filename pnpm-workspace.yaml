@@ -1,0 +1,10 @@
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+minimumReleaseAgeExclude:
+  - '@playwright/test@1.64.0'
+  - '@vercel/build-utils@14.20.0'
+  - '@vercel/node@23.0.0'
+  - drizzle-orm@0.45.4
+  - playwright-core@1.64.0
+  - playwright@1.64.0

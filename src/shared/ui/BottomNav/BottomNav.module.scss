@@ -1,0 +1,170 @@
+@use "mixins" as *;
+
+.wrapper {
+  position: fixed;
+  bottom: 20px;
+  left: 16px;
+  right: 16px;
+  max-width: 540px;
+  margin: 0 auto;
+  z-index: 1100;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  pointer-events: none;
+}
+
+.topHighlight {
+  position: absolute;
+  top: 0;
+  left: 32px;
+  right: 32px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--mui-palette-primary-main, #7dd3fc) 50%, transparent) 50%,
+    transparent 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+.root {
+  pointer-events: auto;
+  position: relative;
+  background: rgba(15, 23, 42, 0.6) !important; // bg-slate-900/60
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: 9999px !important;
+  height: 64px !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  outline: 1px solid rgba(255, 255, 255, 0.2) !important;
+  outline-offset: -1px;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(125, 211, 252, 0.15) !important;
+  overflow: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 4px !important;
+}
+
+.action {
+  flex: 1 1 0% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  padding: 6px 4px !important;
+  border-radius: 9999px !important;
+  border: 1px solid transparent !important;
+  color: var(--mui-palette-text-secondary, #94a3b8) !important;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:hover {
+    color: var(--mui-palette-text-primary, #f8fafc) !important;
+  }
+
+  &:global(.Mui-selected) {
+    color: var(--mui-palette-primary-main, #7dd3fc) !important;
+    background: rgba(125, 211, 252, 0.15) !important;
+    border-color: rgba(125, 211, 252, 0.3) !important;
+    box-shadow: 0 0 12px rgba(125, 211, 252, 0.2) !important;
+  }
+
+  :global(.MuiBottomNavigationAction-label) {
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.025em !important;
+    margin-top: 2px !important;
+    opacity: 1 !important;
+    transition: none !important;
+
+    &:global(.Mui-selected) {
+      font-size: 10px !important;
+      font-weight: 500 !important;
+    }
+  }
+
+  :global(.MuiSvgIcon-root) {
+    font-size: 20px !important;
+  }
+}
+
+
+
+.addAction {
+  flex: 0 0 auto !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  &:hover, &:active, &:global(.Mui-selected) {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
+
+.addBtn {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 50%, #0284c7 100%);
+  color: #001f2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 24px rgba(125, 211, 252, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  outline: 2px solid rgba(125, 211, 252, 0.3);
+  outline-offset: 0;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  top: 1px;
+  &:active {
+    transform: scale(0.9);
+  }
+
+  &:hover .addIcon {
+    transform: rotate(90deg);
+  }
+}
+
+.addBtnGlossInner {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+.addBtnGlossTop {
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  right: 8px;
+  height: 12px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.35);
+  filter: blur(1px);
+  pointer-events: none;
+}
+
+.addIcon {
+  font-size: 24px !important;
+  font-weight: bold;
+  color: #001f2e !important;
+  position: relative;
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+
