@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AnalyticsIndexRouteImport } from './routes/analytics/index'
 import { Route as EntriesNewRouteImport } from './routes/entries/new'
 import { Route as GarageIndexRouteImport } from './routes/garage/index'
@@ -26,6 +28,16 @@ import { Route as GarageVehiclesVehicleIdEditRouteImport } from './routes/garage
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyticsIndexRoute = AnalyticsIndexRouteImport.update({
@@ -93,6 +105,8 @@ const GarageVehiclesVehicleIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/entries/new': typeof EntriesNewRoute
   '/invite/$token': typeof InviteTokenRoute
   '/settings/conflicts': typeof SettingsConflictsRoute
@@ -108,6 +122,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/entries/new': typeof EntriesNewRoute
   '/invite/$token': typeof InviteTokenRoute
   '/settings/conflicts': typeof SettingsConflictsRoute
@@ -124,6 +140,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/entries/new': typeof EntriesNewRoute
   '/invite/$token': typeof InviteTokenRoute
   '/settings/conflicts': typeof SettingsConflictsRoute
@@ -141,6 +159,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/privacy'
+    | '/terms'
     | '/entries/new'
     | '/invite/$token'
     | '/settings/conflicts'
@@ -156,6 +176,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/privacy'
+    | '/terms'
     | '/entries/new'
     | '/invite/$token'
     | '/settings/conflicts'
@@ -171,6 +193,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/privacy'
+    | '/terms'
     | '/entries/new'
     | '/invite/$token'
     | '/settings/conflicts'
@@ -187,6 +211,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   EntriesNewRoute: typeof EntriesNewRoute
   InviteTokenRoute: typeof InviteTokenRoute
   SettingsConflictsRoute: typeof SettingsConflictsRoute
@@ -208,6 +234,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analytics/': {
@@ -299,6 +339,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   EntriesNewRoute: EntriesNewRoute,
   InviteTokenRoute: InviteTokenRoute,
   SettingsConflictsRoute: SettingsConflictsRoute,

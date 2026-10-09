@@ -4,7 +4,7 @@ import SyncLockOutlinedIcon from '@mui/icons-material/SyncLockOutlined';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
 import { EmailPasswordForm } from '@/features/auth/components/EmailPasswordForm/EmailPasswordForm';
 import { MagicLinkForm } from '@/features/auth/components/MagicLinkForm/MagicLinkForm';
@@ -151,27 +151,13 @@ function SignInPage() {
         {/* Footer & Attribution */}
         <footer className={styles.footer}>
           <div className={styles.footerLinks}>
-            <a
-              href="#terms"
-              onClick={(e) => {
-                e.preventDefault();
-                alert('Terms of Service: Careto is free & open telemetry management software.');
-              }}
-            >
+            <Link to="/terms">
               Terms of Service
-            </a>
+            </Link>
             <span>•</span>
-            <a
-              href="#privacy"
-              onClick={(e) => {
-                e.preventDefault();
-                alert(
-                  'Privacy: All vehicle data is stored on-device in OPFS and end-to-end synced.',
-                );
-              }}
-            >
+            <Link to="/privacy">
               Privacy Policy
-            </a>
+            </Link>
           </div>
           <div className={styles.offlineNotice}>
             <SyncLockOutlinedIcon sx={{ fontSize: 13 }} />

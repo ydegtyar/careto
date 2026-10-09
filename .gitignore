@@ -11,4 +11,5 @@ scripts/.seed-ids.json
 .env*
 *.tsbuildinfo
 test-results/
-playwright-report/
+
+.tanstack

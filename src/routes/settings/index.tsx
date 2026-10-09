@@ -15,7 +15,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/app/store';
@@ -392,6 +392,39 @@ function SettingsPage() {
           </div>
         </GlassCard>
       </div>
+
+      {/* Legal & Compliance */}
+      <GlassCard style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <SecurityIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+            Legal & Compliance
+          </Typography>
+        </div>
+        <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
+          Careto is operating under legal terms and privacy protections. Read our documentation below:
+        </Typography>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 4 }}>
+          <RouterLink to="/terms" style={{ textDecoration: 'none' }}>
+            <Button
+              size="small"
+              variant="outlined"
+              sx={{ textTransform: 'none', borderRadius: 2 }}
+            >
+              Terms of Service
+            </Button>
+          </RouterLink>
+          <RouterLink to="/privacy" style={{ textDecoration: 'none' }}>
+            <Button
+              size="small"
+              variant="outlined"
+              sx={{ textTransform: 'none', borderRadius: 2 }}
+            >
+              Privacy Policy
+            </Button>
+          </RouterLink>
+        </div>
+      </GlassCard>
 
       {/* About & Attribution */}
       <GlassCard style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
