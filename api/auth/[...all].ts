@@ -2,6 +2,18 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const NEON_AUTH_BASE = process.env.NEON_AUTH_BASE_URL || 'https://ep-old-queen-b2swdkvy.neonauth.c-6.eu-central-1.aws.neon.tech/neondb/auth';
 
+function sanitizeCookie(cookieStr: string): string {
+  // Strip Domain=... attribute so the browser attributes cookie to app host
+  let cleaned = cookieStr.replace(/;\s*Domain=[^;]*/gi, '');
+  if (!/;\s*Path=/i.test(cleaned)) {
+    cleaned += '; Path=/';
+  }
+  if (!/;\s*SameSite=/i.test(cleaned)) {
+    cleaned += '; SameSite=Lax';
+  }
+  return cleaned;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     let subpath = '';
@@ -55,6 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const init: RequestInit = {
       method: req.method,
       headers,
+      redirect: 'manual',
     };
 
     if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
@@ -63,20 +76,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const upstreamRes = await fetch(targetUrl, init);
     
-    // Forward headers
-    const setCookies = typeof upstreamRes.headers.getSetCookie === 'function'
+    // Process set-cookie headers
+    const rawCookies = typeof upstreamRes.headers.getSetCookie === 'function'
       ? upstreamRes.headers.getSetCookie()
       : null;
 
-    if (setCookies && setCookies.length > 0) {
-      res.setHeader('set-cookie', setCookies);
+    if (rawCookies && rawCookies.length > 0) {
+      const sanitized = rawCookies.map(sanitizeCookie);
+      res.setHeader('set-cookie', sanitized);
     }
 
+    // Forward headers except set-cookie, content-encoding, content-length
     upstreamRes.headers.forEach((val, key) => {
       const lowerKey = key.toLowerCase();
       if (lowerKey === 'set-cookie') {
-        if (!setCookies) {
-          res.setHeader('set-cookie', val);
+        if (!rawCookies) {
+          res.setHeader('set-cookie', sanitizeCookie(val));
         }
       } else if (lowerKey !== 'content-encoding' && lowerKey !== 'content-length') {
         res.setHeader(key, val);
