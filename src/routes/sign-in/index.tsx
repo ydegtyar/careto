@@ -86,7 +86,6 @@ function SignInPage() {
 
           <div className={styles.badgePill}>
             <SyncLockOutlinedIcon sx={{ fontSize: 13 }} />
-            <span>Glacier Edition • Offline Replicas</span>
           </div>
         </header>
 

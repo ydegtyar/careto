@@ -4,15 +4,39 @@ const NEON_AUTH_BASE = process.env.NEON_AUTH_BASE_URL || 'https://ep-old-queen-b
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    let rawUrl = (req.headers['x-forwarded-uri'] as string) || (req.headers['x-original-url'] as string) || req.url || '';
-    if (rawUrl.includes('[...all]')) {
-      const allParam = req.query.all;
-      const subpath = Array.isArray(allParam) ? allParam.join('/') : (allParam || '');
-      const queryString = req.url?.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
-      rawUrl = `/api/auth/${subpath}${queryString}`;
+    let subpath = '';
+
+    if (req.query.__path) {
+      subpath = Array.isArray(req.query.__path) ? req.query.__path.join('/') : (req.query.__path as string);
+    } else if (req.query.path) {
+      subpath = Array.isArray(req.query.path) ? req.query.path.join('/') : (req.query.path as string);
+    } else if (req.query.all) {
+      subpath = Array.isArray(req.query.all) ? req.query.all.join('/') : (req.query.all as string);
+    } else {
+      const rawUrl = (req.headers['x-forwarded-uri'] as string) || (req.headers['x-original-url'] as string) || req.url || '';
+      subpath = rawUrl.replace(/^\/api\/auth\/?/, '').split('?')[0] || '';
     }
-    const path = rawUrl.replace(/^\/api\/auth/, '');
-    const targetUrl = `${NEON_AUTH_BASE}${path}`;
+
+    if (!subpath.startsWith('/')) {
+      subpath = '/' + subpath;
+    }
+
+    // Build query string, omitting internal routing parameters
+    const searchParams = new URLSearchParams();
+    if (req.query) {
+      for (const [k, v] of Object.entries(req.query)) {
+        if (k !== '__path' && k !== 'path' && k !== 'all') {
+          if (Array.isArray(v)) {
+            for (const item of v) searchParams.append(k, item);
+          } else if (v !== undefined) {
+            searchParams.append(k, v);
+          }
+        }
+      }
+    }
+    const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
+
+    const targetUrl = `${NEON_AUTH_BASE}${subpath}${queryString}`;
 
     const reqOrigin = (req.headers['origin'] as string) || (req.headers['referer'] ? new URL(req.headers['referer'] as string).origin : 'https://careto.vercel.app');
 

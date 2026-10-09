@@ -8,6 +8,7 @@
     { "source": "/api/push/:action", "destination": "/api/push/[action]" },
     { "source": "/api/export/:action", "destination": "/api/export/[action]" },
     { "source": "/api/ai/:action", "destination": "/api/ai/[action]" },
+    { "source": "/api/auth/(.*)", "destination": "/api/auth/[...all]?__path=$1" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [
