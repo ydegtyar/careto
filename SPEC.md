@@ -192,9 +192,9 @@ Minimum readable: 11px
 - [x] Create `vite.config.ts` (React SWC, TanStack Router plugin, PWA `injectManifest`, SVGR, path alias `@/`)
 - [x] Create `tsconfig.json` (strict, noUncheckedIndexedAccess, verbatimModuleSyntax, paths `@/*`)
 - [x] Create `biome.json` (formatter + linter, 2-space indent, import sorting)
-- [ ] Create `eslint.config.js` (flat: typescript-eslint, react-hooks, jsx-a11y, tanstack query/router, `react/no-multi-comp`, `local/max-map-callback-lines`)
-- [ ] Create `eslint-rules/max-map-callback-lines.js` (local rule: JSX callbacks > 10 lines → error)
-- [ ] Create `.stylelintrc.json` (no hex in `.module.scss`, `@use` only, property order)
+- [x] Create `eslint.config.js` (flat: typescript-eslint, react-hooks, jsx-a11y, tanstack query/router, `react/no-multi-comp`, `local/max-map-callback-lines`)
+- [x] Create `eslint-rules/max-map-callback-lines.js` (local rule: JSX callbacks > 10 lines → error)
+- [x] Create `.stylelintrc.json` (no hex in `.module.scss`, `@use` only, property order)
 - [x] Create `.gitignore`
 - [x] Create `src/main.tsx` entry point (imports providers, global.scss, Inter font)
 - [x] Run `npm install` — zero errors, `package-lock.json` committed
@@ -408,12 +408,12 @@ Stitch: `b6135099397e4e70808808f61cdead74` + `1b1126734d304cd8aae6b69015675d52` 
 - [x] `api/auth/[...all].ts` — Neon Auth / Better Auth proxy with credentials and origin forwarding
 
 ### M3.2 — Dedicated Google OAuth Client (production)
-- [ ] Create/identify Google Cloud project for Careto
-- [ ] Create OAuth 2.0 Web client: authorized origins = `https://careto.vercel.app`, `http://localhost:5173`
-- [ ] Set `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` in Vercel env
-- [ ] Wire into Better Auth config: `socialProviders.google`
-- [ ] Test sign-in with Google on Vercel deploy → session cookie set correctly
-- [ ] `GoogleSignInButton` component: enable once HTTPS + client ID env var present
+- [x] Create/identify Google Cloud project for Careto
+- [x] Create OAuth 2.0 Web client: authorized origins = `https://careto.vercel.app`, `http://localhost:5173`
+- [x] Set `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` in Vercel env
+- [x] Wire into Better Auth config: `socialProviders.google` (configured on Neon Auth standard provider)
+- [x] Test sign-in with Google on Vercel deploy → session cookie set correctly
+- [x] `GoogleSignInButton` component: enable once HTTPS + client ID env var present
 
 ### M3.3 — Sync API
 - [x] `POST /api/sync/push` — validate, HLC merge, idempotency via `applied_ops`, per-column upsert, seq increment
