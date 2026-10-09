@@ -9,7 +9,7 @@ import { styles } from './AnalyticsFilterPillsBar.styles';
 
 export type TimeRangeMode = 'may2025' | 'ytd' | '6months' | 'all' | 'custom';
 
-export interface Props {
+interface Props {
   timeRange: TimeRangeMode;
   onTimeRangeChange: (mode: TimeRangeMode) => void;
   startDate: string;

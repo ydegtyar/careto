@@ -1,5 +1,4 @@
 import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router';
-import React from 'react';
 import { AppHeader } from '@/shared/ui/AppHeader/AppHeader';
 import { BottomNav } from '@/shared/ui/BottomNav/BottomNav';
 

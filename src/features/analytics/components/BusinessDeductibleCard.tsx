@@ -8,7 +8,7 @@ import { exportAnalyticsCSV, exportAnalyticsPDF } from '@/features/analytics/lib
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './BusinessDeductibleCard.styles';
 
-export interface Props {
+interface Props {
   entries: Entry[];
   vehicle?: Vehicle;
 }

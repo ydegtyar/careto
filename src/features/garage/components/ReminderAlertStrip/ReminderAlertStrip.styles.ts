@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export const getStackCardStyle = (index: number, total: number): CSSProperties => {
+export const getStackCardStyle = (index: number, _total: number): CSSProperties => {
   if (index === 0) {
     return {
       position: 'relative',

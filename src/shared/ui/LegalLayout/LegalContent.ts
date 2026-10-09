@@ -118,7 +118,7 @@ export const TERMS_OF_SERVICE_CONTENT: LegalDocumentContent = {
       number: '6.0',
       title: 'Indemnification',
       content: [
-        'You agree to defend, indemnify, and hold harmless Careto, its operators, officers, developers, and service providers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable legal and attorneys\' fees) arising out of or relating to:',
+        "You agree to defend, indemnify, and hold harmless Careto, its operators, officers, developers, and service providers from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable legal and attorneys' fees) arising out of or relating to:",
       ],
       listItems: [
         'Your violation of these Terms of Service or applicable laws',

@@ -9,11 +9,11 @@ import type React from 'react';
 import { useRef, useState } from 'react';
 import { type ExpenseParseResult, parseImageWithAi } from '../../lib/ai-client';
 
-interface ExpenseScannerProps {
+interface Props {
   onParsed: (data: ExpenseParseResult) => void;
 }
 
-export function ExpenseScanner({ onParsed }: ExpenseScannerProps) {
+export function ExpenseScanner({ onParsed }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{

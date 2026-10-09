@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useAppStore } from '@/app/store';
 import {
   AnalyticsFilterPillsBar,
@@ -38,7 +38,7 @@ function AnalyticsPage() {
     }
     if (timeRange === 'ytd') {
       const currentYear = new Date().getFullYear().toString();
-      return rawEntries.filter((e) => e.occurred_on && e.occurred_on.startsWith(currentYear));
+      return rawEntries.filter((e) => e.occurred_on?.startsWith(currentYear));
     }
     if (timeRange === '6months') {
       const sixMonthsAgo = new Date();
@@ -47,7 +47,7 @@ function AnalyticsPage() {
       return rawEntries.filter((e) => e.occurred_on && e.occurred_on >= isoStr);
     }
     if (timeRange === 'may2025') {
-      return rawEntries.filter((e) => e.occurred_on && e.occurred_on.startsWith('2025-05'));
+      return rawEntries.filter((e) => e.occurred_on?.startsWith('2025-05'));
     }
     if (timeRange === 'custom') {
       return rawEntries.filter((e) => {

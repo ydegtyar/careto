@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { GlassCard } from '../GlassCard/GlassCard';
 import styles from './StatCard.module.scss';
 

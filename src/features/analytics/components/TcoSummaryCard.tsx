@@ -7,7 +7,7 @@ import { computeTCO } from '@/features/analytics/lib/analytics-math';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './TcoSummaryCard.styles';
 
-export interface Props {
+interface Props {
   entries: Entry[];
   vehicle?: Vehicle;
 }

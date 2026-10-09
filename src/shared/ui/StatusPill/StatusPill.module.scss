@@ -2,16 +2,17 @@
 
 .pill {
   @include hit-area(36px);
+
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 9999px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border: 1px solid transparent;
 }
 
 .dot {
@@ -21,9 +22,10 @@
 }
 
 .ok {
-  background: rgba(125, 211, 252, 0.12);
+  background: rgb(125 211 252 / 12%);
   color: #7dd3fc;
-  border-color: rgba(125, 211, 252, 0.25);
+  border-color: rgb(125 211 252 / 25%);
+
   .dot {
     background: #7dd3fc;
     box-shadow: 0 0 6px #7dd3fc;
@@ -31,9 +33,10 @@
 }
 
 .upcoming {
-  background: rgba(200, 160, 240, 0.15);
+  background: rgb(200 160 240 / 15%);
   color: #c8a0f0;
-  border-color: rgba(200, 160, 240, 0.3);
+  border-color: rgb(200 160 240 / 30%);
+
   .dot {
     background: #c8a0f0;
     box-shadow: 0 0 6px #c8a0f0;
@@ -41,9 +44,10 @@
 }
 
 .due {
-  background: rgba(251, 191, 36, 0.15);
+  background: rgb(251 191 36 / 15%);
   color: #fbbf24;
-  border-color: rgba(251, 191, 36, 0.3);
+  border-color: rgb(251 191 36 / 30%);
+
   .dot {
     background: #fbbf24;
     box-shadow: 0 0 6px #fbbf24;
@@ -51,9 +55,10 @@
 }
 
 .overdue {
-  background: rgba(255, 107, 107, 0.18);
+  background: rgb(255 107 107 / 18%);
   color: #ff6b6b;
-  border-color: rgba(255, 107, 107, 0.35);
+  border-color: rgb(255 107 107 / 35%);
+
   .dot {
     background: #ff6b6b;
     box-shadow: 0 0 6px #ff6b6b;

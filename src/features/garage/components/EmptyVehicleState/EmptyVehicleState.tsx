@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { getAmbientGlowStyle, getOrbShadowStyle, styles } from './EmptyVehicleState.styles';
 
-export interface Props {
+interface Props {
   onAddVehicle?: () => void;
 }
 
@@ -143,21 +143,17 @@ export const EmptyVehicleState: React.FC<Props> = ({ onAddVehicle }) => {
             }}
           />
           <div style={styles.pillsScrollRow}>
-            {VEHICLE_TYPES.map((type, idx) => {
-              const PillIcon = type.icon;
-              const isActive = idx === currentIndex;
-              return (
-                <Button
-                  key={`${type.short}-${idx}`}
-                  onClick={() => handleSelectCategory(idx)}
-                  variant={isActive ? 'contained' : 'text'}
-                  startIcon={<PillIcon sx={{ fontSize: '14px !important' }} />}
-                  sx={isActive ? styles.activePillButton : styles.pillButton}
-                >
-                  {type.short}
-                </Button>
-              );
-            })}
+            {VEHICLE_TYPES.map((type, idx) => (
+              <Button
+                key={`${type.short}-${idx}`}
+                onClick={() => handleSelectCategory(idx)}
+                variant={idx === currentIndex ? 'contained' : 'text'}
+                startIcon={<type.icon sx={{ fontSize: '14px !important' }} />}
+                sx={idx === currentIndex ? styles.activePillButton : styles.pillButton}
+              >
+                {type.short}
+              </Button>
+            ))}
           </div>
         </div>
 

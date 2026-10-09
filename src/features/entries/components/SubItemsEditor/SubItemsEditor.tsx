@@ -1,11 +1,9 @@
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import type React from 'react';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
+import { SubItemRow } from './SubItemRow';
 
 export interface EditableSubItem {
   id: string;
@@ -14,7 +12,7 @@ export interface EditableSubItem {
   partNumber?: string;
 }
 
-export interface Props {
+interface Props {
   subItems: EditableSubItem[];
   onChange: (items: EditableSubItem[]) => void;
   onAutoSum: (totalCost: number) => void;
@@ -41,7 +39,7 @@ export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum 
 
   const calculatedTotal = subItems.reduce((acc, item) => {
     const val = parseFloat(item.cost);
-    return acc + (isNaN(val) ? 0 : val);
+    return acc + (Number.isNaN(val) ? 0 : val);
   }, 0);
 
   return (
@@ -85,43 +83,12 @@ export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum 
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {subItems.map((item) => (
-            <div key={item.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <TextField
-                placeholder="Item / Service Name (e.g. Oil Filter)"
-                value={item.name}
-                onChange={(e) => handleUpdateItem(item.id, 'name', e.target.value)}
-                fullWidth
-                size="small"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                  },
-                }}
-              />
-              <TextField
-                placeholder="Cost"
-                type="number"
-                value={item.cost}
-                onChange={(e) => handleUpdateItem(item.id, 'cost', e.target.value)}
-                size="small"
-                sx={{
-                  width: 110,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                  },
-                }}
-              />
-              <IconButton
-                size="small"
-                onClick={() => handleRemoveItem(item.id)}
-                aria-label="remove sub-item"
-                sx={{ color: 'error.main' }}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </div>
+            <SubItemRow
+              key={item.id}
+              item={item}
+              onUpdate={handleUpdateItem}
+              onRemove={handleRemoveItem}
+            />
           ))}
         </div>
       )}

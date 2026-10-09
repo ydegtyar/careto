@@ -8,11 +8,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import SendIcon from '@mui/icons-material/Send';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import Link from '@mui/material/Link';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
@@ -28,6 +24,7 @@ import {
   subscribeToPush,
   unsubscribeFromPush,
 } from '@/features/reminders/lib/push-client';
+import { CurrencyChip } from '@/features/settings/components/CurrencyChip/CurrencyChip';
 import { DistanceUnitCard } from '@/features/settings/components/DistanceUnitCard/DistanceUnitCard';
 import { SyncStatusCard } from '@/features/settings/components/SyncStatusCard/SyncStatusCard';
 import { ThemeSelectionCard } from '@/features/settings/components/ThemeSelectionCard/ThemeSelectionCard';
@@ -61,7 +58,7 @@ function SettingsPage() {
   };
 
   const [useMiles, setUseMiles] = useState(false);
-  const [offlineSync, setOfflineSync] = useState(true);
+  const [_offlineSync, _setOfflineSync] = useState(true);
 
   // Push Notifications state
   const [pushSupported, setPushSupported] = useState(false);
@@ -289,25 +286,14 @@ function SettingsPage() {
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-            {ALL_CURRENCIES.map((item) => {
-              const isFav = favoriteCurrencies.includes(item.code);
-              return (
-                <Chip
-                  key={item.code}
-                  label={`${item.code} (${item.symbol})`}
-                  onClick={() => handleToggleFavoriteCurrency(item.code)}
-                  variant={isFav ? 'filled' : 'outlined'}
-                  sx={{
-                    borderRadius: '12px',
-                    fontWeight: 600,
-                    fontSize: '0.8rem',
-                    backgroundColor: isFav ? 'rgba(125, 211, 252, 0.2)' : 'transparent',
-                    borderColor: isFav ? 'primary.main' : 'rgba(125, 211, 252, 0.15)',
-                    color: isFav ? 'primary.main' : 'text.secondary',
-                  }}
-                />
-              );
-            })}
+            {ALL_CURRENCIES.map((item) => (
+              <CurrencyChip
+                key={item.code}
+                item={item}
+                isFav={favoriteCurrencies.includes(item.code)}
+                onToggle={handleToggleFavoriteCurrency}
+              />
+            ))}
           </div>
         </GlassCard>
 
@@ -402,24 +388,17 @@ function SettingsPage() {
           </Typography>
         </div>
         <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
-          Careto is operating under legal terms and privacy protections. Read our documentation below:
+          Careto is operating under legal terms and privacy protections. Read our documentation
+          below:
         </Typography>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 4 }}>
           <RouterLink to="/terms" style={{ textDecoration: 'none' }}>
-            <Button
-              size="small"
-              variant="outlined"
-              sx={{ textTransform: 'none', borderRadius: 2 }}
-            >
+            <Button size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: 2 }}>
               Terms of Service
             </Button>
           </RouterLink>
           <RouterLink to="/privacy" style={{ textDecoration: 'none' }}>
-            <Button
-              size="small"
-              variant="outlined"
-              sx={{ textTransform: 'none', borderRadius: 2 }}
-            >
+            <Button size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: 2 }}>
               Privacy Policy
             </Button>
           </RouterLink>

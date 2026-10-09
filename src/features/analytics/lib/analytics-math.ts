@@ -66,7 +66,7 @@ export function computeTCO(entries: Entry[], vehicle?: Vehicle): TcoSummary {
     const amt = entry.usd_minor ?? entry.amount_minor ?? 0;
     totalSpentMinor += amt;
 
-    if (entry.occurred_on && entry.occurred_on.startsWith(currentYearMonth)) {
+    if (entry.occurred_on?.startsWith(currentYearMonth)) {
       monthTotalMinor += amt;
     }
 
@@ -207,7 +207,7 @@ export function computeMonthlyTrends(entries: Entry[], numMonths = 6): MonthlyTr
     let admin = 0;
 
     for (const e of entries) {
-      if (e.occurred_on && e.occurred_on.startsWith(monthKey)) {
+      if (e.occurred_on?.startsWith(monthKey)) {
         const amt = (e.usd_minor ?? e.amount_minor ?? 0) / 100;
         if (e.kind === 'refuel' || e.kind === 'charge' || e.category_id === 'fuel') {
           fuel += amt;

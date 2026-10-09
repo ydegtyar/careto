@@ -9,11 +9,11 @@ import type React from 'react';
 import { useRef, useState } from 'react';
 import { parseImageWithAi, type VinParseResult } from '../../lib/ai-client';
 
-interface VinScannerProps {
+interface Props {
   onParsed: (data: VinParseResult) => void;
 }
 
-export function VinScanner({ onParsed }: VinScannerProps) {
+export function VinScanner({ onParsed }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{

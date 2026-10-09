@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
-import React from 'react';
 import type { Reminder } from '@/data/client/types';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { type StatusLevel, StatusPill } from '@/shared/ui/StatusPill/StatusPill';

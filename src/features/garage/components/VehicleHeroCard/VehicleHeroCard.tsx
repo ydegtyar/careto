@@ -1,11 +1,5 @@
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import ElectricCarIcon from '@mui/icons-material/ElectricCar';
-import ShareIcon from '@mui/icons-material/Share';
-import Chip from '@mui/material/Chip';
-import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
-import React from 'react';
 import type { Vehicle } from '@/data/client/types';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import styles from './VehicleHeroCard.module.scss';

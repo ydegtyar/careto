@@ -1,12 +1,12 @@
 import type React from 'react';
 
-export interface CaretoLogoProps extends React.SVGProps<SVGSVGElement> {
+interface Props extends React.SVGProps<SVGSVGElement> {
   size?: number | string;
   variant?: 'emblem' | 'full';
   animated?: boolean;
 }
 
-export const CaretoLogo: React.FC<CaretoLogoProps> = ({
+export const CaretoLogo: React.FC<Props> = ({
   size = 32,
   variant = 'emblem',
   animated = true,

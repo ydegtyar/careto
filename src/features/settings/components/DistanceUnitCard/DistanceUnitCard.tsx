@@ -6,7 +6,7 @@ import type React from 'react';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { cardStyle, headerContainerStyle, toggleButtonGroupSx } from './DistanceUnitCard.styles';
 
-export interface Props {
+interface Props {
   useMiles: boolean;
   onUseMilesChange: (useMiles: boolean) => void;
 }

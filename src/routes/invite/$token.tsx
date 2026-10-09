@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 

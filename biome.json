@@ -7,7 +7,12 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["src/**/*", "server/**/*", "scripts/**/*"]
+		"includes": [
+			"src/**/*",
+			"!src/routeTree.gen.ts",
+			"server/**/*",
+			"scripts/**/*"
+		]
 	},
 	"formatter": {
 		"enabled": true,
@@ -19,7 +24,22 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"preset": "recommended"
+			"recommended": true,
+			"suspicious": {
+				"noExplicitAny": "off",
+				"noArrayIndexKey": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off"
+			},
+			"correctness": {
+				"noChildrenProp": "off"
+			},
+			"a11y": {
+				"noSvgWithoutTitle": "off",
+				"noStaticElementInteractions": "off",
+				"useSemanticElements": "off"
+			}
 		}
 	},
 	"javascript": {

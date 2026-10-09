@@ -1,7 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import BuildIcon from '@mui/icons-material/Build';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
-import DeleteIcon from '@mui/icons-material/Delete';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import ElectricCarIcon from '@mui/icons-material/ElectricCar';
 import EvStationIcon from '@mui/icons-material/EvStation';
@@ -22,14 +21,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type React from 'react';
 import { useState } from 'react';
 import { useExpenseCategories } from '@/features/entries/lib/useExpenseCategories';
+import { CategoryChip } from './CategoryChip';
 import { getChipSx, styles } from './CategoryPicker.styles';
+import { IconSelectButton } from './IconSelectButton';
 
 export const AVAILABLE_ICONS = [
   { name: 'Shield', label: 'Shield', Icon: ShieldIcon },
@@ -56,7 +55,7 @@ export function renderCategoryIcon(iconName: string) {
   return <IconComponent sx={{ fontSize: 18 }} />;
 }
 
-export interface Props {
+interface Props {
   category: string;
   onSelectCategory: (categoryId: string) => void;
 }
@@ -108,21 +107,17 @@ export const CategoryPicker: React.FC<Props> = ({ category, onSelectCategory }) 
         Category
       </Typography>
       <div style={styles.chipGroup}>
-        {categories.map((cat) => {
-          const isSelected = category === cat.id;
-          return (
-            <Chip
-              key={cat.id}
-              icon={renderCategoryIcon(cat.iconName)}
-              label={cat.label}
-              onClick={() => onSelectCategory(cat.id)}
-              onDelete={!cat.isDefault ? (e) => handleRemoveCategory(e, cat.id) : undefined}
-              deleteIcon={!cat.isDefault ? <DeleteIcon sx={{ fontSize: 16 }} /> : undefined}
-              variant={isSelected ? 'filled' : 'outlined'}
-              sx={getChipSx(isSelected)}
-            />
-          );
-        })}
+        {categories.map((cat) => (
+          <CategoryChip
+            key={cat.id}
+            cat={cat}
+            isSelected={category === cat.id}
+            onSelect={onSelectCategory}
+            onRemove={handleRemoveCategory}
+            renderIcon={renderCategoryIcon}
+            getChipSx={getChipSx}
+          />
+        ))}
 
         <Chip
           icon={<AddIcon sx={{ fontSize: 18 }} />}
@@ -164,7 +159,6 @@ export const CategoryPicker: React.FC<Props> = ({ category, onSelectCategory }) 
         <DialogTitle sx={{ fontWeight: 700, fontSize: '1.1rem' }}>Add Custom Category</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
           <TextField
-            autoFocus
             label="Category Name"
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
@@ -186,30 +180,16 @@ export const CategoryPicker: React.FC<Props> = ({ category, onSelectCategory }) 
               Choose Icon
             </Typography>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-              {AVAILABLE_ICONS.map(({ name, label, Icon }) => {
-                const isSelected = selectedIconName === name;
-                return (
-                  <Tooltip title={label} key={name}>
-                    <IconButton
-                      onClick={() => setSelectedIconName(name)}
-                      sx={{
-                        borderRadius: 3,
-                        border: '1px solid',
-                        borderColor: isSelected ? 'primary.main' : 'rgba(125, 211, 252, 0.15)',
-                        backgroundColor: isSelected
-                          ? 'rgba(125, 211, 252, 0.2)'
-                          : 'rgba(15, 21, 36, 0.4)',
-                        color: isSelected ? 'primary.main' : 'text.secondary',
-                        '&:hover': {
-                          backgroundColor: 'rgba(125, 211, 252, 0.1)',
-                        },
-                      }}
-                    >
-                      <Icon sx={{ fontSize: 22 }} />
-                    </IconButton>
-                  </Tooltip>
-                );
-              })}
+              {AVAILABLE_ICONS.map(({ name, label, Icon }) => (
+                <IconSelectButton
+                  key={name}
+                  name={name}
+                  label={label}
+                  Icon={Icon}
+                  isSelected={selectedIconName === name}
+                  onSelect={setSelectedIconName}
+                />
+              ))}
             </div>
           </div>
         </DialogContent>

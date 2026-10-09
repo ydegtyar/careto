@@ -2,10 +2,11 @@
 
 .root {
   @include glass(20px, 0.92);
-  background: color-mix(in srgb, var(--mui-palette-background-paper, #0f1524) 92%, #0a0e1a) !important;
-  border-bottom: none;
-  color: var(--mui-palette-text-primary, #e0e8f0) !important;
+
   z-index: 1100;
+  background: color-mix(in srgb, var(--mui-palette-background-paper, #0f1524) 92%, #0a0e1a) !important;
+  color: var(--mui-palette-text-primary, #e0e8f0) !important;
+  border-bottom: none;
 }
 
 .toolbar {
@@ -14,50 +15,49 @@
 }
 
 .title {
-  font-weight: 700 !important;
-  font-size: 1.15rem !important;
-  letter-spacing: -0.3px !important;
-  text-align: center;
   color: var(--mui-palette-text-primary, #e0e8f0);
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  text-align: center;
+  letter-spacing: -0.3px !important;
 }
 
 .side {
-  min-width: 44px;
   display: flex;
   align-items: center;
+  min-width: 44px;
 }
 
 .carSelectorContainer {
   display: flex;
-  align-items: center;
   flex: 1;
   justify-content: flex-start;
+  align-items: center;
   margin-left: 12px;
 }
 
 .carSelectorButton {
-  flex: 0 1 auto;
-  max-width: 440px;
-  background: rgba(15, 21, 36, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(125, 211, 252, 0.2);
-  border-radius: 20px;
-  padding: 6px 14px 6px 8px;
   display: flex;
-  align-items: center;
+  flex: 0 1 auto;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
+  max-width: 440px;
+  padding: 6px 14px 6px 8px;
+  background: rgb(15 21 36 / 70%);
   color: #e0e8f0;
-  cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
+  border: 1px solid rgb(125 211 252 / 20%);
+  border-radius: 20px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(16px);
+  cursor: pointer;
 
   &:hover {
-    background: rgba(15, 21, 36, 0.85);
-    border-color: rgba(125, 211, 252, 0.4);
-    box-shadow: 0 0 16px rgba(125, 211, 252, 0.15);
+    background: rgb(15 21 36 / 85%);
+    border-color: rgb(125 211 252 / 40%);
+    box-shadow: 0 0 16px rgb(125 211 252 / 15%);
   }
 
   &:active {
@@ -66,15 +66,15 @@
 }
 
 .avatarBox {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
   width: 32px;
   height: 32px;
+  background: rgb(15 25 45 / 80%);
+  border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 10px;
-  background: rgba(15, 25, 45, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 
 .carIcon {
@@ -98,54 +98,54 @@
 }
 
 .carSubtext {
-  font-size: 0.7rem;
+  max-width: 140px;
   color: #94a3b8;
   font-family: monospace;
+  font-size: 0.7rem;
   line-height: 1.1;
-  max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .arrowIcon {
-  font-size: 16px !important;
   color: #a0b4c4;
+  font-size: 16px !important;
   transition: transform 0.2s ease;
 }
 
 .carMenuPaper {
-  background-color: rgba(11, 16, 28, 0.92) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1px solid rgba(125, 211, 252, 0.2) !important;
-  border-radius: 20px !important;
-  color: #e0e8f0 !important;
-  //width: 100%;
+  // width: 100%;
   min-width: 320px !important;
-  //max-width: 440px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(125, 211, 252, 0.08) !important;
+  background-color: rgb(11 16 28 / 92%) !important;
+  color: #e0e8f0 !important;
+  border: 1px solid rgb(125 211 252 / 20%) !important;
+  border-radius: 20px !important;
+
+  // max-width: 440px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 60%), 0 0 24px rgb(125 211 252 / 8%) !important;
+  backdrop-filter: blur(24px) !important;
 }
 
 .badgeOnline {
+  padding: 1px 6px;
+  background: rgb(56 189 248 / 12%);
+  color: #38bdf8;
   font-size: 0.62rem;
   font-weight: 700;
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  padding: 1px 6px;
+  border: 1px solid rgb(56 189 248 / 25%);
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
 .badgeTag {
+  padding: 1px 6px;
+  background: rgb(148 163 184 / 12%);
+  color: #94a3b8;
   font-size: 0.62rem;
   font-weight: 700;
-  color: #94a3b8;
-  background: rgba(148, 163, 184, 0.12);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  padding: 1px 6px;
+  border: 1px solid rgb(148 163 184 / 20%);
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.3px;

@@ -3,13 +3,13 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import PrintIcon from '@mui/icons-material/Print';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import Button from '@mui/material/Button';
 import { Link, useNavigate } from '@tanstack/react-router';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import type { LegalDocumentContent } from './LegalContent';
 import styles from './LegalLayout.module.scss';
+import { LegalSectionView } from './LegalSectionView';
 
 interface Props {
   document: LegalDocumentContent;
@@ -18,9 +18,7 @@ interface Props {
 
 export const LegalLayout: React.FC<Props> = ({ document, docType }) => {
   const navigate = useNavigate();
-  const [activeSectionId, setActiveSectionId] = useState<string>(
-    document.sections[0]?.id ?? ''
-  );
+  const [activeSectionId, setActiveSectionId] = useState<string>(document.sections[0]?.id ?? '');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -152,20 +150,14 @@ export const LegalLayout: React.FC<Props> = ({ document, docType }) => {
           <nav className={styles.tocBox} aria-label="Table of Contents">
             <div className={styles.tocTitle}>Table of Contents</div>
             <ul className={styles.tocList}>
-              {document.sections.map((section) => (
-                <li key={section.id}>
+              {document.sections.map((s) => (
+                <li key={s.id}>
                   <a
-                    href={`#${section.id}`}
-                    className={`${styles.tocLink} ${
-                      activeSectionId === section.id ? styles.active : ''
-                    }`}
+                    href={`#${s.id}`}
+                    className={`${styles.tocLink} ${activeSectionId === s.id ? styles.active : ''}`}
                   >
-                    {section.number && (
-                      <span style={{ marginRight: 6, opacity: 0.7 }}>
-                        {section.number}
-                      </span>
-                    )}
-                    {section.title}
+                    {s.number ? `${s.number} ` : ''}
+                    {s.title}
                   </a>
                 </li>
               ))}
@@ -176,62 +168,7 @@ export const LegalLayout: React.FC<Props> = ({ document, docType }) => {
         {/* Main Content Article */}
         <article className={styles.article}>
           {document.sections.map((section) => (
-            <section key={section.id} id={section.id} className={styles.section}>
-              {section.number && (
-                <span className={styles.sectionNumber}>Section {section.number}</span>
-              )}
-              <h2 className={styles.sectionTitle}>{section.title}</h2>
-
-              <div className={styles.sectionBody}>
-                {section.content.map((paragraph, idx) => (
-                  <p key={`${section.id}-p-${idx}`}>{paragraph}</p>
-                ))}
-
-                {section.listItems && section.listItems.length > 0 && (
-                  <ul>
-                    {section.listItems.map((item, idx) => (
-                      <li key={`${section.id}-item-${idx}`}>{item}</li>
-                    ))}
-                  </ul>
-                )}
-
-                {section.warningNote && (
-                  <div className={styles.warningBox}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        fontWeight: 700,
-                        marginBottom: 4,
-                      }}
-                    >
-                      <WarningAmberIcon fontSize="small" />
-                      <span>Legal Disclaimer & Warning</span>
-                    </div>
-                    {section.warningNote}
-                  </div>
-                )}
-
-                {section.infoNote && (
-                  <div className={styles.infoBox}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        fontWeight: 700,
-                        marginBottom: 4,
-                      }}
-                    >
-                      <InfoOutlinedIcon fontSize="small" />
-                      <span>Notice</span>
-                    </div>
-                    {section.infoNote}
-                  </div>
-                )}
-              </div>
-            </section>
+            <LegalSectionView key={section.id} section={section} />
           ))}
         </article>
       </div>

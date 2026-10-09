@@ -12,7 +12,7 @@ import { useGeolocation } from '@/shared/lib/use-geolocation';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './EntryDetailsLocationCard.styles';
 
-export interface Props {
+interface Props {
   date: string;
   onDateChange: (val: string) => void;
   odometerKm: string;

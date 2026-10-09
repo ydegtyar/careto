@@ -13,31 +13,32 @@
 
 .scrollList {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 8px;
   white-space: nowrap;
 }
 
 .chip {
   @include glass(12px, 0.5);
-  font-weight: 600 !important;
-  color: var(--mui-palette-text-secondary, #a0b4c4) !important;
-  border-radius: 9999px !important;
+
   height: 36px !important;
   padding: 0 4px;
+  color: var(--mui-palette-text-secondary, #a0b4c4) !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
   transition: all 0.2s ease;
 
   &.active {
-    background: rgba(125, 211, 252, 0.15) !important;
+    background: rgb(125 211 252 / 15%) !important;
     color: var(--mui-palette-primary-main, #7dd3fc) !important;
-    border-color: rgba(125, 211, 252, 0.4) !important;
-    box-shadow: 0 0 12px rgba(125, 211, 252, 0.2);
+    border-color: rgb(125 211 252 / 40%) !important;
+    box-shadow: 0 0 12px rgb(125 211 252 / 20%);
   }
 }
 
 .addChip {
   height: 36px !important;
-  border-radius: 9999px !important;
-  border-color: rgba(125, 211, 252, 0.2) !important;
   color: var(--mui-palette-primary-main, #7dd3fc) !important;
+  border-radius: 9999px !important;
+  border-color: rgb(125 211 252 / 20%) !important;
 }

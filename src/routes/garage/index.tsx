@@ -1,5 +1,4 @@
 import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import React, { Suspense } from 'react';
@@ -8,7 +7,6 @@ import { ActivityFeed } from '@/features/garage/components/ActivityFeed/Activity
 import { QuickActions } from '@/features/garage/components/QuickActions/QuickActions';
 import { ReminderAlertStrip } from '@/features/garage/components/ReminderAlertStrip/ReminderAlertStrip';
 import { VehicleHeroCard } from '@/features/garage/components/VehicleHeroCard/VehicleHeroCard';
-import { VehicleSwitcher } from '@/features/garage/components/VehicleSwitcher/VehicleSwitcher';
 import {
   entriesQueryOptions,
   remindersQueryOptions,
@@ -75,9 +73,7 @@ function GaragePage() {
 
   // 2. This Month's Spending
   const currentYearMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-  const thisMonthEntries = entries.filter(
-    (e) => e.occurred_on && e.occurred_on.startsWith(currentYearMonth),
-  );
+  const thisMonthEntries = entries.filter((e) => e.occurred_on?.startsWith(currentYearMonth));
   const thisMonthSpentMinor = thisMonthEntries.reduce(
     (sum, e) => sum + (e.usd_minor ?? e.amount_minor ?? 0),
     0,
@@ -97,7 +93,7 @@ function GaragePage() {
   // 4. Efficiency
   const isEv = activeVehicle.powertrain === 'ev';
   const defaultEfficiency = isEv ? '18.2' : '7.5';
-  const defaultEfficiencyUnit = isEv ? 'kWh/100km' : 'L/100km';
+  const _defaultEfficiencyUnit = isEv ? 'kWh/100km' : 'L/100km';
 
   return (
     <div

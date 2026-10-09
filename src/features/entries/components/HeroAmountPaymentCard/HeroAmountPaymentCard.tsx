@@ -14,8 +14,9 @@ import {
 } from '@/shared/lib/currencies';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './HeroAmountPaymentCard.styles';
+import { PaymentOptionButton } from './PaymentOptionButton';
 
-export interface Props {
+interface Props {
   amount: string;
   onAmountChange: (val: string) => void;
   currency: string;
@@ -96,7 +97,6 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
           value={amount}
           onChange={(e) => onAmountChange(e.target.value)}
           placeholder="0.00"
-          autoFocus
           style={styles.amountInput}
         />
       </div>
@@ -104,32 +104,17 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
       {/* Payment Method Selector (Button Group with Icons) */}
       <div style={styles.paymentSection}>
         <div style={styles.paymentButtonGroup}>
-          {PAYMENT_OPTIONS.map(({ id, label, icon: Icon }) => {
-            const isSelected = paymentMethod === id;
-            return (
-              <div
-                key={id}
-                role="button"
-                tabIndex={0}
-                onClick={() => handlePaymentSelect(id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handlePaymentSelect(id);
-                  }
-                }}
-                style={styles.paymentOptionButton(isSelected)}
-              >
-                <Icon sx={{ fontSize: 18 }} />
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: '0.8rem', fontWeight: isSelected ? 700 : 500 }}
-                >
-                  {label}
-                </Typography>
-              </div>
-            );
-          })}
+          {PAYMENT_OPTIONS.map(({ id, label, icon }) => (
+            <PaymentOptionButton
+              key={id}
+              id={id}
+              label={label}
+              icon={icon}
+              isSelected={paymentMethod === id}
+              onSelect={handlePaymentSelect}
+              styleFn={styles.paymentOptionButton}
+            />
+          ))}
         </div>
       </div>
     </GlassCard>

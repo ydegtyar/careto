@@ -8,7 +8,7 @@ import { computePriceVolatility } from '@/features/analytics/lib/analytics-math'
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './PriceVolatilityCard.styles';
 
-export interface Props {
+interface Props {
   entries: Entry[];
 }
 

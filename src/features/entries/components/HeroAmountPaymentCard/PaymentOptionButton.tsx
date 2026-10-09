@@ -1,0 +1,39 @@
+import Typography from '@mui/material/Typography';
+import type React from 'react';
+
+interface Props {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  styleFn: (isSelected: boolean) => React.CSSProperties;
+}
+
+export function PaymentOptionButton({
+  id,
+  label,
+  icon: Icon,
+  isSelected,
+  onSelect,
+  styleFn,
+}: Props) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(id)}
+      style={{
+        ...styleFn(isSelected),
+        background: 'none',
+        border: 'none',
+        font: 'inherit',
+        cursor: 'pointer',
+      }}
+    >
+      <Icon sx={{ fontSize: 18 }} />
+      <Typography variant="body2" sx={{ fontSize: '0.8rem', fontWeight: isSelected ? 700 : 500 }}>
+        {label}
+      </Typography>
+    </button>
+  );
+}

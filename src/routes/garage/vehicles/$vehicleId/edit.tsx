@@ -1,7 +1,7 @@
 import Typography from '@mui/material/Typography';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { data } from '@/data/client';
 import { vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import {

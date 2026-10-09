@@ -10,9 +10,7 @@ import type React from 'react';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { cardStyle, headerContainerStyle, toggleButtonGroupSx } from './ThemeSelectionCard.styles';
 
-export type Props = {};
-
-export const ThemeSelectionCard: React.FC<Props> = () => {
+export const ThemeSelectionCard: React.FC = () => {
   const { mode, setMode } = useColorScheme();
   const currentThemeMode = mode || 'system';
 

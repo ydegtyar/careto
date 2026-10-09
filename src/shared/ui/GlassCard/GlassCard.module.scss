@@ -2,22 +2,23 @@
 
 .root {
   @include glass(16px, 0.6);
-  border-radius: 16px;
-  padding: 16px;
+
   position: relative;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgb(125 211 252 / 5%);
   overflow: hidden;
-  box-shadow: 0 0 30px rgba(125, 211, 252, 0.05);
 
   &::before {
-    content: '';
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
     background: linear-gradient(
       135deg,
       color-mix(in srgb, var(--mui-palette-primary-main, #7dd3fc) 6%, transparent),
       transparent 60%
     );
+    border-radius: inherit;
+    content: '';
+    inset: 0;
     pointer-events: none;
   }
 }

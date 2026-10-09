@@ -7,7 +7,7 @@ import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { type StatusLevel, StatusPill } from '@/shared/ui/StatusPill/StatusPill';
 import { getStackCardStyle, styles } from './ReminderAlertStrip.styles';
 
-export interface Props {
+interface Props {
   reminders: Reminder[];
   currentOdometerM?: number;
   currentDate?: string;
@@ -82,7 +82,18 @@ export const ReminderAlertStrip: React.FC<Props> = ({
   const backgroundCards = evaluated.slice(1, 3);
 
   return (
-    <div style={styles.stackWrapper} onClick={handleClick} role="button" tabIndex={0}>
+    <div
+      style={styles.stackWrapper}
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+    >
       {/* Background stacked cards for visual depth */}
       {backgroundCards.map((_, idx) => (
         <GlassCard key={idx} style={getStackCardStyle(idx + 1, count)}>

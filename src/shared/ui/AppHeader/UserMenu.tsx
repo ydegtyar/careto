@@ -9,10 +9,10 @@ import MenuItem from '@mui/material/MenuItem';
 import { useRouter } from '@tanstack/react-router';
 import type React from 'react';
 import { useState } from 'react';
-import { useSession, signOut } from '@/lib/auth-client';
+import { signOut, useSession } from '@/lib/auth-client';
 import { styles } from './UserMenu.styles';
 
-export interface Props {
+interface Props {
   userName?: string;
   userEmail?: string;
 }
@@ -20,10 +20,14 @@ export interface Props {
 function getInitials(name?: string | null, email?: string | null): string {
   if (name && name.trim().length > 0) {
     const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return `${parts[0]![0]}${parts[parts.length - 1]![0]}`.toUpperCase();
+    const first = parts[0];
+    const last = parts[parts.length - 1];
+    if (parts.length >= 2 && first && last) {
+      return `${first[0]}${last[0]}`.toUpperCase();
     }
-    return parts[0]!.slice(0, 2).toUpperCase();
+    if (first) {
+      return first.slice(0, 2).toUpperCase();
+    }
   }
   if (email && email.trim().length > 0) {
     return email.trim().slice(0, 2).toUpperCase();

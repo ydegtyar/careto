@@ -7,9 +7,7 @@ import { useState } from 'react';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './ConsumptionAnomalyBanner.styles';
 
-export type Props = {};
-
-export const ConsumptionAnomalyBanner: React.FC<Props> = () => {
+export const ConsumptionAnomalyBanner: React.FC = () => {
   const [anomalyDismissed, setAnomalyDismissed] = useState(false);
 
   if (anomalyDismissed) {

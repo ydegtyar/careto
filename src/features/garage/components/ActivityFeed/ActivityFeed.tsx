@@ -17,15 +17,18 @@ import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useQueryClient } from '@tanstack/react-query';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { data } from '@/data/client';
 import type { Entry } from '@/data/client/types';
 import { convertToUsdMinor } from '@/shared/lib/currencies';
 import styles from './ActivityFeed.module.scss';
+import { ActivityItemRow } from './ActivityItemRow';
 
 interface Props {
   entries: Entry[];
 }
+
+export type EntryRecord = Entry;
 
 export function ActivityFeed({ entries }: Props) {
   const queryClient = useQueryClient();
@@ -42,7 +45,7 @@ export function ActivityFeed({ entries }: Props) {
   const [editOdometerKm, setEditOdometerKm] = useState('');
   const [editDate, setEditDate] = useState('');
 
-  const getIcon = (kind: Entry['kind']) => {
+  const getIcon = (kind: string) => {
     switch (kind) {
       case 'refuel':
       case 'charge':
@@ -56,8 +59,8 @@ export function ActivityFeed({ entries }: Props) {
     }
   };
 
-  const formatAmount = (entry: Entry) => {
-    if (!entry.amount_minor || !entry.currency) return null;
+  const formatAmount = (entry: Entry): string => {
+    if (!entry.amount_minor || !entry.currency) return '';
     return `${(entry.amount_minor / 100).toFixed(2)} ${entry.currency}`;
   };
 
@@ -135,32 +138,13 @@ export function ActivityFeed({ entries }: Props) {
           </Typography>
         ) : (
           entries.map((entry) => (
-            <div key={entry.id} className={styles.item} onClick={() => handleOpenDetail(entry)}>
-              <div className={`${styles.iconDisc} ${styles[entry.kind]}`}>
-                {getIcon(entry.kind)}
-              </div>
-              <div className={styles.details}>
-                <Typography variant="body2" sx={{ fontWeight: 600, textTransform: 'capitalize' }}>
-                  {entry.kind}
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {entry.occurred_on}
-                  {entry.odometer_m && ` · ${(entry.odometer_m / 1000).toLocaleString()} km`}
-                </Typography>
-              </div>
-              {entry.amount_minor && (
-                <div className={styles.amount}>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                    {formatAmount(entry)}
-                  </Typography>
-                  {entry.usd_minor && entry.currency !== 'USD' && (
-                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                      ≈ ${(entry.usd_minor / 100).toFixed(2)}
-                    </Typography>
-                  )}
-                </div>
-              )}
-            </div>
+            <ActivityItemRow
+              key={entry.id}
+              entry={entry}
+              onOpen={handleOpenDetail}
+              getIcon={getIcon}
+              formatAmount={formatAmount}
+            />
           ))
         )}
       </div>

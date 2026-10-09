@@ -28,6 +28,7 @@ import {
 } from '@/features/entries/components/EntryKindSelector/EntryKindSelector';
 import { FuelGradeSelector } from '@/features/entries/components/FuelGradeSelector/FuelGradeSelector';
 import { HeroAmountPaymentCard } from '@/features/entries/components/HeroAmountPaymentCard/HeroAmountPaymentCard';
+import { RecurringIntervalButton } from '@/features/entries/components/RecurringIntervalButton/RecurringIntervalButton';
 import {
   type EditableSubItem,
   SubItemsEditor,
@@ -67,7 +68,7 @@ function NewEntryPage() {
   const tanks = activeVehicle?.tanks || [];
 
   const [lastUsedCurrency, setLastUsedCurrency] = useLastUsedCurrency();
-  const [lastUsedPaymentMethod, setLastUsedPaymentMethod] = useLastUsedPaymentMethod();
+  const [lastUsedPaymentMethod, _setLastUsedPaymentMethod] = useLastUsedPaymentMethod();
   const [lastUsedFuelGrade, setLastUsedFuelGrade] = useLastUsedFuelGrade();
   const [lastPricesPerGrade, setLastPricesPerGrade] = useLastPricesPerFuelGrade();
 
@@ -95,25 +96,25 @@ function NewEntryPage() {
   const [lat, setLat] = useState<number | null>(null);
   const [lon, setLon] = useState<number | null>(null);
   const [subItems, setSubItems] = useState<EditableSubItem[]>([]);
-  const [receiptImage, setReceiptImage] = useState<CompressedImage | null>(null);
+  const [_receiptImage, setReceiptImage] = useState<CompressedImage | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (tanks.length > 0 && !tanks.some((t) => t.id === selectedTankId)) {
-      setSelectedTankId(tanks[0]!.id);
-      if (tanks[0]!.primary_fuel_grade) {
-        setFuelGrade(tanks[0]!.primary_fuel_grade);
-      }
-    }
-  }, [tanks, selectedTankId]);
+  const effectiveTankId =
+    tanks.length > 0 && !tanks.some((t) => t.id === selectedTankId) ? tanks[0]?.id : selectedTankId;
 
-  useEffect(() => {
-    if (activeVehicle?.fuel_grades && activeVehicle.fuel_grades.length > 0) {
-      if (!activeVehicle.fuel_grades.includes(fuelGrade)) {
-        setFuelGrade(activeVehicle.fuel_grades[0]!);
-      }
+  const _effectiveFuelGrade = (() => {
+    if (tanks.length > 0 && tanks[0]?.id === effectiveTankId && tanks[0]?.primary_fuel_grade) {
+      return tanks[0]?.primary_fuel_grade;
     }
-  }, [activeVehicle, fuelGrade]);
+    if (
+      activeVehicle?.fuel_grades &&
+      activeVehicle.fuel_grades.length > 0 &&
+      !activeVehicle.fuel_grades.includes(fuelGrade)
+    ) {
+      return activeVehicle.fuel_grades[0]!;
+    }
+    return fuelGrade;
+  })();
 
   useEffect(() => {
     async function loadSharedData() {
@@ -162,7 +163,7 @@ function NewEntryPage() {
     if (searchParams.shared || typeof window !== 'undefined') {
       loadSharedData();
     }
-  }, [searchParams.shared]);
+  }, [searchParams.shared, setLastUsedCurrency, amount]);
 
   const handleCurrencyChange = (newCurrency: string) => {
     setCurrency(newCurrency);
@@ -175,10 +176,10 @@ function NewEntryPage() {
     const volNum = parseFloat(volumeLiters);
     const priceNum = parseFloat(pricePerUnit);
 
-    if (!isNaN(amtNum) && amtNum > 0) {
-      if (!isNaN(volNum) && volNum > 0) {
+    if (!Number.isNaN(amtNum) && amtNum > 0) {
+      if (!Number.isNaN(volNum) && volNum > 0) {
         setPricePerUnit((amtNum / volNum).toFixed(3));
-      } else if (!isNaN(priceNum) && priceNum > 0) {
+      } else if (!Number.isNaN(priceNum) && priceNum > 0) {
         setVolumeLiters((amtNum / priceNum).toFixed(1));
       }
     }
@@ -190,10 +191,10 @@ function NewEntryPage() {
     const priceNum = parseFloat(pricePerUnit);
     const amtNum = parseFloat(amount);
 
-    if (!isNaN(volNum) && volNum > 0) {
-      if (!isNaN(priceNum) && priceNum > 0) {
+    if (!Number.isNaN(volNum) && volNum > 0) {
+      if (!Number.isNaN(priceNum) && priceNum > 0) {
         setAmount((volNum * priceNum).toFixed(2));
-      } else if (!isNaN(amtNum) && amtNum > 0) {
+      } else if (!Number.isNaN(amtNum) && amtNum > 0) {
         setPricePerUnit((amtNum / volNum).toFixed(3));
       }
     }
@@ -208,10 +209,10 @@ function NewEntryPage() {
       const priceNum = parseFloat(storedPrice);
       const volNum = parseFloat(volumeLiters);
       const amtNum = parseFloat(amount);
-      if (!isNaN(priceNum) && priceNum > 0) {
-        if (!isNaN(volNum) && volNum > 0) {
+      if (!Number.isNaN(priceNum) && priceNum > 0) {
+        if (!Number.isNaN(volNum) && volNum > 0) {
           setAmount((volNum * priceNum).toFixed(2));
-        } else if (!isNaN(amtNum) && amtNum > 0) {
+        } else if (!Number.isNaN(amtNum) && amtNum > 0) {
           setVolumeLiters((amtNum / priceNum).toFixed(1));
         }
       }
@@ -230,10 +231,10 @@ function NewEntryPage() {
     const volNum = parseFloat(volumeLiters);
     const amtNum = parseFloat(amount);
 
-    if (!isNaN(priceNum) && priceNum > 0) {
-      if (!isNaN(volNum) && volNum > 0) {
+    if (!Number.isNaN(priceNum) && priceNum > 0) {
+      if (!Number.isNaN(volNum) && volNum > 0) {
         setAmount((volNum * priceNum).toFixed(2));
-      } else if (!isNaN(amtNum) && amtNum > 0) {
+      } else if (!Number.isNaN(amtNum) && amtNum > 0) {
         setVolumeLiters((amtNum / priceNum).toFixed(1));
       }
     }
@@ -505,24 +506,13 @@ function NewEntryPage() {
 
           {isRecurring && (
             <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
-              {['monthly', 'quarterly', 'annual'].map((interval) => (
-                <Button
-                  key={interval}
-                  type="button"
-                  size="small"
-                  onClick={() => setRecurringInterval(interval)}
-                  sx={{
-                    flex: 1,
-                    borderRadius: 3,
-                    textTransform: 'capitalize',
-                    fontWeight: 600,
-                    backgroundColor:
-                      recurringInterval === interval ? 'primary.main' : 'rgba(32, 44, 66, 0.6)',
-                    color: recurringInterval === interval ? 'primary.contrastText' : 'text.primary',
-                  }}
-                >
-                  {interval}
-                </Button>
+              {['monthly', 'quarterly', 'annual'].map((inv) => (
+                <RecurringIntervalButton
+                  key={inv}
+                  inv={inv}
+                  isSelected={recurringInterval === inv}
+                  onSelect={setRecurringInterval}
+                />
               ))}
             </div>
           )}

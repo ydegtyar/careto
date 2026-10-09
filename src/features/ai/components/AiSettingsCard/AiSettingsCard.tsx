@@ -2,7 +2,6 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
@@ -10,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { type AdapterId, useAiSettingsStore } from '../../lib/ai-store';
+import { AdapterRow } from './AdapterRow';
 
 const ADAPTER_LABELS: Record<AdapterId, { title: string; desc: string }> = {
   openrouter_gemini: {
@@ -97,58 +97,14 @@ export function AiSettingsCard() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {adapterOrder.map((id, idx) => (
-            <div
+            <AdapterRow
               key={id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '10px 14px',
-                borderRadius: 10,
-                backgroundColor: 'rgba(15, 23, 42, 0.6)',
-                border: '1px solid rgba(125, 211, 252, 0.15)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Chip
-                  label={`#${idx + 1}`}
-                  size="small"
-                  sx={{
-                    fontWeight: 700,
-                    backgroundColor:
-                      idx === 0 ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.08)',
-                    color: idx === 0 ? '#38bdf8' : 'text.primary',
-                  }}
-                />
-                <div>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {ADAPTER_LABELS[id]?.title || id}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    {ADAPTER_LABELS[id]?.desc}
-                  </Typography>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 4 }}>
-                <Button
-                  size="small"
-                  disabled={idx === 0}
-                  onClick={() => moveAdapter(idx, 'up')}
-                  sx={{ minWidth: 32, px: 0, textTransform: 'none' }}
-                >
-                  ↑
-                </Button>
-                <Button
-                  size="small"
-                  disabled={idx === adapterOrder.length - 1}
-                  onClick={() => moveAdapter(idx, 'down')}
-                  sx={{ minWidth: 32, px: 0, textTransform: 'none' }}
-                >
-                  ↓
-                </Button>
-              </div>
-            </div>
+              id={id}
+              idx={idx}
+              totalLength={adapterOrder.length}
+              labels={ADAPTER_LABELS}
+              onMove={moveAdapter}
+            />
           ))}
         </div>
       </div>

@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from '@tanstack/react-router';
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { data } from '@/data/client';
 import type { ConflictRecord, SyncStatus } from '@/data/client/types';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
@@ -19,7 +19,7 @@ export function SyncStatusCard() {
   const [conflicts, setConflicts] = useState<ConflictRecord[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  const refreshStatus = async () => {
+  const refreshStatus = useCallback(async () => {
     try {
       const s = await data.getSyncStatus();
       setStatus(s);
@@ -28,13 +28,20 @@ export function SyncStatusCard() {
     } catch {
       // Worker loading
     }
-  };
+  }, []);
 
   useEffect(() => {
-    refreshStatus();
-    const interval = setInterval(refreshStatus, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    let isMounted = true;
+    const run = async () => {
+      if (isMounted) await refreshStatus();
+    };
+    run();
+    const interval = setInterval(run, 5000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [refreshStatus]);
 
   const handleSyncNow = async () => {
     setIsSyncing(true);
@@ -90,7 +97,8 @@ export function SyncStatusCard() {
       </div>
 
       {conflicts.length > 0 && (
-        <div
+        <button
+          type="button"
           onClick={() => navigate({ to: '/settings/conflicts' })}
           style={{
             display: 'flex',
@@ -101,6 +109,10 @@ export function SyncStatusCard() {
             backgroundColor: 'rgba(255, 107, 107, 0.15)',
             border: '1px solid rgba(255, 107, 107, 0.3)',
             cursor: 'pointer',
+            width: '100%',
+            font: 'inherit',
+            color: 'inherit',
+            textAlign: 'left',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -112,7 +124,7 @@ export function SyncStatusCard() {
           <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700 }}>
             Resolve →
           </Typography>
-        </div>
+        </button>
       )}
     </GlassCard>
   );

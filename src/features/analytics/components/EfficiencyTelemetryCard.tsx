@@ -5,7 +5,7 @@ import { computeEfficiencyTelemetry } from '@/features/analytics/lib/analytics-m
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './EfficiencyTelemetryCard.styles';
 
-export interface Props {
+interface Props {
   entries: Entry[];
   vehicle?: Vehicle;
 }

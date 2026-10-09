@@ -10,7 +10,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { data } from '@/data/client';
 import type { Reminder } from '@/data/client/types';

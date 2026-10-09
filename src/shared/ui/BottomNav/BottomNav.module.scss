@@ -2,21 +2,22 @@
 
 .wrapper {
   position: fixed;
+  right: 16px;
   bottom: 20px;
   left: 16px;
-  right: 16px;
+  z-index: 1100;
   max-width: 540px;
   margin: 0 auto;
-  z-index: 1100;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0);
   pointer-events: none;
 }
 
 .topHighlight {
   position: absolute;
   top: 0;
-  left: 32px;
   right: 32px;
+  left: 32px;
+  z-index: 2;
   height: 1px;
   background: linear-gradient(
     90deg,
@@ -24,40 +25,39 @@
     color-mix(in srgb, var(--mui-palette-primary-main, #7dd3fc) 50%, transparent) 50%,
     transparent 100%
   );
-  z-index: 2;
   pointer-events: none;
 }
 
 .root {
-  pointer-events: auto;
+  display: flex !important;
   position: relative;
-  background: rgba(15, 23, 42, 0.6) !important; // bg-slate-900/60
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border-radius: 9999px !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 4px !important;
   height: 64px !important;
   padding: 8px 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  outline: 1px solid rgba(255, 255, 255, 0.2) !important;
-  outline-offset: -1px;
+  background: rgb(15 23 42 / 60%) !important; // bg-slate-900/60
+  border: 1px solid rgb(255 255 255 / 15%) !important;
+  border-radius: 9999px !important;
   box-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.6),
-    0 0 20px rgba(125, 211, 252, 0.15) !important;
+    0 12px 32px rgb(0 0 0 / 60%),
+    0 0 20px rgb(125 211 252 / 15%) !important;
+  pointer-events: auto;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  outline: 1px solid rgb(255 255 255 / 20%) !important;
+  outline-offset: -1px;
   overflow: visible !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 4px !important;
 }
 
 .action {
   flex: 1 1 0% !important;
-  max-width: none !important;
   min-width: 0 !important;
+  max-width: none !important;
   padding: 6px 4px !important;
-  border-radius: 9999px !important;
-  border: 1px solid transparent !important;
   color: var(--mui-palette-text-secondary, #94a3b8) !important;
+  border: 1px solid transparent !important;
+  border-radius: 9999px !important;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
 
   &:active {
@@ -69,19 +69,19 @@
   }
 
   &:global(.Mui-selected) {
+    background: rgb(125 211 252 / 15%) !important;
     color: var(--mui-palette-primary-main, #7dd3fc) !important;
-    background: rgba(125, 211, 252, 0.15) !important;
-    border-color: rgba(125, 211, 252, 0.3) !important;
-    box-shadow: 0 0 12px rgba(125, 211, 252, 0.2) !important;
+    box-shadow: 0 0 12px rgb(125 211 252 / 20%) !important;
+    border-color: rgb(125 211 252 / 30%) !important;
   }
 
   :global(.MuiBottomNavigationAction-label) {
+    margin-top: 2px !important;
     font-size: 10px !important;
     font-weight: 500 !important;
-    letter-spacing: -0.025em !important;
-    margin-top: 2px !important;
     opacity: 1 !important;
     transition: none !important;
+    letter-spacing: -0.025em !important;
 
     &:global(.Mui-selected) {
       font-size: 10px !important;
@@ -114,21 +114,22 @@
 }
 
 .addBtn {
+  display: flex;
   position: relative;
+  top: 1px;
+  justify-content: center;
+  align-items: center;
   width: 52px;
   height: 52px;
-  border-radius: 50%;
   background: linear-gradient(180deg, #7dd3fc 0%, #38bdf8 50%, #0284c7 100%);
   color: #001f2e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 24px rgba(125, 211, 252, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  outline: 2px solid rgba(125, 211, 252, 0.3);
-  outline-offset: 0;
+  border: 1px solid rgb(255 255 255 / 40%);
+  border-radius: 50%;
+  box-shadow: 0 0 24px rgb(125 211 252 / 55%);
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  top: 1px;
+  outline: 2px solid rgb(125 211 252 / 30%);
+  outline-offset: 0;
+
   &:active {
     transform: scale(0.9);
   }
@@ -140,9 +141,9 @@
 
 .addBtnGlossInner {
   position: absolute;
-  inset: 0;
+  background: rgb(255 255 255 / 20%);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  inset: 0;
   filter: blur(1px);
   pointer-events: none;
 }
@@ -150,21 +151,21 @@
 .addBtnGlossTop {
   position: absolute;
   top: 4px;
-  left: 8px;
   right: 8px;
+  left: 8px;
   height: 12px;
+  background: rgb(255 255 255 / 35%);
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.35);
   filter: blur(1px);
   pointer-events: none;
 }
 
 .addIcon {
-  font-size: 24px !important;
-  font-weight: bold;
-  color: #001f2e !important;
   position: relative;
   z-index: 10;
+  color: #001f2e !important;
+  font-size: 24px !important;
+  font-weight: bold;
   transition: transform 0.3s ease;
 }
 

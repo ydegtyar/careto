@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './StatusPill.module.scss';
 
 export type StatusLevel = 'ok' | 'upcoming' | 'due' | 'overdue';

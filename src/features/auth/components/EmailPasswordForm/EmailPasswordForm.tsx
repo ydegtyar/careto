@@ -72,7 +72,9 @@ export function EmailPasswordForm() {
         });
 
         if (!res.ok) {
-          throw new Error(signInError.message || 'Invalid email or password. Please verify credentials.');
+          throw new Error(
+            signInError.message || 'Invalid email or password. Please verify credentials.',
+          );
         }
       }
 

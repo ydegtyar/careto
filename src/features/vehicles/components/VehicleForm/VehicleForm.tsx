@@ -3,7 +3,6 @@ import CheckIcon from '@mui/icons-material/Check';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -19,18 +18,19 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import { useForm } from '@tanstack/react-form';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { Vehicle } from '@/data/client/types';
 import { VinScanner } from '@/features/ai/components/VinScanner/VinScanner';
 import { WheelsScanner } from '@/features/ai/components/WheelsScanner/WheelsScanner';
 import type { VinParseResult, WheelsParseResult } from '@/features/ai/lib/ai-client';
 import {
-  DEFAULT_FUEL_GRADES,
   type FuelGrade,
   getDefaultFuelGradesForPowertrain,
   getGradesForPowertrain,
   useAccountFuelGrades,
 } from '@/shared/lib/fuel-grades';
+import { GradeChip } from './GradeChip';
+import { ColorSwatchButton } from './VehicleFormHelpers';
 
 const COLOR_SWATCHES = [
   '#7dd3fc', // Ice Blue
@@ -67,7 +67,7 @@ export interface VehicleFormValues {
   efficiencyUnit: string;
 }
 
-export interface Props {
+interface Props {
   initialVehicle?: Vehicle;
   onSubmit: (values: VehicleFormValues) => Promise<void>;
   onCancel?: () => void;
@@ -123,7 +123,6 @@ function getDefaultTanksForPowertrain(powertrain: string): Vehicle['tanks'] {
           primary_fuel_grade: 'hydrogen',
         },
       ];
-    case 'ice':
     default:
       return [
         {
@@ -144,7 +143,7 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
   const [customDialogOpen, setCustomDialogOpen] = useState(false);
   const [customLabel, setCustomLabel] = useState('');
   const [customCategory, setCustomCategory] = useState<FuelGrade['category']>('petrol');
-  const [customColor, setCustomColor] = useState('#7dd3fc');
+  const [customColor, _setCustomColor] = useState('#7dd3fc');
 
   const initialPowertrain = initialVehicle?.powertrain ?? 'ev';
   const initialTanks =
@@ -199,9 +198,10 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
     setTimeout(() => setCopiedVin(false), 2000);
   };
 
-  const handleAddCustomGrade = (currentFuelGrades: string[], currentPowertrain: string) => {
+  const handleAddCustomGrade = (currentFuelGrades: string[], _currentPowertrain: string) => {
     if (!customLabel.trim()) return;
-    const newId = `custom_${customLabel.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now().toString(36)}`;
+    const sanitizedLabel = customLabel.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const newId = `custom_${sanitizedLabel}`;
     addCustomGrade({
       id: newId,
       label: customLabel.trim(),
@@ -443,29 +443,12 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
             </Typography>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
               {COLOR_SWATCHES.map((swatchHex) => (
-                <button
+                <ColorSwatchButton
                   key={swatchHex}
-                  type="button"
-                  onClick={() => field.handleChange(swatchHex)}
-                  style={{
-                    height: 36,
-                    borderRadius: 10,
-                    backgroundColor: swatchHex,
-                    border:
-                      field.state.value === swatchHex
-                        ? '2px solid #ffffff'
-                        : '1px solid rgba(255, 255, 255, 0.1)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: field.state.value === swatchHex ? `0 0 12px ${swatchHex}` : 'none',
-                  }}
-                >
-                  {field.state.value === swatchHex && (
-                    <CheckIcon sx={{ color: '#000', fontSize: 18 }} />
-                  )}
-                </button>
+                  swatchHex={swatchHex}
+                  selectedValue={field.state.value}
+                  onSelect={field.handleChange}
+                />
               ))}
             </div>
           </div>
@@ -674,28 +657,14 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                     </Button>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {displayedGrades.map((grade) => {
-                      const isSelected = activeIds.includes(grade.id);
-                      return (
-                        <Chip
-                          key={grade.id}
-                          label={grade.label}
-                          onClick={() => toggleGrade(grade.id)}
-                          variant={isSelected ? 'filled' : 'outlined'}
-                          sx={{
-                            borderRadius: '10px',
-                            fontWeight: 600,
-                            fontSize: '0.75rem',
-                            height: 30,
-                            backgroundColor: isSelected
-                              ? 'rgba(125, 211, 252, 0.2)'
-                              : 'transparent',
-                            borderColor: isSelected ? 'primary.main' : 'rgba(125, 211, 252, 0.15)',
-                            color: isSelected ? 'primary.main' : 'text.secondary',
-                          }}
-                        />
-                      );
-                    })}
+                    {displayedGrades.map((grade) => (
+                      <GradeChip
+                        key={grade.id}
+                        grade={grade}
+                        isSelected={activeIds.includes(grade.id)}
+                        onToggle={toggleGrade}
+                      />
+                    ))}
                   </div>
 
                   <Dialog

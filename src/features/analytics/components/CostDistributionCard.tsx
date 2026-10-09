@@ -6,8 +6,9 @@ import { CostDonut } from '@/features/analytics/charts/CostDonut/CostDonut';
 import { computeCategoryDistribution, computeTCO } from '@/features/analytics/lib/analytics-math';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './CostDistributionCard.styles';
+import { LegendItemRow } from './LegendItemRow';
 
-export interface Props {
+interface Props {
   entries: Entry[];
 }
 
@@ -38,15 +39,7 @@ export const CostDistributionCard: React.FC<Props> = ({ entries }) => {
         </div>
         <div style={styles.legendList}>
           {categoryDistribution.map((cat) => (
-            <div key={cat.name} style={styles.legendItem}>
-              <span style={{ color: cat.color, fontSize: '0.78rem', fontWeight: 600 }}>
-                ● {cat.name}
-              </span>
-              <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>
-                ${cat.value.toFixed(2)}{' '}
-                <span style={{ color: '#a0b4c4', fontWeight: 400 }}>({cat.percentage}%)</span>
-              </span>
-            </div>
+            <LegendItemRow key={cat.name} cat={cat} styles={styles} />
           ))}
         </div>
       </div>

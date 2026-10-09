@@ -14,6 +14,7 @@ html {
 }
 
 body {
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
   background-color: var(--mui-palette-background-default, #0a0e1a);
@@ -21,7 +22,6 @@ body {
   font-family: var(--mui-typography-fontFamily, 'Inter Variable', Inter, sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: 100dvh;
 }
 
 /* Custom minimal scrollbar */
@@ -29,9 +29,11 @@ body {
   width: 4px;
   height: 4px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--mui-palette-divider, #2a3a48);
   border-radius: 9999px;

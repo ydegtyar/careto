@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import '@fontsource-variable/inter';
 import '@/styles/global.scss';
 
-import setupLocatorUI from '@locator/runtime';
 import { registerSW } from 'virtual:pwa-register';
+import setupLocatorUI from '@locator/runtime';
 import { Providers } from '@/app/providers';
 
 if (import.meta.env.DEV) {
@@ -34,9 +34,12 @@ const updateSW = registerSW({
 });
 
 // Periodically check for service worker updates (e.g. every hour)
-setInterval(() => {
-  updateSW();
-}, 60 * 60 * 1000);
+setInterval(
+  () => {
+    updateSW();
+  },
+  60 * 60 * 1000,
+);
 
 const rootElement = document.getElementById('root');
 if (rootElement && !rootElement.innerHTML) {
@@ -55,4 +58,3 @@ window.addEventListener('vite:preloadError', () => {
     window.location.reload();
   }
 });
-

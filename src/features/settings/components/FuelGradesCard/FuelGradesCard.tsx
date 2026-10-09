@@ -1,5 +1,4 @@
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import Button from '@mui/material/Button';
@@ -16,6 +15,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import type React from 'react';
 import { useState } from 'react';
+import { GradeChip } from '@/features/vehicles/components/VehicleForm/GradeChip';
 import { type FuelGrade, useAccountFuelGrades } from '@/shared/lib/fuel-grades';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 
@@ -32,7 +32,7 @@ export const FuelGradesCard: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const [newCategory, setNewCategory] = useState<FuelGrade['category']>('petrol');
-  const [newColor, setNewColor] = useState('#7dd3fc');
+  const [newColor, _setNewColor] = useState('#7dd3fc');
 
   const handleAdd = () => {
     if (!newLabel.trim()) return;
@@ -73,35 +73,14 @@ export const FuelGradesCard: React.FC = () => {
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-        {allGrades.map((grade) => {
-          const isSelected = enabledIds.includes(grade.id);
-          return (
-            <Chip
-              key={grade.id}
-              label={grade.label}
-              onClick={() => toggleGradeEnabled(grade.id)}
-              onDelete={
-                !grade.isDefault
-                  ? (e) => {
-                      e.stopPropagation();
-                      removeCustomGrade(grade.id);
-                    }
-                  : undefined
-              }
-              deleteIcon={!grade.isDefault ? <DeleteIcon sx={{ fontSize: 16 }} /> : undefined}
-              variant={isSelected ? 'filled' : 'outlined'}
-              sx={{
-                borderRadius: '10px',
-                fontWeight: 600,
-                fontSize: '0.75rem',
-                height: 30,
-                backgroundColor: isSelected ? 'rgba(125, 211, 252, 0.2)' : 'transparent',
-                borderColor: isSelected ? 'primary.main' : 'rgba(125, 211, 252, 0.15)',
-                color: isSelected ? 'primary.main' : 'text.secondary',
-              }}
-            />
-          );
-        })}
+        {allGrades.map((grade) => (
+          <GradeChip
+            key={grade.id}
+            grade={grade}
+            isSelected={enabledIds.includes(grade.id)}
+            onToggle={toggleGradeEnabled}
+          />
+        ))}
 
         <Chip
           icon={<AddIcon sx={{ fontSize: 16 }} />}
@@ -133,7 +112,6 @@ export const FuelGradesCard: React.FC = () => {
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             fullWidth
-            autoFocus
           />
 
           <FormControl fullWidth>

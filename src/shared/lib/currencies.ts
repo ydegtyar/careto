@@ -52,7 +52,7 @@ export function convertToUsdMinor(
   currencyCode: string,
   fxRateToUsd?: number,
 ): number {
-  if (!amountMinor || isNaN(amountMinor)) return 0;
+  if (!amountMinor || Number.isNaN(amountMinor)) return 0;
   if (currencyCode === 'USD') return Math.round(amountMinor);
 
   if (fxRateToUsd && fxRateToUsd > 0) {

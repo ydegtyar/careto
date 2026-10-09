@@ -66,7 +66,7 @@ class LocalDbService {
   }
 
   // --- Entries ---
-  async getEntries(vehicleId?: string): Promise<Entry[]> {
+  async getEntries(_vehicleId?: string): Promise<Entry[]> {
     return this.entries;
   }
 
@@ -109,7 +109,7 @@ class LocalDbService {
   }
 
   // --- Reminders ---
-  async getReminders(vehicleId?: string): Promise<Reminder[]> {
+  async getReminders(_vehicleId?: string): Promise<Reminder[]> {
     return this.reminders;
   }
 

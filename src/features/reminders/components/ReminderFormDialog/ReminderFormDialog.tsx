@@ -1,4 +1,3 @@
-import EditIcon from '@mui/icons-material/Edit';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -66,25 +65,28 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
   // Sync state when reminder prop changes or dialog opens
   React.useEffect(() => {
     if (open) {
-      setTitle(reminder?.title ?? '');
-      setKind(reminder?.kind ?? 'service');
-      setCustomKindInput('');
-      setMode(reminder?.mode ?? 'earlier');
-      setIntervalKm(
-        reminder?.interval_m ? String(Math.round(reminder.interval_m / 1000)) : '10000',
-      );
-      setIntervalDays(reminder?.interval_days ? String(reminder.interval_days) : '365');
-      setBaseDate(reminder?.base_date ?? new Date().toISOString().split('T')[0] ?? '');
-      setBaseOdometerKm(
-        reminder?.base_odometer_m !== undefined && reminder?.base_odometer_m !== null
-          ? String(Math.round(reminder.base_odometer_m / 1000))
-          : '0',
-      );
-      setEstCost(
-        reminder?.est_cost_usd_minor !== undefined && reminder?.est_cost_usd_minor !== null
-          ? String(Math.round(reminder.est_cost_usd_minor / 100))
-          : '',
-      );
+      const timer = setTimeout(() => {
+        setTitle(reminder?.title ?? '');
+        setKind(reminder?.kind ?? 'service');
+        setCustomKindInput('');
+        setMode(reminder?.mode ?? 'earlier');
+        setIntervalKm(
+          reminder?.interval_m ? String(Math.round(reminder.interval_m / 1000)) : '10000',
+        );
+        setIntervalDays(reminder?.interval_days ? String(reminder.interval_days) : '365');
+        setBaseDate(reminder?.base_date ?? new Date().toISOString().split('T')[0] ?? '');
+        setBaseOdometerKm(
+          reminder?.base_odometer_m !== undefined && reminder?.base_odometer_m !== null
+            ? String(Math.round(reminder.base_odometer_m / 1000))
+            : '0',
+        );
+        setEstCost(
+          reminder?.est_cost_usd_minor !== undefined && reminder?.est_cost_usd_minor !== null
+            ? String(Math.round(reminder.est_cost_usd_minor / 100))
+            : '',
+        );
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [open, reminder]);
 

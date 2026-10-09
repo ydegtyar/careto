@@ -2,19 +2,18 @@
 
 @mixin glass($blur: 16px, $alpha: 0.6) {
   background: color-mix(in srgb, var(--mui-palette-background-paper, #0f1524) #{$alpha * 100%}, transparent);
-  backdrop-filter: blur($blur);
-  -webkit-backdrop-filter: blur($blur);
   border: 1px solid color-mix(in srgb, var(--mui-palette-primary-main, #7dd3fc) 15%, transparent);
+  backdrop-filter: blur($blur);
 
   @media (prefers-reduced-transparency: reduce) {
     background: var(--mui-palette-background-paper, #0f1524);
     backdrop-filter: none;
-    -webkit-backdrop-filter: none;
   }
 }
 
 @mixin hit-area($size: 44px) {
   position: relative;
+
   &::after {
     content: '';
     position: absolute;

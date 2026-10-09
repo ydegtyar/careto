@@ -30,10 +30,10 @@ function OnboardingPage() {
   const [activeStep, setActiveStep] = useState(0);
 
   // Storage step
-  const [storagePersisted, setStoragePersisted] = useState(false);
+  const [_storagePersisted, setStoragePersisted] = useState(false);
 
   // Push step
-  const [pushEnabled, setPushEnabled] = useState(false);
+  const [_pushEnabled, setPushEnabled] = useState(false);
 
   // Vehicle step
   const [name, setName] = useState('My Car');

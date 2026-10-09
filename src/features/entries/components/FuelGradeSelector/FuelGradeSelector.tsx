@@ -1,6 +1,3 @@
-import EvStationIcon from '@mui/icons-material/EvStation';
-import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
-import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import type React from 'react';
@@ -8,9 +5,10 @@ import { useAppStore } from '@/app/store';
 import { vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import { getGradesForPowertrain, useAccountFuelGrades } from '@/shared/lib/fuel-grades';
 import { useLastUsedFuelGrade } from '../../lib/fuel-grade-storage';
+import { FuelGradeChip } from './FuelGradeChip';
 import { getChipSx, styles } from './FuelGradeSelector.styles';
 
-export interface Props {
+interface Props {
   selectedGrade: string;
   onSelectGrade: (gradeId: string) => void;
   filterCategory?: 'petrol' | 'diesel' | 'gas' | 'ev' | 'alternative' | 'all';
@@ -67,25 +65,15 @@ export const FuelGradeSelector: React.FC<Props> = ({
         {title}
       </Typography>
       <div style={styles.chipGroup}>
-        {displayedGrades.map((grade) => {
-          const isEv = grade.category === 'ev' || grade.id.startsWith('ev');
-          return (
-            <Chip
-              key={grade.id}
-              icon={
-                isEv ? (
-                  <EvStationIcon sx={{ fontSize: 16 }} />
-                ) : (
-                  <LocalGasStationIcon sx={{ fontSize: 16 }} />
-                )
-              }
-              label={grade.label}
-              onClick={() => handleSelectGrade(grade.id)}
-              variant={selectedGrade === grade.id ? 'filled' : 'outlined'}
-              sx={getChipSx(selectedGrade === grade.id)}
-            />
-          );
-        })}
+        {displayedGrades.map((grade) => (
+          <FuelGradeChip
+            key={grade.id}
+            grade={grade}
+            isSelected={selectedGrade === grade.id}
+            onSelect={handleSelectGrade}
+            getChipSx={getChipSx}
+          />
+        ))}
       </div>
     </div>
   );

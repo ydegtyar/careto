@@ -6,7 +6,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { useLocation, useRouter } from '@tanstack/react-router';
-import React from 'react';
 import styles from './BottomNav.module.scss';
 
 export function BottomNav() {

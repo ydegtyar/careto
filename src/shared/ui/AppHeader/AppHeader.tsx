@@ -5,7 +5,6 @@ import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
-import React from 'react';
 import { useAppStore } from '@/app/store';
 import { remindersQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import { computeDue } from '@/features/reminders/lib/compute-due';
@@ -57,13 +56,24 @@ export function AppHeader() {
       >
         {/* Left: App Logo */}
         <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-          <div
-            style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+          <button
+            type="button"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              cursor: 'pointer',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              font: 'inherit',
+              color: 'inherit',
+            }}
             onClick={() => router.navigate({ to: '/garage' })}
-            role={'link'}
+            aria-label="Go to Garage"
           >
             <CaretoLogo size={36} animated={true} />
-          </div>
+          </button>
         </div>
         {/* Center: Car Selector Dropdown */}
         <CarSelectorDropdown vehicles={vehicles} activeVehicle={activeVehicle} />

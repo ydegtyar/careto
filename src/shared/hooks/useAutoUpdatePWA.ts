@@ -7,17 +7,16 @@ import { useEffect, useState } from 'react';
  * Automatically updates the service worker and reloads the client when a new build is detected.
  */
 export function useAutoUpdatePWA() {
-  if (!import.meta.env.PROD) {
-    return { needRefresh: false, updateServiceWorker: () => {} };
-  }
   const [needRefresh, setNeedRefresh] = useState(false);
+
+  const isProd = Boolean(import.meta.env.PROD);
 
   const {
     needRefresh: [needRefreshState],
     updateServiceWorker,
   } = useRegisterSW({
     onNeedRefresh() {
-      setNeedRefresh(true);
+      if (isProd) setNeedRefresh(true);
     },
     onRegisteredSW(_swUrl: string, r?: ServiceWorkerRegistration) {
       if (!r) return;
@@ -60,13 +59,13 @@ export function useAutoUpdatePWA() {
 
   // Auto-update as soon as a new service worker version is waiting
   useEffect(() => {
-    if (needRefresh || needRefreshState) {
+    if (isProd && (needRefresh || needRefreshState)) {
       updateServiceWorker(true);
     }
-  }, [needRefresh, needRefreshState, updateServiceWorker]);
+  }, [isProd, needRefresh, needRefreshState, updateServiceWorker]);
 
   return {
-    needRefresh: needRefresh || needRefreshState,
+    needRefresh: isProd && (needRefresh || needRefreshState),
     updateServiceWorker: () => updateServiceWorker(true),
   };
 }

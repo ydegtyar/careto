@@ -1,7 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import Chip from '@mui/material/Chip';
 import { useRouter } from '@tanstack/react-router';
-import React from 'react';
 import type { Vehicle } from '@/data/client/types';
 import styles from './VehicleSwitcher.module.scss';
 
@@ -17,18 +16,15 @@ export function VehicleSwitcher({ vehicles, activeId, onSelect }: Props) {
   return (
     <div className={styles.container}>
       <div className={styles.scrollList}>
-        {vehicles.map((v) => {
-          const isActive = v.id === activeId;
-          return (
-            <Chip
-              key={v.id}
-              label={v.name}
-              clickable
-              onClick={() => onSelect(v.id)}
-              className={`${styles.chip} ${isActive ? styles.active : ''}`}
-            />
-          );
-        })}
+        {vehicles.map((v) => (
+          <Chip
+            key={v.id}
+            label={v.name}
+            clickable
+            onClick={() => onSelect(v.id)}
+            className={`${styles.chip} ${v.id === activeId ? styles.active : ''}`}
+          />
+        ))}
         <Chip
           icon={<AddIcon style={{ fontSize: 16 }} />}
           label="Add"

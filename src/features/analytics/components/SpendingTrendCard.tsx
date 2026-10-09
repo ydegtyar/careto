@@ -7,7 +7,7 @@ import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import type { TimeRangeMode } from './AnalyticsFilterPillsBar';
 import { styles } from './SpendingTrendCard.styles';
 
-export interface Props {
+interface Props {
   entries: Entry[];
   timeRange: TimeRangeMode;
 }

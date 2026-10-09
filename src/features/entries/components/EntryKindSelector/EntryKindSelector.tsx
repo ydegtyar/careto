@@ -8,7 +8,7 @@ import { styles } from './EntryKindSelector.styles';
 
 export type EntryKind = 'refuel' | 'expense' | 'service';
 
-export interface Props {
+interface Props {
   value: EntryKind;
   onChange: (kind: EntryKind) => void;
 }

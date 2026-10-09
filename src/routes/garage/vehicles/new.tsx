@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { data } from '@/data/client';
 import {

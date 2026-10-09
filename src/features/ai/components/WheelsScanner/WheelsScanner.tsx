@@ -9,11 +9,11 @@ import type React from 'react';
 import { useRef, useState } from 'react';
 import { parseImageWithAi, type WheelsParseResult } from '../../lib/ai-client';
 
-interface WheelsScannerProps {
+interface Props {
   onParsed: (data: WheelsParseResult) => void;
 }
 
-export function WheelsScanner({ onParsed }: WheelsScannerProps) {
+export function WheelsScanner({ onParsed }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{
