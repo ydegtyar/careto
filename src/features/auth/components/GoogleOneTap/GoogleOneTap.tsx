@@ -5,9 +5,14 @@ export function GoogleOneTap() {
   useEffect(() => {
     let unmounted = false;
 
+    // Strict guard: Only execute when on /sign-in page
+    if (typeof window === 'undefined' || !window.location.pathname.startsWith('/sign-in')) {
+      return;
+    }
+
     async function initOneTap() {
       try {
-        if (typeof window === 'undefined' || unmounted) return;
+        if (unmounted || !window.location.pathname.startsWith('/sign-in')) return;
 
         await oneTap({
           fetchOptions: {
@@ -25,6 +30,14 @@ export function GoogleOneTap() {
 
     return () => {
       unmounted = true;
+      // Cancel GIS prompt if present on unmount
+      try {
+        if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+          (window as any).google.accounts.id.cancel();
+        }
+      } catch {
+        // Ignore cancel errors
+      }
     };
   }, []);
 
