@@ -88,7 +88,20 @@ export async function handleListVehicles(req: VercelRequest, res: VercelResponse
     if (!session) return res.status(401).json({ error: 'Unauthorized' });
 
     const vehicleRows = await sql`
-      SELECT v.id, v.name, v.seq, vm.role
+      SELECT 
+        v.id, 
+        v.name, 
+        v.make, 
+        v.model, 
+        v.year, 
+        v.powertrain, 
+        v.initial_odometer_m, 
+        v.distance_unit, 
+        v.efficiency_unit, 
+        v.tanks, 
+        v.fuel_grades, 
+        v.seq, 
+        vm.role
       FROM vehicle_members vm
       JOIN vehicles v ON vm.vehicle_id = v.id
       WHERE vm.user_id = ${session.user.id}::uuid AND v.archived_at IS NULL

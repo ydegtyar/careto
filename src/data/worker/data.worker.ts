@@ -6,23 +6,7 @@ class LocalDbService {
   private syncEngine: SyncEngine;
   private conflicts: ConflictRecord[] = [];
 
-  private vehicles: Vehicle[] = [
-    {
-      id: 'f85e3426-dbf2-4022-8467-c5bc5367358d',
-      name: 'Suzuki SX4',
-      make: 'Suzuki',
-      model: 'SX4',
-      powertrain: 'ice',
-      initial_odometer_m: 117321000,
-      tanks: [
-        { id: 'tank-1', name: 'Petrol Tank', type: 'petrol' },
-        { id: 'tank-2', name: 'LPG Tank', type: 'lpg' },
-      ],
-      fuel_grades: ['ron95', 'lpg'],
-      distance_unit: 'km',
-      efficiency_unit: 'l100km',
-    },
-  ];
+  private vehicles: Vehicle[] = [];
   private entries: Entry[] = [];
   private notes: Note[] = [];
   private reminders: Reminder[] = [];
@@ -36,8 +20,26 @@ class LocalDbService {
     }, 1000);
   }
 
+  private async fetchUserVehicles(): Promise<void> {
+    try {
+      const res = await fetch('/api/vehicles/list', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.vehicles)) {
+          this.vehicles = data.vehicles;
+          this.broadcast(['vehicle']);
+        }
+      }
+    } catch {
+      // Ignore network errors offline
+    }
+  }
+
   // --- Vehicles ---
   async getVehicles(): Promise<Vehicle[]> {
+    if (this.vehicles.length === 0) {
+      await this.fetchUserVehicles();
+    }
     return this.vehicles;
   }
 
@@ -133,7 +135,13 @@ class LocalDbService {
   }
 
   async syncNow(vehicleId?: string): Promise<{ ok: boolean; status: SyncStatus }> {
-    const targetId = vehicleId || this.vehicles[0]?.id || 'f85e3426-dbf2-4022-8467-c5bc5367358d';
+    if (this.vehicles.length === 0) {
+      await this.fetchUserVehicles();
+    }
+    const targetId = vehicleId || this.vehicles[0]?.id;
+    if (!targetId) {
+      return { ok: true, status: this.syncEngine.getStatus() };
+    }
 
     // 1. Push pending local mutations
     await this.syncEngine.push(targetId);

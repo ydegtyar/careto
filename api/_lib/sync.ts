@@ -38,9 +38,14 @@ export async function handlePush(req: VercelRequest, res: VercelResponse) {
 
     const vehicleId = isValidUuid(rawVehicleId) ? rawVehicleId : toUuid(rawVehicleId);
 
-    const canEdit = await hasRole(session.user.id, vehicleId, 'editor');
+    let canEdit = await hasRole(session.user.id, vehicleId, 'editor');
     if (!canEdit) {
-      return res.status(403).json({ error: 'Forbidden: Insufficient vehicle permissions' });
+      const exists = await sql`SELECT 1 FROM vehicles WHERE id = ${vehicleId}::uuid LIMIT 1`;
+      if (exists.length === 0) {
+        canEdit = true;
+      } else {
+        return res.status(403).json({ error: 'Forbidden: Insufficient vehicle permissions' });
+      }
     }
 
     if (ops.length === 0) {
@@ -48,10 +53,24 @@ export async function handlePush(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true, currentSeq: v[0]?.seq ?? 0, appliedCount: 0 });
     }
 
-    const vehicleRows = await sql`
+    let vehicleRows = await sql`
       SELECT seq FROM vehicles WHERE id = ${vehicleId}::uuid FOR UPDATE LIMIT 1
     `;
-    if (vehicleRows.length === 0) return res.status(404).json({ error: 'Vehicle not found' });
+    if (vehicleRows.length === 0) {
+      await sql`
+        INSERT INTO vehicles (id, name, owner_id, seq)
+        VALUES (${vehicleId}::uuid, 'New Vehicle', ${session.user.id}::uuid, 0)
+        ON CONFLICT (id) DO NOTHING
+      `;
+      await sql`
+        INSERT INTO vehicle_members (vehicle_id, user_id, role)
+        VALUES (${vehicleId}::uuid, ${session.user.id}::uuid, 'owner')
+        ON CONFLICT (vehicle_id, user_id) DO NOTHING
+      `;
+      vehicleRows = await sql`
+        SELECT seq FROM vehicles WHERE id = ${vehicleId}::uuid FOR UPDATE LIMIT 1
+      `;
+    }
 
     let currentSeq = Number(vehicleRows[0]!.seq);
     let appliedCount = 0;
