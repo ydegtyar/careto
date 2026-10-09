@@ -175,7 +175,7 @@ function SignInPage() {
           </div>
           <div className={styles.offlineNotice}>
             <SyncLockOutlinedIcon sx={{ fontSize: 13 }} />
-            <span>End-to-end encrypted offline SQLite & Neon sync</span>
+            <span>End-to-end encrypted</span>
           </div>
         </footer>
       </div>
