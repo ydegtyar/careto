@@ -50,6 +50,14 @@ async function handleGoogleOneTap(req: VercelRequest, res: VercelResponse) {
     let userId: string;
     if (userRows.length > 0) {
       userId = userRows[0]!.id;
+      // Update name or image if missing or changed
+      await sql`
+        UPDATE neon_auth."user"
+        SET name = COALESCE(NULLIF(${name}, ''), name),
+            image = COALESCE(${picture}, image),
+            "updatedAt" = now()
+        WHERE id = ${userId}
+      `;
     } else {
       const newId = crypto.randomUUID();
       await sql`
