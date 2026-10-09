@@ -31,7 +31,6 @@ function InviteAcceptPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-dev-user-id': 'c5a95d6f-e299-4dff-839d-cdedea1f0f65',
         },
         body: JSON.stringify({ token }),
       });
@@ -81,7 +80,7 @@ function InviteAcceptPage() {
         </Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
-          You have been invited to collaborate on a vehicle in Careta. Accept to synchronize
+          You have been invited to collaborate on a vehicle in Careto. Accept to synchronize
           records, maintenance schedules, and telemetry.
         </Typography>
 

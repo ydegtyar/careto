@@ -280,7 +280,7 @@ class LocalDbService {
 
   private broadcast(tables: string[]) {
     try {
-      const channel = new BroadcastChannel('careta-db');
+      const channel = new BroadcastChannel('careto-db');
       channel.postMessage({ tables, timestamp: Date.now() });
       channel.close();
     } catch {

@@ -35,7 +35,7 @@ export function Providers() {
 
   React.useEffect(() => {
     try {
-      const channel = new BroadcastChannel('careta-db');
+      const channel = new BroadcastChannel('careto-db');
       channel.onmessage = (event: MessageEvent<{ tables?: string[] }>) => {
         const tables = event.data?.tables || [];
         if (tables.includes('vehicle')) {

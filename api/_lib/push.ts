@@ -6,7 +6,7 @@ import { getSession } from './auth.js';
 // Setup VAPID details if configured
 const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || 'BPKTb_7Uh-098R76GoNEi6qzcd7zOV0279rNUvjAhEvEBAtUe7kZC0r1c8xdRmDlMcIEK40kLtDHDK0Ybj4vMSs';
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || 'JUzNRjo2jZSQfCgHOY3hNdU3M_CS1RfDS7z6sILKI6Q';
-const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:notifications@careta.app';
+const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:notifications@careto.app';
 
 try {
   webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
@@ -143,7 +143,7 @@ export async function handleTestPush(req: VercelRequest, res: VercelResponse) {
     const session = await getSession(req.headers);
     if (!session) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { title = 'Careta Reminder', body = 'Scheduled maintenance is upcoming', url = '/reminders' } = req.body || {};
+    const { title = 'Careto Reminder', body = 'Scheduled maintenance is upcoming', url = '/reminders' } = req.body || {};
 
     const devices = await sql`
       SELECT endpoint, p256dh, auth
@@ -159,7 +159,7 @@ export async function handleTestPush(req: VercelRequest, res: VercelResponse) {
       title,
       body,
       url,
-      tag: 'careta-reminder',
+      tag: 'careto-reminder',
       badge: '/icons/icon-192.png',
       icon: '/icons/icon-192.png',
     });

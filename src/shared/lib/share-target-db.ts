@@ -1,6 +1,6 @@
 import { type IDBPDatabase, openDB } from 'idb';
 
-const DB_NAME = 'careta-share-target-db';
+const DB_NAME = 'careto-share-target-db';
 const STORE_NAME = 'shared_payloads';
 
 export interface SharedPayload {
@@ -17,7 +17,7 @@ let dbPromise: Promise<IDBPDatabase> | null = null;
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, 1, {
-      upgrade(db) {
+      upgrade(db: IDBPDatabase) {
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           db.createObjectStore(STORE_NAME, { keyPath: 'id' });
         }

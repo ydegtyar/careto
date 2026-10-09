@@ -18,9 +18,9 @@ export const ALL_CURRENCIES: CurrencyInfo[] = [
 export const DEFAULT_FAVORITE_CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'UAH', 'ALL'];
 export const DEFAULT_CURRENCY = 'EUR';
 
-export const FAVORITE_CURRENCIES_KEY = 'careta_favorite_currencies';
-export const LAST_USED_CURRENCY_KEY = 'careta_last_used_currency';
-export const LAST_USED_PAYMENT_METHOD_KEY = 'careta_last_used_payment_method';
+export const FAVORITE_CURRENCIES_KEY = 'careto_favorite_currencies';
+export const LAST_USED_CURRENCY_KEY = 'careto_last_used_currency';
+export const LAST_USED_PAYMENT_METHOD_KEY = 'careto_last_used_payment_method';
 
 export function useFavoriteCurrencies() {
   return useLocalStorage<string[]>(FAVORITE_CURRENCIES_KEY, DEFAULT_FAVORITE_CURRENCIES);

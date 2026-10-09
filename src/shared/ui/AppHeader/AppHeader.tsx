@@ -9,7 +9,7 @@ import React from 'react';
 import { useAppStore } from '@/app/store';
 import { remindersQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import { computeDue } from '@/features/reminders/lib/compute-due';
-import { CaretaLogo } from '@/shared/ui/CaretaLogo/CaretaLogo';
+import { CaretoLogo } from '@/shared/ui/CaretoLogo/CaretoLogo';
 import styles from './AppHeader.module.scss';
 import { CarSelectorDropdown } from './CarSelectorDropdown';
 import { UserMenu } from './UserMenu';
@@ -62,7 +62,7 @@ export function AppHeader() {
             onClick={() => router.navigate({ to: '/garage' })}
             role={'link'}
           >
-            <CaretaLogo size={36} animated={true} />
+            <CaretoLogo size={36} animated={true} />
           </div>
         </div>
         {/* Center: Car Selector Dropdown */}

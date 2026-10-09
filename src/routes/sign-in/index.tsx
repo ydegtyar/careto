@@ -8,7 +8,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import React, { useState } from 'react';
 import { EmailPasswordForm } from '@/features/auth/components/EmailPasswordForm/EmailPasswordForm';
 import { MagicLinkForm } from '@/features/auth/components/MagicLinkForm/MagicLinkForm';
-import { CaretaLogo } from '@/shared/ui/CaretaLogo/CaretaLogo';
+import { CaretoLogo } from '@/shared/ui/CaretoLogo/CaretoLogo';
 import styles from './SignIn.module.scss';
 
 export const Route = createFileRoute('/sign-in/')({
@@ -57,7 +57,7 @@ function SignInPage() {
         {/* Brand Header */}
         <header className={styles.header}>
           <div className={styles.emblemWrapper} aria-hidden="true">
-            <CaretaLogo size={72} animated={true} />
+            <CaretoLogo size={72} animated={true} />
           </div>
 
           <Typography
@@ -70,7 +70,7 @@ function SignInPage() {
               textShadow: '0 0 24px rgba(125, 211, 252, 0.4)',
             }}
           >
-            Careta
+            Careto
           </Typography>
 
           <Typography
@@ -148,7 +148,7 @@ function SignInPage() {
               href="#terms"
               onClick={(e) => {
                 e.preventDefault();
-                alert('Terms of Service: Careta is free & open telemetry management software.');
+                alert('Terms of Service: Careto is free & open telemetry management software.');
               }}
             >
               Terms of Service

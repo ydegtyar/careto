@@ -1,12 +1,12 @@
 import type React from 'react';
 
-export interface CaretaLogoProps extends React.SVGProps<SVGSVGElement> {
+export interface CaretoLogoProps extends React.SVGProps<SVGSVGElement> {
   size?: number | string;
   variant?: 'emblem' | 'full';
   animated?: boolean;
 }
 
-export const CaretaLogo: React.FC<CaretaLogoProps> = ({
+export const CaretoLogo: React.FC<CaretoLogoProps> = ({
   size = 32,
   variant = 'emblem',
   animated = true,
@@ -121,7 +121,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
 
       {animated && (
         <style>{`
-          @keyframes caretaAmbientHaloPulse {
+          @keyframes caretoAmbientHaloPulse {
             0%, 100% {
               opacity: 0.12;
               transform: scale(0.96);
@@ -133,7 +133,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
               transform-origin: 256px 225px;
             }
           }
-          @keyframes caretaLaserPulse {
+          @keyframes caretoLaserPulse {
             0%, 100% {
               opacity: 0.7;
               filter: drop-shadow(0 0 2px #7dd3fc);
@@ -143,7 +143,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
               filter: drop-shadow(0 0 10px #bae6fd);
             }
           }
-          @keyframes caretaArrowGlintFlash {
+          @keyframes caretoArrowGlintFlash {
             0%, 38% {
               opacity: 0;
               transform: scale(0.2) rotate(0deg);
@@ -165,7 +165,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
               transform-origin: 358px 126px;
             }
           }
-          @keyframes caretaNoseGlintFlash {
+          @keyframes caretoNoseGlintFlash {
             0%, 46% {
               opacity: 0;
               transform: scale(0.2) rotate(0deg);
@@ -187,7 +187,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
               transform-origin: 418px 276px;
             }
           }
-          @keyframes caretaWheelHubGlow {
+          @keyframes caretoWheelHubGlow {
             0%, 100% {
               fill: #7dd3fc;
               r: 10px;
@@ -199,20 +199,20 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
               opacity: 1;
             }
           }
-          .careta-ambient-halo {
-            animation: caretaAmbientHaloPulse 4.5s ease-in-out infinite;
+          .careto-ambient-halo {
+            animation: caretoAmbientHaloPulse 4.5s ease-in-out infinite;
           }
-          .careta-headlight-beam {
-            animation: caretaLaserPulse 4.5s ease-in-out infinite;
+          .careto-headlight-beam {
+            animation: caretoLaserPulse 4.5s ease-in-out infinite;
           }
-          .careta-glint-arrow {
-            animation: caretaArrowGlintFlash 4.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+          .careto-glint-arrow {
+            animation: caretoArrowGlintFlash 4.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
           }
-          .careta-glint-nose {
-            animation: caretaNoseGlintFlash 4.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+          .careto-glint-nose {
+            animation: caretoNoseGlintFlash 4.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
           }
-          .careta-wheel-core {
-            animation: caretaWheelHubGlow 4.5s ease-in-out infinite;
+          .careto-wheel-core {
+            animation: caretoWheelHubGlow 4.5s ease-in-out infinite;
           }
         `}</style>
       )}
@@ -226,7 +226,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
         r="135"
         fill="#7dd3fc"
         filter="url(#iceGlow)"
-        className={animated ? 'careta-ambient-halo' : undefined}
+        className={animated ? 'careto-ambient-halo' : undefined}
         opacity={animated ? undefined : 0.2}
       />
 
@@ -275,7 +275,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
           cy="304"
           r="10"
           fill="#bae6fd"
-          className={animated ? 'careta-wheel-core' : undefined}
+          className={animated ? 'careto-wheel-core' : undefined}
         />
         <circle cx="196" cy="304" r="28" fill="#040a12" stroke="#7dd3fc" strokeWidth="9" />
         <circle
@@ -283,10 +283,10 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
           cy="304"
           r="10"
           fill="#bae6fd"
-          className={animated ? 'careta-wheel-core' : undefined}
+          className={animated ? 'careto-wheel-core' : undefined}
         />
         {/* Headlight Laser Blade */}
-        <g className={animated ? 'careta-headlight-beam' : undefined}>
+        <g className={animated ? 'careto-headlight-beam' : undefined}>
           <polygon
             points="404,272 432,274 416,282 396,280"
             fill="#7dd3fc"
@@ -318,7 +318,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
 
       {/* SYNCHRONIZED SPARKLES */}
       <g
-        className={animated ? 'careta-glint-arrow' : undefined}
+        className={animated ? 'careto-glint-arrow' : undefined}
         filter="url(#sparkleBloom)"
         opacity={animated ? undefined : 0.8}
       >
@@ -347,7 +347,7 @@ export const CaretaLogo: React.FC<CaretaLogoProps> = ({
         <circle cx="358" cy="126" r="4.5" fill="#7dd3fc" />
       </g>
       <g
-        className={animated ? 'careta-glint-nose' : undefined}
+        className={animated ? 'careto-glint-nose' : undefined}
         filter="url(#sparkleBloom)"
         opacity={animated ? undefined : 0.8}
       >

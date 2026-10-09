@@ -77,8 +77,8 @@ export const DEFAULT_FUEL_GRADES: FuelGrade[] = [
   },
 ];
 
-export const ACCOUNT_FUEL_GRADES_KEY = 'careta_account_fuel_grades_v1';
-export const SELECTED_FUEL_GRADES_KEY = 'careta_selected_fuel_grades_v1';
+export const ACCOUNT_FUEL_GRADES_KEY = 'careto_account_fuel_grades_v1';
+export const SELECTED_FUEL_GRADES_KEY = 'careto_selected_fuel_grades_v1';
 
 export function useAccountFuelGrades() {
   const [allGrades, setAllGrades] = useLocalStorage<FuelGrade[]>(

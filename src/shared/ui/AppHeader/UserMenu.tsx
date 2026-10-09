@@ -9,11 +9,10 @@ import MenuItem from '@mui/material/MenuItem';
 import { useRouter } from '@tanstack/react-router';
 import type React from 'react';
 import { useState } from 'react';
-import { useSession } from '@/lib/auth-client';
+import { useSession, signOut } from '@/lib/auth-client';
 import { styles } from './UserMenu.styles';
 
 export interface Props {
-  // Option for minimal props or override if needed
   userName?: string;
   userEmail?: string;
 }
@@ -32,27 +31,14 @@ function getInitials(name?: string | null, email?: string | null): string {
   return 'CU';
 }
 
-function getStoredUser(): { name?: string; email?: string } | null {
-  try {
-    const sessionStr = localStorage.getItem('careta_session');
-    if (sessionStr) {
-      return JSON.parse(sessionStr);
-    }
-  } catch {
-    // Ignore JSON parse errors
-  }
-  return null;
-}
-
 export const UserMenu: React.FC<Props> = ({ userName, userEmail }) => {
   const router = useRouter();
   const { data: session } = useSession();
-  const storedUser = getStoredUser();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const displayName = userName ?? session?.user?.name ?? storedUser?.name;
-  const displayEmail = userEmail ?? session?.user?.email ?? storedUser?.email;
+  const displayName = userName ?? session?.user?.name;
+  const displayEmail = userEmail ?? session?.user?.email;
 
   const initials = getInitials(displayName, displayEmail);
 
@@ -69,8 +55,14 @@ export const UserMenu: React.FC<Props> = ({ userName, userEmail }) => {
     router.navigate({ to: '/settings' });
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     handleClose();
+    try {
+      await signOut();
+    } catch {
+      // Ignore
+    }
+    localStorage.removeItem('careto_session');
     localStorage.removeItem('careta_session');
     router.navigate({ to: '/sign-in' });
   };

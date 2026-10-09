@@ -95,7 +95,7 @@ export function parseImportZip(zipBytes: Uint8Array): ImportResult {
 
   const manifestFile = unzipped['manifest.json'];
   if (!manifestFile) {
-    throw new Error('Invalid Careta archive: missing manifest.json');
+    throw new Error('Invalid Careto archive: missing manifest.json');
   }
 
   let manifest: ExportManifest;
@@ -152,7 +152,7 @@ export function parseImportZip(zipBytes: Uint8Array): ImportResult {
   };
 }
 
-export function downloadExportZip(zipBytes: Uint8Array, filename = 'careta-backup.aem.zip') {
+export function downloadExportZip(zipBytes: Uint8Array, filename = 'careto-backup.aem.zip') {
   const blob = new Blob([zipBytes.buffer as ArrayBuffer], { type: 'application/zip' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

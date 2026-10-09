@@ -15,7 +15,7 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
   { id: 'other', label: 'Other Expense', iconName: 'MoreHoriz', isDefault: true },
 ];
 
-export const CATEGORIES_STORAGE_KEY = 'careta_expense_categories_v1';
+export const CATEGORIES_STORAGE_KEY = 'careto_expense_categories_v1';
 
 export function useExpenseCategories() {
   const [categories, setCategories] = useLocalStorage<CategoryItem[]>(

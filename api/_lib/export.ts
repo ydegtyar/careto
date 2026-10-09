@@ -57,7 +57,7 @@ export async function handleExportData(req: VercelRequest, res: VercelResponse) 
     };
 
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename="careta-gdpr-export-${session.user.id}.json"`);
+    res.setHeader('Content-Disposition', `attachment; filename="careto-gdpr-export-${session.user.id}.json"`);
     return res.status(200).send(JSON.stringify(exportPayload, null, 2));
   } catch (err: any) {
     console.error('GDPR Export error:', err);

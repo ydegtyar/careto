@@ -47,7 +47,7 @@ self.addEventListener('fetch', (event) => {
           }
 
           // Open IndexedDB and store payload
-          const dbReq = indexedDB.open('careta-share-target-db', 1);
+          const dbReq = indexedDB.open('careto-share-target-db', 1);
           await new Promise<void>((resolve, reject) => {
             dbReq.onupgradeneeded = (e: any) => {
               const db = e.target.result;
@@ -88,12 +88,12 @@ self.addEventListener('push', (event) => {
 
   try {
     const payload = event.data.json();
-    const title = payload.title || 'Careta';
+    const title = payload.title || 'Careto';
     const options: NotificationOptions = {
       body: payload.body || 'New vehicle notification',
       icon: payload.icon || '/icons/icon-192.png',
       badge: payload.badge || '/icons/icon-192.png',
-      tag: payload.tag || 'careta-notification',
+      tag: payload.tag || 'careto-notification',
       data: {
         url: payload.url || '/reminders',
         reminderId: payload.reminderId,
@@ -109,7 +109,7 @@ self.addEventListener('push', (event) => {
   } catch (err) {
     console.error('Failed to parse push event payload:', err);
     event.waitUntil(
-      self.registration.showNotification('Careta Reminder', {
+      self.registration.showNotification('Careto Reminder', {
         body: event.data.text(),
         icon: '/icons/icon-192.png',
       }),

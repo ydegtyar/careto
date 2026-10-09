@@ -113,7 +113,7 @@ function SettingsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: 'Careta Alert',
+          title: 'Careto Alert',
           body: 'Dual-trigger reminder: Service is upcoming in 450 km',
           url: '/reminders',
         }),
@@ -135,7 +135,7 @@ function SettingsPage() {
     try {
       const fullData = await data.getAllData();
       const zip = createExportZip(fullData);
-      downloadExportZip(zip, `careta-backup-${new Date().toISOString().split('T')[0]}.aem.zip`);
+      downloadExportZip(zip, `careto-backup-${new Date().toISOString().split('T')[0]}.aem.zip`);
       setBackupMessage({
         type: 'success',
         text: `Exported ${fullData.vehicles.length} vehicle(s), ${fullData.entries.length} entries, ${fullData.reminders.length} reminders.`,

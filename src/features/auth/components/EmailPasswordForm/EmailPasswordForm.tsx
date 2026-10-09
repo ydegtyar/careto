@@ -1,6 +1,7 @@
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import KeyIcon from '@mui/icons-material/Key';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import Alert from '@mui/material/Alert';
@@ -14,12 +15,15 @@ import TextField from '@mui/material/TextField';
 import { useRouter } from '@tanstack/react-router';
 import type React from 'react';
 import { useState } from 'react';
+import { signIn, signUp } from '@/lib/auth-client';
 import styles from './EmailPasswordForm.module.scss';
 
 export function EmailPasswordForm() {
   const router = useRouter();
-  const [email, setEmail] = useState('dev@careta.app');
-  const [password, setPassword] = useState('careta-dev-2026');
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -37,34 +41,44 @@ export function EmailPasswordForm() {
     setError(null);
 
     try {
-      // Local dev seed / direct auth sign-in check
-      if (email === 'dev@careta.app' && password === 'careta-dev-2026') {
-        localStorage.setItem(
-          'careta_session',
-          JSON.stringify({
-            userId: 'c5a95d6f-e299-4dff-839d-cdedea1f0f65',
-            email: 'dev@careta.app',
-            name: 'Dev User',
-            rememberMe,
-          }),
-        );
+      if (mode === 'signup') {
+        const { error: signUpError } = await signUp.email({
+          email,
+          password,
+          name: name.trim() || email.split('@')[0] || 'User',
+        });
+
+        if (signUpError) {
+          throw new Error(signUpError.message || 'Failed to create account.');
+        }
+
         router.navigate({ to: '/garage' });
         return;
       }
 
-      const res = await fetch('/api/auth/sign-in/email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, rememberMe }),
+      // Sign In mode
+      const { error: signInError } = await signIn.email({
+        email,
+        password,
+        rememberMe,
       });
 
-      if (!res.ok) {
-        throw new Error('Invalid email or password. Please verify credentials.');
+      if (signInError) {
+        // Direct endpoint fallback try
+        const res = await fetch('/api/auth/sign-in/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, rememberMe }),
+        });
+
+        if (!res.ok) {
+          throw new Error(signInError.message || 'Invalid email or password. Please verify credentials.');
+        }
       }
 
       router.navigate({ to: '/garage' });
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in. Please verify your credentials.');
+      setError(err.message || 'Authentication failed. Please verify your details.');
     } finally {
       setLoading(false);
     }
@@ -76,6 +90,40 @@ export function EmailPasswordForm() {
         <Alert severity="error" sx={{ borderRadius: 3 }}>
           {error}
         </Alert>
+      )}
+
+      {mode === 'signup' && (
+        <div className={styles.fieldGroup}>
+          <label htmlFor="signup-name" className={styles.fieldLabel}>
+            Full Name
+          </label>
+          <TextField
+            id="signup-name"
+            type="text"
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            hiddenLabel
+            placeholder="Alex Driver"
+            className={styles.input}
+            sx={{
+              '& input': {
+                color: '#f0f6fc !important',
+                WebkitTextFillColor: '#f0f6fc !important',
+              },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonOutlinedIcon sx={{ color: '#7dd3fc', fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        </div>
       )}
 
       <div className={styles.fieldGroup}>
@@ -118,7 +166,7 @@ export function EmailPasswordForm() {
         <TextField
           id="signin-password"
           type={showPassword ? 'text' : 'password'}
-          autoComplete="current-password"
+          autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -161,37 +209,39 @@ export function EmailPasswordForm() {
         />
       </div>
 
-      <div className={styles.rowBetween}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              size="small"
-              slotProps={{ input: { 'aria-label': 'Remember this device' } }}
-              sx={{
+      {mode === 'signin' && (
+        <div className={styles.rowBetween}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                size="small"
+                slotProps={{ input: { 'aria-label': 'Remember this device' } }}
+                sx={{
+                  color: '#a0b4c4',
+                  '&.Mui-checked': { color: '#7dd3fc' },
+                }}
+              />
+            }
+            label="Remember device"
+            sx={{
+              '& .MuiTypography-root': {
+                fontSize: '0.8125rem',
                 color: '#a0b4c4',
-                '&.Mui-checked': { color: '#7dd3fc' },
-              }}
-            />
-          }
-          label="Remember device"
-          sx={{
-            '& .MuiTypography-root': {
-              fontSize: '0.8125rem',
-              color: '#a0b4c4',
-            },
-          }}
-        />
+              },
+            }}
+          />
 
-        <button
-          type="button"
-          className={styles.forgotLink}
-          onClick={() => alert('Password reset link sent to your registered email.')}
-        >
-          Forgot password?
-        </button>
-      </div>
+          <button
+            type="button"
+            className={styles.forgotLink}
+            onClick={() => alert('Password reset link sent to your registered email.')}
+          >
+            Forgot password?
+          </button>
+        </div>
+      )}
 
       <button
         type="button"
@@ -210,8 +260,36 @@ export function EmailPasswordForm() {
         fullWidth
         className={styles.submitBtn}
       >
-        {loading ? <CircularProgress size={24} sx={{ color: '#001f2e' }} /> : 'Sign In'}
+        {loading ? (
+          <CircularProgress size={24} sx={{ color: '#001f2e' }} />
+        ) : mode === 'signup' ? (
+          'Create Account'
+        ) : (
+          'Sign In'
+        )}
       </Button>
+
+      <div style={{ textAlign: 'center', marginTop: 8 }}>
+        <button
+          type="button"
+          onClick={() => {
+            setMode((m) => (m === 'signin' ? 'signup' : 'signin'));
+            setError(null);
+          }}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#7dd3fc',
+            fontSize: '0.8125rem',
+            cursor: 'pointer',
+            textDecoration: 'underline',
+          }}
+        >
+          {mode === 'signin'
+            ? "Don't have an account? Create one"
+            : 'Already have an account? Sign In'}
+        </button>
+      </div>
     </form>
   );
 }

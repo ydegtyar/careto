@@ -50,8 +50,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: false,
       manifest: {
-        name: 'Careta',
-        short_name: 'Careta',
+        name: 'Careto',
+        short_name: 'Careto',
         description: 'Auto Expense Manager',
         theme_color: '#0a0e1a',
         background_color: '#0a0e1a',

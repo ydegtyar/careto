@@ -106,7 +106,7 @@ function OnboardingPage() {
     >
       <header style={{ textAlign: 'center' }}>
         <Typography variant="h5" sx={{ fontWeight: 800, color: 'primary.main', mb: 0.5 }}>
-          Welcome to Careta
+          Welcome to Careto
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           Your offline-first vehicle expense & telemetry companion
@@ -141,7 +141,7 @@ function OnboardingPage() {
           </div>
 
           <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-            Careta uses OPFS SQLite replicas so your expenses, refuels, and maintenance records
+            Careto uses OPFS SQLite replicas so your expenses, refuels, and maintenance records
             remain accessible even without network connectivity.
           </Typography>
 

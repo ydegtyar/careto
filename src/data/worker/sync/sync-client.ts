@@ -83,7 +83,7 @@ export class SyncEngine {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Careta': '1',
+          'X-Careto': '1',
         },
         body: JSON.stringify({
           vehicleId,
@@ -131,7 +131,7 @@ export class SyncEngine {
       const res = await fetch(
         `/api/sync/pull?vehicle_id=${encodeURIComponent(vehicleId)}&since=${since}`,
         {
-          headers: { 'X-Careta': '1' },
+          headers: { 'X-Careto': '1' },
         },
       );
 

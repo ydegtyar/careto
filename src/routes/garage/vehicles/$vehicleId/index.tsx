@@ -89,9 +89,7 @@ function VehicleDetailPage() {
   const fetchMembers = async () => {
     if (!vehicleId) return;
     try {
-      const res = await fetch(`/api/vehicles/members?vehicle_id=${vehicleId}`, {
-        headers: { 'x-dev-user-id': 'c5a95d6f-e299-4dff-839d-cdedea1f0f65' },
-      });
+      const res = await fetch(`/api/vehicles/members?vehicle_id=${vehicleId}`);
       if (res.ok) {
         const data = (await res.json()) as any;
         setMembers(data.members || []);
@@ -116,7 +114,6 @@ function VehicleDetailPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-dev-user-id': 'c5a95d6f-e299-4dff-839d-cdedea1f0f65',
         },
         body: JSON.stringify({ vehicleId, email, role }),
       });
@@ -151,7 +148,6 @@ function VehicleDetailPage() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'x-dev-user-id': 'c5a95d6f-e299-4dff-839d-cdedea1f0f65',
         },
         body: JSON.stringify({ vehicleId, targetUserId }),
       });

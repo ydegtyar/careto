@@ -33,10 +33,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const upstreamRes = await fetch(targetUrl, init);
     
     // Forward headers
+    const setCookies = typeof upstreamRes.headers.getSetCookie === 'function'
+      ? upstreamRes.headers.getSetCookie()
+      : null;
+
+    if (setCookies && setCookies.length > 0) {
+      res.setHeader('set-cookie', setCookies);
+    }
+
     upstreamRes.headers.forEach((val, key) => {
-      if (key.toLowerCase() === 'set-cookie') {
-        res.setHeader('set-cookie', val);
-      } else if (key.toLowerCase() !== 'content-encoding' && key.toLowerCase() !== 'content-length') {
+      const lowerKey = key.toLowerCase();
+      if (lowerKey === 'set-cookie') {
+        if (!setCookies) {
+          res.setHeader('set-cookie', val);
+        }
+      } else if (lowerKey !== 'content-encoding' && lowerKey !== 'content-length') {
         res.setHeader(key, val);
       }
     });

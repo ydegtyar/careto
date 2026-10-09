@@ -40,8 +40,8 @@ export class OpenRouterGeminiAdapter implements LlmAdapter {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://careta.app',
-        'X-Title': 'Careta Automotive App',
+        'HTTP-Referer': 'https://careto.app',
+        'X-Title': 'Careto Automotive App',
       },
       body: JSON.stringify({
         model: 'google/gemini-2.0-flash-001',
@@ -98,8 +98,8 @@ export class OpenRouterDeepSeekAdapter implements LlmAdapter {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://careta.app',
-        'X-Title': 'Careta Automotive App',
+        'HTTP-Referer': 'https://careto.app',
+        'X-Title': 'Careto Automotive App',
       },
       body: JSON.stringify({
         model: 'qwen/qwen-2.5-vl-72b-instruct:free',

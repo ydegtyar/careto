@@ -51,7 +51,7 @@ export const useAppStore = create<AppState>()(
       setIsPremium: (isPremium) => set({ isPremium }),
     }),
     {
-      name: 'careta-app-store',
+      name: 'careto-app-store',
       partialize: (state) => ({ activeVehicleId: state.activeVehicleId }),
     },
   ),

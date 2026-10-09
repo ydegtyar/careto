@@ -32,7 +32,7 @@ export function exportAnalyticsCSV(entries: Entry[], vehicle?: Vehicle) {
   link.setAttribute('href', url);
   link.setAttribute(
     'download',
-    `careta_tax_report_${vehicle?.name.replace(/\s+/g, '_') || 'vehicle'}_${new Date().toISOString().slice(0, 10)}.csv`,
+    `careto_tax_report_${vehicle?.name.replace(/\s+/g, '_') || 'vehicle'}_${new Date().toISOString().slice(0, 10)}.csv`,
   );
   document.body.appendChild(link);
   link.click();
@@ -53,7 +53,7 @@ export function exportAnalyticsPDF(entries: Entry[], vehicle?: Vehicle) {
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Tax & Mileage Deductible Report - Careta</title>
+        <title>Tax & Mileage Deductible Report - Careto</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; color: #1a202c; }
           h1 { font-size: 20px; margin-bottom: 4px; }
@@ -65,7 +65,7 @@ export function exportAnalyticsPDF(entries: Entry[], vehicle?: Vehicle) {
         </style>
       </head>
       <body>
-        <h1>Careta Telemetry — Tax & Mileage Report</h1>
+        <h1>Careto Telemetry — Tax & Mileage Report</h1>
         <div class="subtitle">Vehicle: ${vehicle?.name || 'Active Vehicle'} | Date Generated: ${new Date().toLocaleDateString()}</div>
 
         <div class="summary-card">

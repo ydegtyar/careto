@@ -17,8 +17,8 @@ async function main() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: 'Dev User',
-        email: 'dev@careta.app',
-        password: 'careta-dev-2026',
+        email: 'dev@careto.app',
+        password: 'careto-dev-2026',
       }),
     });
     const data = await res.json() as any;
@@ -27,20 +27,20 @@ async function main() {
       console.log('Created new user:', userId);
     } else {
       console.log('Sign up response:', data);
-      const existing = await sql`SELECT id FROM neon_auth."user" WHERE email = 'dev@careta.app' LIMIT 1`;
+      const existing = await sql`SELECT id FROM neon_auth."user" WHERE email = 'dev@careto.app' LIMIT 1`;
       userId = existing[0]!.id;
       console.log('Using existing user id:', userId);
     }
   } catch (err) {
     console.warn('Fallback to query user:', err);
-    const existing = await sql`SELECT id FROM neon_auth."user" WHERE email = 'dev@careta.app' LIMIT 1`;
+    const existing = await sql`SELECT id FROM neon_auth."user" WHERE email = 'dev@careto.app' LIMIT 1`;
     if (existing.length > 0) {
       userId = existing[0]!.id;
     } else {
       // Direct SQL insert fallback
       const inserted = await sql`
         INSERT INTO neon_auth."user" (id, name, email, "emailVerified", "createdAt", "updatedAt")
-        VALUES (gen_random_uuid(), 'Dev User', 'dev@careta.app', true, now(), now())
+        VALUES (gen_random_uuid(), 'Dev User', 'dev@careto.app', true, now(), now())
         RETURNING id
       `;
       userId = inserted[0]!.id;

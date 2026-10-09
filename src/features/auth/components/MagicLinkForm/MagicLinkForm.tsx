@@ -23,19 +23,15 @@ export function MagicLinkForm() {
     setError(null);
 
     try {
+      const callbackURL = `${window.location.origin}/garage`;
       const res = await fetch('/api/auth/sign-in/magic-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, callbackURL }),
       });
 
       if (!res.ok) {
-        // Fallback for offline/mock demo
-        if (email.includes('@')) {
-          setSent(true);
-          return;
-        }
-        throw new Error('Failed to send magic link. Please check your email.');
+        throw new Error('Failed to send magic link. Please check your email address.');
       }
 
       setSent(true);

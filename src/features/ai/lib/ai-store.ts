@@ -32,7 +32,7 @@ export const useAiSettingsStore = create<AiSettingsState>()(
       resetDefaults: () => set({ adapterOrder: DEFAULT_ORDER, customApiKey: '' }),
     }),
     {
-      name: 'careta-ai-settings-v1',
+      name: 'careto-ai-settings-v1',
     },
   ),
 );

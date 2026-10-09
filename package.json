@@ -1,5 +1,5 @@
 {
-  "name": "careta",
+  "name": "careto",
   "private": true,
   "type": "module",
   "scripts": {
@@ -38,6 +38,7 @@
     "comlink": "^4.4.2",
     "drizzle-orm": "^0.45.4",
     "fflate": "^0.8.3",
+    "idb": "^8.0.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "recharts": "^3.10.1",
@@ -45,6 +46,7 @@
     "uuidv7": "^1.2.1",
     "valibot": "^1.5.0",
     "web-push": "^3.6.7",
+    "workbox-precaching": "^7.4.1",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

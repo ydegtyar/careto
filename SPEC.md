@@ -1,4 +1,4 @@
-# Careta — Living Spec & Progress Tracker
+# Careto — Living Spec & Progress Tracker
 
 > **How to use this file**: Every subtask is a checkbox. Tick `[x]` as you complete it.
 > When resuming, scan for the first `[ ]` to know where to pick up.
@@ -10,15 +10,15 @@
 
 | Key | Value |
 |---|---|
-| App name | **Careta** (title shown in UI: "Careta") |
+| App name | **Careto** (title shown in UI: "Careto") |
 | Description | Mobile-first PWA auto expense manager |
 | Theme | **Glacier** — dark glassmorphism, ice-blue accents |
 | Design source | Stitch project `15374606287284007947` "Auto Expense Manager" — 9 screens |
-| Vercel domain | `careto.vercel.app` (fallback: `careta-app`, `caret-auto`, `carauto`, `cartrack-app`) |
+| Vercel domain | `careto.vercel.app` (fallback: `careto-app`, `caret-auto`, `carauto`, `cartrack-app`) |
 | Neon project | `flat-violet-51448335`, `eu-central-1`, Postgres 18 |
 | Neon Auth | Better Auth, Google OAuth (shared provider dev / dedicated client prod), magic link, email/password |
-| Test user | `dev@careta.app` / `careta-dev-2026` |
-| Repo path | `/Users/degtyar/code/ydegtyar/careta` |
+| Test user | `dev@careto.app` / `careto-dev-2026` |
+| Repo path | `/Users/degtyar/code/ydegtyar/careto` |
 | Neon org | `org-polished-dew-63529608` |
 | Neon branch | `production` (`br-billowing-cherry-b2ve1pgs`) |
 | Neon Auth base URL | `https://ep-old-queen-b2swdkvy.neonauth.c-6.eu-central-1.aws.neon.tech/neondb/auth` |
@@ -246,7 +246,7 @@ Minimum readable: 11px
 ### M0.7 — Neon: Seed User & Data
 - [x] Add `tsx` as dev dep: `npm install -D tsx`
 - [x] Create `scripts/seed.ts`:
-  - Call `POST {NEON_AUTH_BASE_URL}/sign-up/email` with `{name: 'Dev User', email: 'dev@careta.app', password: 'careta-dev-2026'}`
+  - Call `POST {NEON_AUTH_BASE_URL}/sign-up/email` with `{name: 'Dev User', email: 'dev@careto.app', password: 'careto-dev-2026'}`
   - Insert vehicle: `{name: 'Tesla Model 3', owner_id: <user.id>}` via `neon` SQL
   - Insert 3 `records` rows: 2× refuel entries + 1× service entry (as JSONB in `data` column)
   - Insert FX rates for today: EUR=1.08, GBP=1.27, UAH=0.024
@@ -267,14 +267,14 @@ Minimum readable: 11px
   - "Continue with Google" button (disabled/hidden on localhost — enabled on Vercel HTTPS)
   - Matches Stitch screen `3e72e26a00db49c693d27e9e1f671a18`
 - [x] Route guard in `__root.tsx` `beforeLoad`: no session → redirect to `/sign-in`
-- [x] Verify: sign in with `dev@careta.app / careta-dev-2026` → lands on `/garage`
+- [x] Verify: sign in with `dev@careto.app / careto-dev-2026` → lands on `/garage`
 - [x] Verify: request magic link → email delivered (Neon Auth shared email provider)
 
 ### M0.9 — Vercel Deployment
 - [x] Create `nitro.config.ts` (preset: `vercel`, routeRules: no-cache on index/sw/version, immutable on assets, no COOP/COEP)
 - [x] Create `vercel.json` (minimal: only cron/headers not covered by nitro routeRules)
 - [x] Run `vercel login` (user must authenticate)
-- [x] Run `vercel link` → project name `careto` (fallback if taken: `careta-app`, `caret-auto`, `carauto`)
+- [x] Run `vercel link` → project name `careto` (fallback if taken: `careto-app`, `caret-auto`, `carauto`)
 - [x] Set Vercel env vars via `vercel env add` or dashboard: `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_AUTH_BASE_URL`, `NEON_AUTH_JWKS_URL`, `BETTER_AUTH_SECRET`
 - [x] Add `careto.vercel.app` (or fallback) as trusted origin in Neon Auth MCP: `add_auth_trusted_domain`
 - [x] Run `vercel --prod`
@@ -290,7 +290,7 @@ Minimum readable: 11px
 
 ### M1.1 — Worker Boot
 - [x] Create `src/data/worker/data.worker.ts`:
-  - Acquire Web Lock `careta-db-owner` (`ifAvailable: true`) → single-tab guard
+  - Acquire Web Lock `careto-db-owner` (`ifAvailable: true`) → single-tab guard
   - Open `account.db` + `local.db` → run migrations → emit `{type:'ready'}`
 - [x] Create `src/data/client/index.ts` — Comlink `wrap<typeof api>(worker)`; re-export `data` proxy
 - [x] `src/app/providers.tsx`: listen for `{type:'ready'}` → set Zustand `dbReady: true`
@@ -310,7 +310,7 @@ Minimum readable: 11px
 
 ### M1.4 — Write Path & HLC
 - [x] `src/shared/lib/hlc.ts` — `now()`, `recv(remote)`, `compare(a, b)`, clamped to `now + 5min`
-- [x] Every repo write: broadcast `careta-db` event to main thread
+- [x] Every repo write: broadcast `careto-db` event to main thread
 
 ### M1.5 — TanStack Query Integration
 - [x] `src/features/garage/queries/vehicles.ts` — `queryOptions({staleTime:Infinity, networkMode:'always'})`
@@ -345,7 +345,7 @@ Stitch: `8482ce5c057c429f88d13959986e81d1` (780×3126px rendered at 390px)
 Stitch: `3e72e26a00db49c693d27e9e1f671a18` (780×1878px)
 
 - [x] Full-screen Glacier gradient background (deep navy, no card)
-- [x] App wordmark "Careta" (Inter 700, large, ice-blue accent)
+- [x] App wordmark "Careto" (Inter 700, large, ice-blue accent)
 - [x] Tab switcher: "Password" | "Magic Link"
 - [x] `src/features/auth/components/EmailPasswordForm/EmailPasswordForm.tsx` — email + password + Sign In button
 - [x] `src/features/auth/components/MagicLinkForm/MagicLinkForm.tsx` — email + "Send Magic Link" button + sent confirmation state
@@ -408,7 +408,7 @@ Stitch: `b6135099397e4e70808808f61cdead74` + `1b1126734d304cd8aae6b69015675d52` 
 - [x] `api/auth/[...all].ts` — Neon Auth / Better Auth proxy with credentials and origin forwarding
 
 ### M3.2 — Dedicated Google OAuth Client (production)
-- [ ] Create/identify Google Cloud project for Careta
+- [ ] Create/identify Google Cloud project for Careto
 - [ ] Create OAuth 2.0 Web client: authorized origins = `https://careto.vercel.app`, `http://localhost:5173`
 - [ ] Set `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` in Vercel env
 - [ ] Wire into Better Auth config: `socialProviders.google`

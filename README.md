@@ -1,4 +1,4 @@
-# Careta
+# Careto
 
 > **Car expense manager**
 
@@ -15,7 +15,7 @@
 
 ## About
 
-Careta is a modern web application for managing car expenses, tracking mileage, and organizing vehicle‑related data. It provides a clean UI for logging fuel, maintenance, and other costs, while offering analytics dashboards to visualize spending trends. Designed for both individual drivers and small fleets, it helps users stay on top of budgeting, reminders, and vehicle health.
+Careto is a modern web application for managing car expenses, tracking mileage, and organizing vehicle‑related data. It provides a clean UI for logging fuel, maintenance, and other costs, while offering analytics dashboards to visualize spending trends. Designed for both individual drivers and small fleets, it helps users stay on top of budgeting, reminders, and vehicle health.
 
 ## Features
 
@@ -34,8 +34,8 @@ Careta is a modern web application for managing car expenses, tracking mileage, 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/careta.git
-cd careta
+git clone https://github.com/yourusername/careto.git
+cd careto
 
 # Install dependencies (adjust for your package manager)
 npm install  # or yarn install, pip install -r requirements.txt, etc.
@@ -52,7 +52,7 @@ Explain how to run the project with example commands. Include typical use‑case
 npm run dev
 
 # Or, for a compiled binary
-./careta --help
+./careto --help
 ```
 
 Add code snippets or screenshots where helpful, and describe common commands or flags.
@@ -92,7 +92,7 @@ Provide a link to the full license text (e.g., `LICENSE` file).
 ## Contact
 
 - **Author:** Your Name <your.email@example.com>
-- **GitHub:** https://github.com/yourusername/careta
+- **GitHub:** https://github.com/yourusername/careto
 - **Twitter:** @yourhandle (optional)
 
 Feel free to open an issue for bugs, feature requests, or questions.

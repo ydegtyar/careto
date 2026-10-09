@@ -91,7 +91,7 @@ export function AiSettingsCard() {
           Waterfall Adapter Execution Priority Order
         </Typography>
         <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 1.5 }}>
-          If the primary adapter fails or is rate-limited, Careta automatically falls back down the
+          If the primary adapter fails or is rate-limited, Careto automatically falls back down the
           list.
         </Typography>
 

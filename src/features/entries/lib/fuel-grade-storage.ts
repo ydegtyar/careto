@@ -1,7 +1,7 @@
 import { useLocalStorage } from 'usehooks-ts';
 
-export const LAST_USED_FUEL_GRADE_KEY = 'careta_last_used_fuel_grade';
-export const LAST_PRICES_PER_FUEL_GRADE_KEY = 'careta_last_prices_per_fuel_grade';
+export const LAST_USED_FUEL_GRADE_KEY = 'careto_last_used_fuel_grade';
+export const LAST_PRICES_PER_FUEL_GRADE_KEY = 'careto_last_prices_per_fuel_grade';
 
 export const DEFAULT_PRICES_PER_GRADE: Record<string, string> = {
   ron95: '1.85',
