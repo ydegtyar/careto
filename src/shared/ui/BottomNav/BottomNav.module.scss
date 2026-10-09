@@ -43,6 +43,7 @@
     0 12px 32px rgb(0 0 0 / 60%),
     0 0 20px rgb(125 211 252 / 15%) !important;
   pointer-events: auto;
+  transform: translateZ(0) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
   outline: 1px solid rgb(255 255 255 / 20%) !important;
