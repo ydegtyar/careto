@@ -1,4 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import crypto from 'node:crypto';
+import { sql } from '../_lib/db.js';
 
 const NEON_AUTH_BASE = process.env.NEON_AUTH_BASE_URL || 'https://ep-old-queen-b2swdkvy.neonauth.c-6.eu-central-1.aws.neon.tech/neondb/auth';
 
@@ -12,6 +14,75 @@ function sanitizeCookie(cookieStr: string): string {
     cleaned += '; SameSite=Lax';
   }
   return cleaned;
+}
+
+async function handleGoogleOneTap(req: VercelRequest, res: VercelResponse) {
+  try {
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    const idToken = body.idToken || body.credential || body.token || body.id_token;
+
+    if (!idToken) {
+      return res.status(400).json({ error: 'Missing idToken in request body' });
+    }
+
+    // Verify Google ID token
+    const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
+    if (!googleRes.ok) {
+      const errText = await googleRes.text();
+      console.error('Google token verification failed:', errText);
+      return res.status(400).json({ error: 'Invalid Google ID token' });
+    }
+
+    const payload = await googleRes.json();
+    const email = payload.email;
+    const name = payload.name || payload.given_name || email?.split('@')[0] || 'User';
+    const picture = payload.picture || null;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Google ID token missing email' });
+    }
+
+    // Check or create user in neon_auth.user
+    const userRows = await sql`
+      SELECT id, email, name FROM neon_auth."user" WHERE email = ${email} LIMIT 1
+    `;
+
+    let userId: string;
+    if (userRows.length > 0) {
+      userId = userRows[0]!.id;
+    } else {
+      const newId = crypto.randomUUID();
+      await sql`
+        INSERT INTO neon_auth."user" (id, name, email, "emailVerified", image, "createdAt", "updatedAt", role)
+        VALUES (${newId}, ${name}, ${email}, true, ${picture}, now(), now(), 'user')
+      `;
+      userId = newId;
+    }
+
+    // Create session in neon_auth.session
+    const sessionId = crypto.randomUUID();
+    const sessionToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await sql`
+      INSERT INTO neon_auth.session (id, token, "userId", "expiresAt", "createdAt", "updatedAt")
+      VALUES (${sessionId}, ${sessionToken}, ${userId}, ${expiresAt.toISOString()}, now(), now())
+    `;
+
+    const cookieOptions = `Path=/; SameSite=Lax; HttpOnly; Expires=${expiresAt.toUTCString()}`;
+    res.setHeader('set-cookie', [
+      `better-auth.session_token=${sessionToken}; ${cookieOptions}`,
+      `__Secure-better-auth.session_token=${sessionToken}; ${cookieOptions}; Secure`,
+    ]);
+
+    return res.status(200).json({
+      user: { id: userId, email, name, image: picture },
+      session: { id: sessionId, token: sessionToken, expiresAt },
+    });
+  } catch (err: any) {
+    console.error('Google One Tap verification error:', err);
+    return res.status(500).json({ error: 'Internal server error during One Tap login' });
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -31,6 +102,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!subpath.startsWith('/')) {
       subpath = '/' + subpath;
+    }
+
+    // Intercept one-tap callback endpoints
+    if (subpath.includes('one-tap') && req.method === 'POST') {
+      return await handleGoogleOneTap(req, res);
     }
 
     // Build query string, omitting internal routing parameters
