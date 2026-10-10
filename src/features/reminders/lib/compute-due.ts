@@ -1,4 +1,5 @@
-export type ReminderMode = 'km' | 'time' | 'earlier' | 'later';
+export type ReminderMode = 'km' | 'time' | 'earlier' | 'later' | 'seasonal';
+
 export type DueStatus = 'ok' | 'upcoming' | 'due' | 'overdue' | 'snoozed';
 
 export interface ComputeDueReminderInput {
@@ -251,6 +252,23 @@ export function computeDue(
         reason = `Later of ${kmVal.toLocaleString()} km and ${remainingDays}d`;
       } else {
         reason = 'Interval not configured';
+      }
+      break;
+    }
+
+    case 'seasonal': {
+      // Seasonal cycle (e.g. biannual Spring / Autumn changeover)
+      finalStatus = timeStatus;
+      finalPercent = timePercent;
+      finalProjectedDate = targetDateStr;
+      if (remainingDays !== null) {
+        if (remainingDays <= 0) {
+          reason = `Seasonal changeover overdue by ${Math.abs(remainingDays)} day${Math.abs(remainingDays) === 1 ? '' : 's'}`;
+        } else {
+          reason = `Seasonal changeover due in ${remainingDays} day${remainingDays === 1 ? '' : 's'}`;
+        }
+      } else {
+        reason = 'Seasonal cycle date not set';
       }
       break;
     }

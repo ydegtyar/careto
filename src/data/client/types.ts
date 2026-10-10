@@ -103,6 +103,7 @@ export enum ReminderMode {
   Time = 'time',
   Earlier = 'earlier',
   Later = 'later',
+  Seasonal = 'seasonal',
 }
 
 export type ReminderModeType = `${ReminderMode}`;
