@@ -10,6 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { Link as RouterLink } from '@tanstack/react-router';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
@@ -121,14 +122,21 @@ export function ApiKeysSettingsCard() {
           </div>
         </div>
 
-        <Button
-          size="small"
-          variant="contained"
-          onClick={() => setCreateOpen(true)}
-          sx={{ textTransform: 'none', borderRadius: 2 }}
-        >
-          Create API Key
-        </Button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <RouterLink to="/mcp" style={{ textDecoration: 'none' }}>
+            <Button size="small" variant="outlined" sx={{ textTransform: 'none', borderRadius: 2 }}>
+              MCP Docs
+            </Button>
+          </RouterLink>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => setCreateOpen(true)}
+            sx={{ textTransform: 'none', borderRadius: 2 }}
+          >
+            Create API Key
+          </Button>
+        </div>
       </div>
 
       {keys.length === 0 ? (
