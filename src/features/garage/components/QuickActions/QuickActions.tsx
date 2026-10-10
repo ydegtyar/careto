@@ -2,6 +2,7 @@ import BuildIcon from '@mui/icons-material/Build';
 import EvStationIcon from '@mui/icons-material/EvStation';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import { useRouter } from '@tanstack/react-router';
 import type { Vehicle } from '@/data/client/types';
 import styles from './QuickActions.module.scss';
@@ -35,6 +36,12 @@ export function QuickActions({ vehicle }: Props) {
       label: 'Expense',
       icon: <ReceiptIcon sx={{ fontSize: 22 }} />,
       onClick: () => router.navigate({ to: '/entries/new', search: { kind: 'expense' } }),
+    },
+    {
+      id: 'note',
+      label: 'Note',
+      icon: <StickyNote2Icon sx={{ fontSize: 22 }} />,
+      onClick: () => router.navigate({ to: '/entries/new', search: { kind: 'note' } }),
     },
   ];
 

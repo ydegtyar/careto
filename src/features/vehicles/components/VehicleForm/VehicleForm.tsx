@@ -10,11 +10,13 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -32,10 +34,10 @@ import {
   getGradesForPowertrain,
   useAccountFuelGrades,
 } from '@/shared/lib/fuel-grades';
+import { type DecodedVehicleSpecs, decodeVinWithNhtsa } from '../../lib/vin-decoder';
+import { VinDecodeDialog } from '../VinDecodeDialog/VinDecodeDialog';
 import { GradeChip } from './GradeChip';
 import { ColorSwatchButton } from './VehicleFormHelpers';
-import { VinDecodeDialog } from '../VinDecodeDialog/VinDecodeDialog';
-import { decodeVinWithNhtsa, type DecodedVehicleSpecs } from '../../lib/vin-decoder';
 
 const COLOR_SWATCHES = [
   '#7dd3fc', // Ice Blue
@@ -70,6 +72,7 @@ export interface VehicleFormValues {
   initialOdometerKm: string;
   distanceUnit: string;
   efficiencyUnit: string;
+  usedByBusiness?: boolean;
 }
 
 interface Props {
@@ -194,6 +197,7 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
         : '0',
       distanceUnit: initialVehicle?.distance_unit ?? 'km',
       efficiencyUnit: initialVehicle?.efficiency_unit ?? 'kwh100km',
+      usedByBusiness: initialVehicle?.used_by_business ?? false,
     },
     onSubmit: async ({ value }) => {
       await onSubmit(value);
@@ -662,6 +666,178 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
         />
       </div>
 
+      {/* Tank / Container Management Editor */}
+      <form.Subscribe
+        selector={(state) => [state.values.tanks, state.values.powertrain] as const}
+        children={([tanks = [], powertrain]) => (
+          <form.Field
+            name="tanks"
+            children={(field) => {
+              const currentTanks = field.state.value || tanks;
+
+              const handleAddTank = () => {
+                const newId = `tank_${Date.now()}`;
+                const isEvPowertrain = powertrain === 'ev';
+                const newTank: NonNullable<Vehicle['tanks']>[number] = {
+                  id: newId,
+                  name: isEvPowertrain ? 'Secondary Battery' : 'Auxiliary Fuel Tank',
+                  type: isEvPowertrain ? 'ev' : 'petrol',
+                  capacity_ml_or_wh: isEvPowertrain ? 10000 : 25000,
+                  primary_fuel_grade: isEvPowertrain ? 'ev_ac' : 'ron95',
+                };
+                field.handleChange([...currentTanks, newTank]);
+              };
+
+              const handleRemoveTank = (id: string) => {
+                if (currentTanks.length <= 1) return;
+                field.handleChange(currentTanks.filter((t) => t.id !== id));
+              };
+
+              const handleUpdateTank = (
+                id: string,
+                updates: Partial<NonNullable<Vehicle['tanks']>[number]>,
+              ) => {
+                field.handleChange(
+                  currentTanks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+                );
+              };
+
+              return (
+                <div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'text.secondary',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Configured Energy Containers / Tanks ({currentTanks.length})
+                    </Typography>
+                    <Button
+                      size="small"
+                      startIcon={<AddIcon sx={{ fontSize: 14 }} />}
+                      onClick={handleAddTank}
+                      sx={{
+                        fontSize: '0.75rem',
+                        textTransform: 'none',
+                        color: 'primary.main',
+                        py: 0,
+                      }}
+                    >
+                      Add Container
+                    </Button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {currentTanks.map((tank, idx) => (
+                      <div
+                        key={tank.id}
+                        style={{
+                          padding: '12px',
+                          borderRadius: '12px',
+                          border: '1px solid rgba(125, 211, 252, 0.2)',
+                          backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 10,
+                        }}
+                      >
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <TextField
+                            label={`Container #${idx + 1} Name`}
+                            size="small"
+                            value={tank.name}
+                            onChange={(e) => handleUpdateTank(tank.id, { name: e.target.value })}
+                            fullWidth
+                          />
+                          <FormControl size="small" style={{ minWidth: 120 }}>
+                            <InputLabel id={`tank-type-label-${tank.id}`}>Type</InputLabel>
+                            <Select
+                              labelId={`tank-type-label-${tank.id}`}
+                              value={tank.type}
+                              label="Type"
+                              onChange={(e) =>
+                                handleUpdateTank(tank.id, {
+                                  type: e.target.value as NonNullable<
+                                    Vehicle['tanks']
+                                  >[number]['type'],
+                                })
+                              }
+                            >
+                              <MenuItem value="petrol">Petrol</MenuItem>
+                              <MenuItem value="diesel">Diesel</MenuItem>
+                              <MenuItem value="lpg">LPG</MenuItem>
+                              <MenuItem value="cng">CNG</MenuItem>
+                              <MenuItem value="ev">EV Battery</MenuItem>
+                              <MenuItem value="hydrogen">Hydrogen</MenuItem>
+                              <MenuItem value="other">Other</MenuItem>
+                            </Select>
+                          </FormControl>
+                          {currentTanks.length > 1 && (
+                            <Button
+                              size="small"
+                              color="error"
+                              onClick={() => handleRemoveTank(tank.id)}
+                              sx={{ minWidth: 'auto', px: 1 }}
+                            >
+                              ✕
+                            </Button>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <TextField
+                            label={tank.type === 'ev' ? 'Capacity (kWh)' : 'Capacity (L)'}
+                            size="small"
+                            type="number"
+                            value={
+                              tank.capacity_ml_or_wh
+                                ? tank.type === 'ev'
+                                  ? tank.capacity_ml_or_wh / 1000
+                                  : tank.capacity_ml_or_wh / 1000
+                                : ''
+                            }
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              handleUpdateTank(tank.id, {
+                                capacity_ml_or_wh: Number.isNaN(val) ? undefined : val * 1000,
+                              });
+                            }}
+                            fullWidth
+                          />
+                          <TextField
+                            label="Default Fuel / Charge Grade"
+                            size="small"
+                            placeholder="e.g. ron95 / ev_ac"
+                            value={tank.primary_fuel_grade || ''}
+                            onChange={(e) =>
+                              handleUpdateTank(tank.id, {
+                                primary_fuel_grade: e.target.value,
+                              })
+                            }
+                            fullWidth
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }}
+          />
+        )}
+      />
+
       {/* Supported Fuel & Charge Grades per vehicle */}
       <form.Subscribe
         selector={(state) => [state.values.powertrain, state.values.fuelGrades] as const}
@@ -832,6 +1008,26 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
           )}
         />
       </div>
+
+      <form.Field
+        name="usedByBusiness"
+        children={(field) => (
+          <FormControlLabel
+            control={
+              <Switch
+                checked={field.state.value}
+                onChange={(e) => field.handleChange(e.target.checked)}
+                color="primary"
+              />
+            }
+            label={
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                Used by business
+              </Typography>
+            }
+          />
+        )}
+      />
 
       <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
         {onCancel && (

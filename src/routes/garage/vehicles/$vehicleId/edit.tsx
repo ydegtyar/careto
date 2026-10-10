@@ -61,6 +61,7 @@ function EditVehiclePage() {
         fuel_grades: values.fuelGrades,
         distance_unit: values.distanceUnit,
         efficiency_unit: values.efficiencyUnit,
+        used_by_business: values.usedByBusiness ?? false,
       });
 
       await queryClient.invalidateQueries({ queryKey: ['vehicles'] });

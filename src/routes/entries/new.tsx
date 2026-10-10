@@ -1,5 +1,3 @@
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import SavingsIcon from '@mui/icons-material/Savings';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -27,7 +25,7 @@ import {
 } from '@/features/entries/components/EntryKindSelector/EntryKindSelector';
 import { FuelGradeSelector } from '@/features/entries/components/FuelGradeSelector/FuelGradeSelector';
 import { HeroAmountPaymentCard } from '@/features/entries/components/HeroAmountPaymentCard/HeroAmountPaymentCard';
-import { RecurringIntervalButton } from '@/features/entries/components/RecurringIntervalButton/RecurringIntervalButton';
+import { RecurringExpenseOptions } from '@/features/entries/components/RecurringExpenseOptions/RecurringExpenseOptions';
 import {
   type EditableSubItem,
   SubItemsEditor,
@@ -77,7 +75,7 @@ function NewEntryPage() {
   const [fuelGrade, setFuelGrade] = useState<string>(lastUsedFuelGrade);
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState(lastUsedCurrency);
-  const [odometerKm, setOdometerKm] = useState('48250');
+  const [odometerKm, setOdometerKm] = useState(kind === 'note' ? '' : '48250');
   const [volumeLiters, setVolumeLiters] = useState('45.2');
   const [pricePerUnit, setPricePerUnit] = useState<string>(
     lastPricesPerGrade[lastUsedFuelGrade] || '1.44',
@@ -96,7 +94,59 @@ function NewEntryPage() {
   const [lon, setLon] = useState<number | null>(null);
   const [subItems, setSubItems] = useState<EditableSubItem[]>([]);
   const [_receiptImage, setReceiptImage] = useState<CompressedImage | null>(null);
+  const [aiSummaryEnabled, setAiSummaryEnabled] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  const handleImageReady = async (
+    compressed: CompressedImage | null,
+    originalFile?: File | Blob,
+  ) => {
+    setReceiptImage(compressed);
+    if (!compressed || !aiSummaryEnabled) return;
+
+    try {
+      const fileToParse = originalFile || compressed.blob;
+      const targetPurpose = kind === 'note' ? 'note' : 'expense';
+      const res = await parseImageWithAi(targetPurpose, fileToParse);
+
+      if (res.success && res.data) {
+        const parsed = res.data;
+        if (targetPurpose === 'note') {
+          const noteData = parsed as any;
+          if (noteData.notes)
+            setNotes((prev) => (prev ? `${prev}\n${noteData.notes}` : noteData.notes));
+          if (noteData.date) setDate(noteData.date);
+          if (noteData.odometerKm) setOdometerKm(noteData.odometerKm.toString());
+          if (noteData.merchant || noteData.vendorName) {
+            setVendorName(noteData.vendorName || noteData.merchant || '');
+            setVendorLocation(noteData.merchant || noteData.vendorName || '');
+          }
+          if (noteData.lat && noteData.lon) {
+            setLat(noteData.lat);
+            setLon(noteData.lon);
+          }
+        } else {
+          const expenseData = parsed as ExpenseParseResult;
+          if (expenseData.amount) handleAmountChange(expenseData.amount.toString());
+          if (expenseData.date) setDate(expenseData.date);
+          if (expenseData.fuelVolume) handleVolumeChange(expenseData.fuelVolume.toString());
+          if (expenseData.category) setCategory(expenseData.category);
+          if (expenseData.merchant || expenseData.vendorName) {
+            setVendorName(expenseData.vendorName || expenseData.merchant || '');
+            setVendorLocation(expenseData.merchant || expenseData.vendorName || '');
+          }
+          if (expenseData.lat && expenseData.lon) {
+            setLat(expenseData.lat);
+            setLon(expenseData.lon);
+          }
+          if (expenseData.notes) setNotes(expenseData.notes);
+          if (expenseData.currency) handleCurrencyChange(expenseData.currency);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to parse image with AI:', err);
+    }
+  };
 
   const effectiveTankId =
     tanks.length > 0 && !tanks.some((t) => t.id === selectedTankId) ? tanks[0]?.id : selectedTankId;
@@ -133,24 +183,7 @@ function NewEntryPage() {
       if (payload.file) {
         try {
           const compressed = await compressAndPrepareImage(payload.file);
-          setReceiptImage(compressed);
-
-          const res = await parseImageWithAi('expense', payload.file);
-          if (res.success && res.data) {
-            const parsed = res.data;
-            if (parsed.amount) setAmount(parsed.amount.toString());
-            if (parsed.date) setDate(parsed.date);
-            if (parsed.fuelVolume) setVolumeLiters(parsed.fuelVolume.toString());
-            if (parsed.category) setCategory(parsed.category);
-            if (parsed.merchant || parsed.notes) {
-              setNotes(parsed.notes || parsed.merchant || '');
-              if (parsed.merchant) setVendorLocation(parsed.merchant);
-            }
-            if (parsed.currency) {
-              setCurrency(parsed.currency);
-              setLastUsedCurrency(parsed.currency);
-            }
-          }
+          await handleImageReady(compressed, payload.file);
         } catch (err) {
           console.error('Failed to process shared receipt image:', err);
         }
@@ -162,7 +195,7 @@ function NewEntryPage() {
     if (searchParams.shared || typeof window !== 'undefined') {
       loadSharedData();
     }
-  }, [searchParams.shared, setLastUsedCurrency, amount]);
+  }, [searchParams.shared, amount]);
 
   const handleCurrencyChange = (newCurrency: string) => {
     setCurrency(newCurrency);
@@ -254,9 +287,9 @@ function NewEntryPage() {
     setSubmitting(true);
 
     try {
-      const amountMinor = Math.round(parseFloat(amount) * 100);
-      const odoM = Math.round(parseFloat(odometerKm) * 1000);
-      const usdMinor = convertToUsdMinor(amountMinor, currency);
+      const amountMinor = amount ? Math.round(parseFloat(amount) * 100) : undefined;
+      const odoM = odometerKm ? Math.round(parseFloat(odometerKm) * 1000) : undefined;
+      const usdMinor = amountMinor ? convertToUsdMinor(amountMinor, currency) : undefined;
 
       await data.upsertEntry({
         id: crypto.randomUUID(),
@@ -264,10 +297,10 @@ function NewEntryPage() {
         occurred_on: date,
         odometer_m: odoM,
         amount_minor: amountMinor,
-        currency,
+        currency: amountMinor ? currency : undefined,
         usd_minor: usdMinor,
         business: isBusiness ? 1 : 0,
-        vendor_name: vendorName || undefined,
+        vendor_name: vendorName || notes || undefined,
         lat: lat ?? undefined,
         lon: lon ?? undefined,
       });
@@ -303,40 +336,42 @@ function NewEntryPage() {
           />
         </GlassCard>
 
-        {/* Hero Amount & Payment Card */}
-        <HeroAmountPaymentCard
-          amount={amount}
-          onAmountChange={handleAmountChange}
-          currency={currency}
-          onCurrencyChange={handleCurrencyChange}
-          paymentMethod={paymentMethod}
-          onPaymentMethodChange={setPaymentMethod}
-          onAiParsed={(parsed: ExpenseParseResult) => {
-            if (parsed.amount) handleAmountChange(parsed.amount.toString());
-            if (parsed.date) setDate(parsed.date);
-            if (parsed.fuelVolume) handleVolumeChange(parsed.fuelVolume.toString());
-            if (parsed.category) setCategory(parsed.category);
-            if (parsed.vendorName || parsed.merchant) {
-              setVendorName(parsed.vendorName || parsed.merchant || '');
-              setVendorLocation(parsed.merchant || parsed.vendorName || '');
-            }
-            if (parsed.lat && parsed.lon) {
-              setLat(parsed.lat);
-              setLon(parsed.lon);
-            }
-            if (parsed.notes) setNotes(parsed.notes);
-            if (parsed.currency) handleCurrencyChange(parsed.currency);
-            if (parsed.subItems && parsed.subItems.length > 0) {
-              const convertedItems: EditableSubItem[] = parsed.subItems.map((sub) => ({
-                id: crypto.randomUUID(),
-                name: sub.name,
-                cost: sub.cost !== undefined ? sub.cost.toString() : '',
-                partNumber: sub.partNumber,
-              }));
-              setSubItems(convertedItems);
-            }
-          }}
-        />
+        {/* Hero Amount & Payment Card — Hidden for Notes unless specified */}
+        {kind !== 'note' && (
+          <HeroAmountPaymentCard
+            amount={amount}
+            onAmountChange={handleAmountChange}
+            currency={currency}
+            onCurrencyChange={handleCurrencyChange}
+            paymentMethod={paymentMethod}
+            onPaymentMethodChange={setPaymentMethod}
+            onAiParsed={(parsed: ExpenseParseResult) => {
+              if (parsed.amount) handleAmountChange(parsed.amount.toString());
+              if (parsed.date) setDate(parsed.date);
+              if (parsed.fuelVolume) handleVolumeChange(parsed.fuelVolume.toString());
+              if (parsed.category) setCategory(parsed.category);
+              if (parsed.vendorName || parsed.merchant) {
+                setVendorName(parsed.vendorName || parsed.merchant || '');
+                setVendorLocation(parsed.merchant || parsed.vendorName || '');
+              }
+              if (parsed.lat && parsed.lon) {
+                setLat(parsed.lat);
+                setLon(parsed.lon);
+              }
+              if (parsed.notes) setNotes(parsed.notes);
+              if (parsed.currency) handleCurrencyChange(parsed.currency);
+              if (parsed.subItems && parsed.subItems.length > 0) {
+                const convertedItems: EditableSubItem[] = parsed.subItems.map((sub) => ({
+                  id: crypto.randomUUID(),
+                  name: sub.name,
+                  cost: sub.cost !== undefined ? sub.cost.toString() : '',
+                  partNumber: sub.partNumber,
+                }));
+                setSubItems(convertedItems);
+              }
+            }}
+          />
+        )}
 
         {/* Sub-Items Editor for Service entries */}
         {(kind === 'service' || subItems.length > 0) && (
@@ -348,7 +383,7 @@ function NewEntryPage() {
         )}
 
         {/* Category & Fuel Grade Selector */}
-        {(kind === 'expense' || (kind === 'refuel' && fuelGrade)) && (
+        {kind !== 'note' && (kind === 'expense' || (kind === 'refuel' && fuelGrade)) && (
           <GlassCard
             style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}
           >
@@ -407,7 +442,7 @@ function NewEntryPage() {
           </GlassCard>
         )}
 
-        {/* Smart Capture & Receipt OCR Feature */}
+        {/* Smart Capture & AI Image Summarizer */}
         <GlassCard
           style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}
         >
@@ -421,23 +456,26 @@ function NewEntryPage() {
                 fontWeight: 700,
               }}
             >
-              Smart OCR Scanner
+              Image & Media Attachment
             </Typography>
-            <Typography
-              variant="caption"
-              sx={{
-                color: 'primary.main',
-                backgroundColor: 'rgba(125, 211, 252, 0.1)',
-                px: 1,
-                py: 0.25,
-                borderRadius: 2,
-                fontWeight: 600,
-              }}
-            >
-              Auto-Extract Active
-            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={aiSummaryEnabled}
+                  onChange={(e) => setAiSummaryEnabled(e.target.checked)}
+                  color="primary"
+                  size="small"
+                />
+              }
+              label={
+                <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 600 }}>
+                  Summarize image with AI
+                </Typography>
+              }
+              sx={{ margin: 0 }}
+            />
           </div>
-          <ReceiptCapture onImageReady={setReceiptImage} />
+          <ReceiptCapture onImageReady={(img) => handleImageReady(img)} />
         </GlassCard>
 
         {/* Details & Location Metadata */}
@@ -446,6 +484,7 @@ function NewEntryPage() {
           onDateChange={setDate}
           odometerKm={odometerKm}
           onOdometerKmChange={setOdometerKm}
+          isOdometerRequired={kind !== 'note'}
           vendorName={vendorName}
           onVendorNameChange={setVendorName}
           vendorLocation={vendorLocation}
@@ -461,76 +500,20 @@ function NewEntryPage() {
           isBusiness={isBusiness}
           onBusinessChange={setIsBusiness}
           showFullTankOption={kind === 'refuel'}
+          showBusinessOption={Boolean(activeVehicle?.used_by_business)}
         />
 
-        {/* Recurring Expense Options */}
-        <GlassCard
-          style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <AutorenewIcon sx={{ color: 'secondary.main', fontSize: 20 }} />
-              <div>
-                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                  Recurring Expense
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{ color: 'text.secondary', display: 'block', fontSize: '0.7rem' }}
-                >
-                  Parking spot rental, dashcam SIM, etc.
-                </Typography>
-              </div>
-            </div>
-            <Switch
-              checked={isRecurring}
-              onChange={(e) => setIsRecurring(e.target.checked)}
-              color="primary"
-              size="small"
-            />
-          </div>
-
-          {isRecurring && (
-            <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
-              {['monthly', 'quarterly', 'annual'].map((inv) => (
-                <RecurringIntervalButton
-                  key={inv}
-                  inv={inv}
-                  isSelected={recurringInterval === inv}
-                  onSelect={setRecurringInterval}
-                />
-              ))}
-            </div>
-          )}
-
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingTop: 4,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <SavingsIcon sx={{ color: 'tertiary.main', fontSize: 18 }} />
-              <Typography variant="caption" sx={{ color: 'text.primary', fontSize: '0.75rem' }}>
-                Fund via Vehicle Sinking Reserve
-              </Typography>
-            </div>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={useSinkingFund}
-                  onChange={(e) => setUseSinkingFund(e.target.checked)}
-                  color="primary"
-                  size="small"
-                />
-              }
-              label=""
-              sx={{ margin: 0 }}
-            />
-          </div>
-        </GlassCard>
+        {/* Recurring Expense Options — Hidden for Notes */}
+        {kind !== 'note' && (
+          <RecurringExpenseOptions
+            isRecurring={isRecurring}
+            onRecurringChange={setIsRecurring}
+            recurringInterval={recurringInterval}
+            onIntervalChange={setRecurringInterval}
+            useSinkingFund={useSinkingFund}
+            onSinkingFundChange={setUseSinkingFund}
+          />
+        )}
 
         {/* Notes & Tags */}
         <GlassCard

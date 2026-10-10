@@ -1,3 +1,4 @@
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import CircularProgress from '@mui/material/CircularProgress';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -8,9 +9,11 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type React from 'react';
+import { useState } from 'react';
 import { useGeolocation } from '@/shared/lib/use-geolocation';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './EntryDetailsLocationCard.styles';
+import { LocationMapDialog } from './LocationMapDialog';
 
 interface Props {
   date: string;
@@ -29,6 +32,8 @@ interface Props {
   isBusiness: boolean;
   onBusinessChange: (val: boolean) => void;
   showFullTankOption?: boolean;
+  showBusinessOption?: boolean;
+  isOdometerRequired?: boolean;
 }
 
 export const EntryDetailsLocationCard: React.FC<Props> = ({
@@ -48,8 +53,11 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
   isBusiness,
   onBusinessChange,
   showFullTankOption = true,
+  showBusinessOption = true,
+  isOdometerRequired = true,
 }) => {
   const { loading: locationLoading, error: locationError, getCurrentLocation } = useGeolocation();
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   const handleFetchLocation = async () => {
     const loc = await getCurrentLocation();
@@ -58,6 +66,13 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
       if (onCoordsChange) {
         onCoordsChange(loc.latitude, loc.longitude);
       }
+    }
+  };
+
+  const handleSelectMapLocation = (loc: { address: string; lat: number; lon: number }) => {
+    onVendorLocationChange(loc.address);
+    if (onCoordsChange) {
+      onCoordsChange(loc.lat, loc.lon);
     }
   };
 
@@ -83,7 +98,7 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
           type="number"
           value={odometerKm}
           onChange={(e) => onOdometerKmChange(e.target.value)}
-          required
+          required={isOdometerRequired}
           fullWidth
           sx={styles.inputRoot}
         />
@@ -91,7 +106,7 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
 
       {onVendorNameChange && (
         <TextField
-          label="Vendor / Shop Name (e.g. AlexGas, Шиномонтаж, У Саши)"
+          label="Vendor / Shop Name"
           value={vendorName}
           onChange={(e) => onVendorNameChange(e.target.value)}
           fullWidth
@@ -111,13 +126,12 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
         slotProps={{
           input: {
             endAdornment: (
-              <InputAdornment position="end">
+              <InputAdornment position="end" sx={{ gap: 0.5 }}>
                 <Tooltip title="Use current location">
                   <IconButton
                     onClick={handleFetchLocation}
                     disabled={locationLoading}
                     size="small"
-                    edge="end"
                     aria-label="use current location"
                     sx={{ color: 'primary.main' }}
                   >
@@ -128,6 +142,18 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
                     )}
                   </IconButton>
                 </Tooltip>
+
+                <Tooltip title="Select location on map">
+                  <IconButton
+                    onClick={() => setIsMapOpen(true)}
+                    size="small"
+                    edge="end"
+                    aria-label="select location on map"
+                    sx={{ color: 'primary.main' }}
+                  >
+                    <MapOutlinedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </InputAdornment>
             ),
           },
@@ -135,43 +161,56 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
         sx={styles.inputRoot}
       />
 
-      <div style={styles.switchContainer}>
-        {showFullTankOption && (
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isFullTank}
-                onChange={(e) => onFullTankChange(e.target.checked)}
-                color="primary"
-                size="small"
-              />
-            }
-            label={
-              <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.82rem' }}>
-                Full Tank Fill
-              </Typography>
-            }
-            sx={{ margin: 0 }}
-          />
-        )}
+      <LocationMapDialog
+        open={isMapOpen}
+        onClose={() => setIsMapOpen(false)}
+        initialAddress={vendorLocation}
+        initialLat={lat}
+        initialLon={lon}
+        onSelectLocation={handleSelectMapLocation}
+      />
 
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isBusiness}
-              onChange={(e) => onBusinessChange(e.target.checked)}
-              color="primary"
-              size="small"
+      {(showFullTankOption || showBusinessOption) && (
+        <div style={styles.switchContainer}>
+          {showFullTankOption && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isFullTank}
+                  onChange={(e) => onFullTankChange(e.target.checked)}
+                  color="primary"
+                  size="small"
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.82rem' }}>
+                  Full Tank Fill
+                </Typography>
+              }
+              sx={{ margin: 0 }}
             />
-          }
-          label={
-            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.82rem' }}>
-              Business Expense
-            </Typography>
-          }
-          sx={{ margin: 0 }}
-        />
-      </div>
+          )}
+
+          {showBusinessOption && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isBusiness}
+                  onChange={(e) => onBusinessChange(e.target.checked)}
+                  color="primary"
+                  size="small"
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.82rem' }}>
+                  Business Expense
+                </Typography>
+              }
+              sx={{ margin: 0 }}
+            />
+          )}
+        </div>
+      )}
     </GlassCard>
   );
 };

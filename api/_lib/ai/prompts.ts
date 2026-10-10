@@ -58,4 +58,19 @@ Return ONLY a valid JSON object matching this TypeScript interface without markd
   "conditionNotes": string | null, // Visible state e.g. "New tread", "Sidewall wear visible"
   "rawText": string | null         // Recognized raw text snippet from tire sidewall
 }`,
+
+  note: `You are an expert vehicle journal assistant.
+Analyze the provided image (photo of car part, dashboard odometer reading, document, parking ticket, garage receipt, or photo with location details) and extract notes data.
+
+Return ONLY a valid JSON object matching this TypeScript interface without markdown code block wrappers or explanations:
+{
+  "notes": string | null,          // Concise description or summary of what is shown in the image
+  "date": string | null,           // ISO date string YYYY-MM-DD
+  "odometerKm": number | null,     // Odometer reading in kilometers if dashboard/odometer is visible
+  "merchant": string | null,       // Location or business name if visible
+  "vendorName": string | null,     // Business/vendor name if visible
+  "lat": number | null,            // Latitude coordinate if available
+  "lon": number | null,            // Longitude coordinate if available
+  "rawText": string | null         // Recognized raw text snippet
+}`,
 };

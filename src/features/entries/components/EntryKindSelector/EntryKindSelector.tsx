@@ -6,7 +6,7 @@ import { useAppStore } from '@/app/store';
 import { vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import { styles } from './EntryKindSelector.styles';
 
-export type EntryKind = 'refuel' | 'expense' | 'service';
+export type EntryKind = 'refuel' | 'expense' | 'service' | 'note';
 
 interface Props {
   value: EntryKind;
@@ -37,6 +37,7 @@ export const EntryKindSelector: React.FC<Props> = ({ value, onChange }) => {
       <ToggleButton value="refuel">{refuelLabel}</ToggleButton>
       <ToggleButton value="service">Service</ToggleButton>
       <ToggleButton value="expense">Expense</ToggleButton>
+      <ToggleButton value="note">Note</ToggleButton>
     </ToggleButtonGroup>
   );
 };

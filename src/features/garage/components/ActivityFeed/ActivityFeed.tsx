@@ -2,6 +2,7 @@ import BuildIcon from '@mui/icons-material/Build';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import SpeedIcon from '@mui/icons-material/Speed';
+import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import type { Entry } from '@/data/client/types';
@@ -27,6 +28,8 @@ export function ActivityFeed({ entries }: Props) {
         return <BuildIcon sx={{ fontSize: 18 }} />;
       case 'odometer':
         return <SpeedIcon sx={{ fontSize: 18 }} />;
+      case 'note':
+        return <StickyNote2Icon sx={{ fontSize: 18 }} />;
       default:
         return <ReceiptIcon sx={{ fontSize: 18 }} />;
     }

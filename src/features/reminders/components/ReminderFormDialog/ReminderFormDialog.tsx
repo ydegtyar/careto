@@ -27,12 +27,60 @@ export const DEFAULT_MAINTENANCE_TYPES = [
 ] as const;
 
 export const QUICK_PRESETS = [
-  { id: 'cabin', label: 'Cabin Air Filter', icon: 'air', kind: 'filters', intervalKm: '20000', intervalDays: '365', mode: 'earlier' },
-  { id: 'tires', label: 'Tire Rotation', icon: 'rotate_right', kind: 'tires', intervalKm: '10000', intervalDays: '180', mode: 'earlier' },
-  { id: 'seasonal_tires', label: 'Seasonal Tire Change', icon: 'ac_unit', kind: 'tires', intervalKm: '', intervalDays: '180', mode: 'seasonal' },
-  { id: 'brake', label: 'Brake Inspection', icon: 'tune', kind: 'brakes', intervalKm: '20000', intervalDays: '365', mode: 'earlier' },
-  { id: 'fluid', label: 'Brake Fluid Flush', icon: 'opacity', kind: 'fluids', intervalKm: '40000', intervalDays: '730', mode: 'earlier' },
-  { id: 'hvac', label: 'HVAC Desiccant Bag', icon: 'mode_fan', kind: 'service', intervalKm: '60000', intervalDays: '1095', mode: 'earlier' },
+  {
+    id: 'cabin',
+    label: 'Cabin Air Filter',
+    icon: 'air',
+    kind: 'filters',
+    intervalKm: '20000',
+    intervalDays: '365',
+    mode: 'earlier',
+  },
+  {
+    id: 'tires',
+    label: 'Tire Rotation',
+    icon: 'rotate_right',
+    kind: 'tires',
+    intervalKm: '10000',
+    intervalDays: '180',
+    mode: 'earlier',
+  },
+  {
+    id: 'seasonal_tires',
+    label: 'Seasonal Tire Change',
+    icon: 'ac_unit',
+    kind: 'tires',
+    intervalKm: '',
+    intervalDays: '180',
+    mode: 'seasonal',
+  },
+  {
+    id: 'brake',
+    label: 'Brake Inspection',
+    icon: 'tune',
+    kind: 'brakes',
+    intervalKm: '20000',
+    intervalDays: '365',
+    mode: 'earlier',
+  },
+  {
+    id: 'fluid',
+    label: 'Brake Fluid Flush',
+    icon: 'opacity',
+    kind: 'fluids',
+    intervalKm: '40000',
+    intervalDays: '730',
+    mode: 'earlier',
+  },
+  {
+    id: 'hvac',
+    label: 'HVAC Desiccant Bag',
+    icon: 'mode_fan',
+    kind: 'service',
+    intervalKm: '60000',
+    intervalDays: '1095',
+    mode: 'earlier',
+  },
 ] as const;
 
 const STANDARD_KM_PRESETS = [5000, 7500, 10000, 15000, 20000, 60000, 100000];
@@ -44,7 +92,13 @@ const STANDARD_DAYS_PRESETS = [
   { label: '5 yrs', days: 1825 },
 ];
 
-const TRIGGER_MODES: { id: ReminderModeType; title: string; desc: string; icon: string; recommended?: boolean }[] = [
+const TRIGGER_MODES: {
+  id: ReminderModeType;
+  title: string;
+  desc: string;
+  icon: string;
+  recommended?: boolean;
+}[] = [
   {
     id: 'earlier',
     title: 'Dual Trigger',
@@ -137,7 +191,7 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
     }
   }, [open, reminder]);
 
-  const handleApplyPreset = (preset: typeof QUICK_PRESETS[number]) => {
+  const handleApplyPreset = (preset: (typeof QUICK_PRESETS)[number]) => {
     setTitle(preset.label);
     setKind(preset.kind);
     setMode(preset.mode as ReminderModeType);
@@ -156,10 +210,16 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
       title,
       kind: selectedKind || 'service',
       mode,
-      interval_m: mode !== 'time' && mode !== 'seasonal' && intervalKm ? parseInt(intervalKm, 10) * 1000 : undefined,
+      interval_m:
+        mode !== 'time' && mode !== 'seasonal' && intervalKm
+          ? parseInt(intervalKm, 10) * 1000
+          : undefined,
       interval_days: mode !== 'km' && intervalDays ? parseInt(intervalDays, 10) : undefined,
       base_date: mode !== 'km' && baseDate ? baseDate : undefined,
-      base_odometer_m: mode !== 'time' && mode !== 'seasonal' && baseOdometerKm ? parseInt(baseOdometerKm, 10) * 1000 : 0,
+      base_odometer_m:
+        mode !== 'time' && mode !== 'seasonal' && baseOdometerKm
+          ? parseInt(baseOdometerKm, 10) * 1000
+          : 0,
       est_cost_usd_minor: estCost ? Math.round(parseFloat(estCost) * 100) : undefined,
       lead_m: reminder?.lead_m ?? 500_000,
       lead_days: reminder?.lead_days ?? 14,
@@ -170,18 +230,32 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
   };
 
   const showKmFields = mode === 'earlier' || mode === 'later' || mode === 'km';
-  const showDaysFields = mode === 'earlier' || mode === 'later' || mode === 'time' || mode === 'seasonal';
+  const showDaysFields =
+    mode === 'earlier' || mode === 'later' || mode === 'time' || mode === 'seasonal';
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth scroll="paper">
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%', overflow: 'hidden' }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', maxHeight: '100%', overflow: 'hidden' }}
+      >
         <DialogTitle sx={{ fontWeight: 700, pb: 1, flexShrink: 0 }}>
           {isEditing ? 'Edit Maintenance Schedule' : 'Add Maintenance Schedule'}
         </DialogTitle>
         <DialogContent dividers style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Quick Presets */}
           <div>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                display: 'block',
+                mb: 1,
+              }}
+            >
               Quick Presets
             </Typography>
             <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
@@ -246,7 +320,17 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
 
           {/* Section 2: Trigger Mode Grid */}
           <div>
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', mb: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                display: 'block',
+                mb: 1,
+              }}
+            >
               Trigger Mode
             </Typography>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -263,24 +347,51 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
                       alignItems: 'flex-start',
                       padding: 12,
                       borderRadius: 12,
-                      border: isSelected ? '2px solid var(--mui-palette-primary-main, #7dd3fc)' : '1px solid var(--mui-palette-divider, rgba(255, 255, 255, 0.12))',
+                      border: isSelected
+                        ? '2px solid var(--mui-palette-primary-main, #7dd3fc)'
+                        : '1px solid var(--mui-palette-divider, rgba(255, 255, 255, 0.12))',
                       backgroundColor: isSelected ? 'rgba(125, 211, 252, 0.08)' : 'transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'all 0.15s ease',
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: 4 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? '#7dd3fc' : 'inherit' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        marginBottom: 4,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: isSelected ? '#7dd3fc' : 'inherit',
+                        }}
+                      >
                         {item.title}
                       </span>
                       {item.recommended && (
-                        <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', color: '#7dd3fc', backgroundColor: 'rgba(125, 211, 252, 0.15)', padding: '2px 6px', borderRadius: 4 }}>
+                        <span
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            color: '#7dd3fc',
+                            backgroundColor: 'rgba(125, 211, 252, 0.15)',
+                            padding: '2px 6px',
+                            borderRadius: 4,
+                          }}
+                        >
                           Rec
                         </span>
                       )}
                     </div>
-                    <span style={{ fontSize: 11, color: 'rgba(255, 255, 255, 0.6)', lineHeight: 1.3 }}>
+                    <span
+                      style={{ fontSize: 11, color: 'rgba(255, 255, 255, 0.6)', lineHeight: 1.3 }}
+                    >
                       {item.desc}
                     </span>
                   </button>
@@ -315,7 +426,10 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
 
               {showKmFields && (
                 <div>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.5 }}
+                  >
                     Standard Distance Presets
                   </Typography>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -339,7 +453,10 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
 
               {showDaysFields && (
                 <div>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.5 }}
+                  >
                     Standard Time Presets
                   </Typography>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>

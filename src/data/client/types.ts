@@ -48,6 +48,7 @@ export interface Vehicle {
   dismissed_suggested_reminders?: string[];
   distance_unit: string;
   efficiency_unit: string;
+  used_by_business?: boolean;
 }
 
 export enum EntryKind {
@@ -58,6 +59,7 @@ export enum EntryKind {
   Service = 'service',
   Route = 'route',
   Odometer = 'odometer',
+  Note = 'note',
 }
 
 export type EntryKindType = `${EntryKind}`;

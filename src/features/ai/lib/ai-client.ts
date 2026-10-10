@@ -1,6 +1,17 @@
 import { useAiSettingsStore } from './ai-store';
 
-export type TaskPurpose = 'expense' | 'vin' | 'wheels';
+export type TaskPurpose = 'expense' | 'vin' | 'wheels' | 'note';
+
+export interface NoteParseResult {
+  notes?: string;
+  date?: string;
+  odometerKm?: number;
+  merchant?: string;
+  vendorName?: string;
+  lat?: number;
+  lon?: number;
+  rawText?: string;
+}
 
 export interface SubItemParseResult {
   name: string;
@@ -54,6 +65,7 @@ export type ParsePurposeResultMap = {
   expense: ExpenseParseResult;
   vin: VinParseResult;
   wheels: WheelsParseResult;
+  note: NoteParseResult;
 };
 
 export interface ParseResponse<T extends TaskPurpose> {

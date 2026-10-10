@@ -162,4 +162,3 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
 };
 
 export default HeroAmountPaymentCard;
-

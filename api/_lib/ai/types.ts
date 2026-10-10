@@ -1,6 +1,17 @@
 export type AdapterId = 'openrouter_gemini' | 'openrouter_deepseek' | 'gemini_direct' | 'deepseek_direct';
 
-export type TaskPurpose = 'expense' | 'vin' | 'wheels';
+export type TaskPurpose = 'expense' | 'vin' | 'wheels' | 'note';
+
+export interface NoteParseResult {
+  notes?: string;
+  date?: string; // YYYY-MM-DD
+  odometerKm?: number;
+  merchant?: string;
+  vendorName?: string;
+  lat?: number;
+  lon?: number;
+  rawText?: string;
+}
 
 export interface SubItemParseResult {
   name: string;
@@ -55,6 +66,7 @@ export type ParsePurposeResultMap = {
   expense: ExpenseParseResult;
   vin: VinParseResult;
   wheels: WheelsParseResult;
+  note: NoteParseResult;
 };
 
 export interface WaterfallOptions {
