@@ -23,7 +23,7 @@ export const Route = createFileRoute('/garage/')({
 });
 
 function GaragePage() {
-  const { activeVehicleId, setActiveVehicleId } = useAppStore();
+  const { activeVehicleId } = useAppStore();
 
   const { data: vehicles = [], isLoading: loadingVehicles } = useQuery(vehiclesQueryOptions());
   const { data: entries = [] } = useQuery(entriesQueryOptions(activeVehicleId ?? undefined));

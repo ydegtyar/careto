@@ -7,7 +7,7 @@ export interface SyncOp {
   id: string;
   hlc: string;
   deleted?: boolean;
-  patch: Record<string, any>;
+  patch: Record<string, unknown>;
   colHlc?: Record<string, string>;
   attempts?: number;
 }
@@ -42,7 +42,7 @@ export class SyncEngine {
     vehicleId: string,
     tbl: string,
     id: string,
-    patch: Record<string, any>,
+    patch: Record<string, unknown>,
     deleted = false,
   ): SyncOp {
     const opId = crypto.randomUUID();
@@ -103,7 +103,7 @@ export class SyncEngine {
         throw new Error(`Push failed with status ${res.status}`);
       }
 
-      const data = (await res.json()) as any;
+      const data = (await res.json()) as { currentSeq?: number };
       if (data.currentSeq) {
         this.cursors[vehicleId] = data.currentSeq;
         this.status.currentSeq = data.currentSeq;
@@ -116,15 +116,18 @@ export class SyncEngine {
       this.status.state = 'idle';
       this.status.lastSyncedAt = new Date().toISOString();
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorObj = err as Error;
       console.warn('Sync push error:', err);
       this.status.state = 'error';
-      this.status.lastError = err.message;
+      this.status.lastError = errorObj.message;
       return false;
     }
   }
 
-  public async pull(vehicleId: string): Promise<{ records: any[]; currentSeq: number } | null> {
+  public async pull(
+    vehicleId: string,
+  ): Promise<{ records: Record<string, unknown>[]; currentSeq: number } | null> {
     const since = this.cursors[vehicleId] || 0;
     try {
       this.status.state = 'syncing';
@@ -139,7 +142,10 @@ export class SyncEngine {
         throw new Error(`Pull failed with status ${res.status}`);
       }
 
-      const data = (await res.json()) as any;
+      const data = (await res.json()) as {
+        records: Record<string, unknown>[];
+        currentSeq: number;
+      };
       if (data.currentSeq !== undefined) {
         this.cursors[vehicleId] = data.currentSeq;
         this.status.currentSeq = data.currentSeq;
@@ -148,10 +154,11 @@ export class SyncEngine {
       this.status.state = 'idle';
       this.status.lastSyncedAt = new Date().toISOString();
       return data;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorObj = err as Error;
       console.warn('Sync pull error:', err);
       this.status.state = 'error';
-      this.status.lastError = err.message;
+      this.status.lastError = errorObj.message;
       return null;
     }
   }

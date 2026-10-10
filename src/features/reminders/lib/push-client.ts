@@ -74,9 +74,10 @@ export async function subscribeToPush(): Promise<{ success: boolean; error?: str
     }
 
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorObj = err as Error;
     console.error('Error subscribing to push:', err);
-    return { success: false, error: err.message || 'Unknown error subscribing' };
+    return { success: false, error: errorObj.message || 'Unknown error subscribing' };
   }
 }
 

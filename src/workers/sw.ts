@@ -35,7 +35,16 @@ self.addEventListener('fetch', (event) => {
           const shareUrl = (formData.get('url') as string) || undefined;
           const file = formData.get('receipt');
 
-          const payload: any = {
+          interface SharedPayload {
+            id: string;
+            timestamp: number;
+            title?: string;
+            text?: string;
+            url?: string;
+            file?: File;
+          }
+
+          const payload: SharedPayload = {
             id: `share-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
             timestamp: Date.now(),
           };
@@ -49,14 +58,14 @@ self.addEventListener('fetch', (event) => {
           // Open IndexedDB and store payload
           const dbReq = indexedDB.open('careto-share-target-db', 1);
           await new Promise<void>((resolve, reject) => {
-            dbReq.onupgradeneeded = (e: any) => {
-              const db = e.target.result;
+            dbReq.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+              const db = (e.target as IDBOpenDBRequest).result;
               if (!db.objectStoreNames.contains('shared_payloads')) {
                 db.createObjectStore('shared_payloads', { keyPath: 'id' });
               }
             };
-            dbReq.onsuccess = (e: any) => {
-              const db = e.target.result;
+            dbReq.onsuccess = (e: Event) => {
+              const db = (e.target as IDBOpenDBRequest).result;
               const tx = db.transaction('shared_payloads', 'readwrite');
               const store = tx.objectStore('shared_payloads');
               store.put(payload);
@@ -100,10 +109,14 @@ self.addEventListener('push', (event) => {
       },
     };
 
+    const nav = navigator as Navigator & {
+      setAppBadge?: (contents?: number) => Promise<void>;
+    };
+
     event.waitUntil(
       Promise.all([
         self.registration.showNotification(title, options),
-        'setAppBadge' in navigator ? (navigator as any).setAppBadge(1) : Promise.resolve(),
+        nav.setAppBadge ? nav.setAppBadge(1) : Promise.resolve(),
       ]),
     );
   } catch (err) {
@@ -126,10 +139,13 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     (async () => {
       // Clear app badge if supported
-      if ('clearAppBadge' in navigator) {
+      const nav = navigator as Navigator & {
+        clearAppBadge?: () => Promise<void>;
+      };
+      if (nav.clearAppBadge) {
         try {
-          await (navigator as any).clearAppBadge();
-        } catch (_) {}
+          await nav.clearAppBadge();
+        } catch {}
       }
 
       // Check if window is already open

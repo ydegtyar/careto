@@ -91,7 +91,7 @@ function VehicleDetailPage() {
     try {
       const res = await fetch(`/api/vehicles/members?vehicle_id=${vehicleId}`);
       if (res.ok) {
-        const data = (await res.json()) as any;
+        const data = (await res.json()) as { members?: VehicleMember[] };
         setMembers(data.members || []);
       }
     } finally {
@@ -118,16 +118,16 @@ function VehicleDetailPage() {
         body: JSON.stringify({ vehicleId, email, role }),
       });
 
+      const data = (await res.json()) as { error?: string; inviteUrl?: string };
       if (!res.ok) {
-        const data = (await res.json()) as any;
         throw new Error(data.error || 'Failed to create invite');
       }
 
-      const data = (await res.json()) as any;
-      setInviteUrl(data.inviteUrl);
+      setInviteUrl(data.inviteUrl || null);
       setEmail('');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message);
     } finally {
       setLoading(false);
     }
@@ -376,7 +376,11 @@ function VehicleDetailPage() {
 
           <FormControl size="small" fullWidth>
             <InputLabel>Role</InputLabel>
-            <Select value={role} label="Role" onChange={(e) => setRole(e.target.value as any)}>
+            <Select
+              value={role}
+              label="Role"
+              onChange={(e) => setRole(e.target.value as 'editor' | 'viewer')}
+            >
               <MenuItem value="editor">Editor — Can log refuels, services, notes</MenuItem>
               <MenuItem value="viewer">Viewer — Read-only telemetry and stats</MenuItem>
             </Select>

@@ -30,7 +30,7 @@ export interface ImportResult {
   errors: string[];
 }
 
-function toNdjson(items: any[]): string {
+function toNdjson<T>(items: T[]): string {
   return items.map((item) => JSON.stringify(item)).join('\n');
 }
 
@@ -101,8 +101,9 @@ export function parseImportZip(zipBytes: Uint8Array): ImportResult {
   let manifest: ExportManifest;
   try {
     manifest = JSON.parse(strFromU8(manifestFile));
-  } catch (e: any) {
-    throw new Error(`Failed to parse manifest.json: ${e.message}`);
+  } catch (e: unknown) {
+    const err = e as Error;
+    throw new Error(`Failed to parse manifest.json: ${err.message}`);
   }
 
   let vehicles: Vehicle[] = [];
@@ -113,32 +114,36 @@ export function parseImportZip(zipBytes: Uint8Array): ImportResult {
   if (unzipped['data/vehicles.ndjson']) {
     try {
       vehicles = parseNdjson<Vehicle>(strFromU8(unzipped['data/vehicles.ndjson']!));
-    } catch (e: any) {
-      errors.push(`Vehicles parse warning: ${e.message}`);
+    } catch (e: unknown) {
+      const err = e as Error;
+      errors.push(`Vehicles parse warning: ${err.message}`);
     }
   }
 
   if (unzipped['data/entries.ndjson']) {
     try {
       entries = parseNdjson<Entry>(strFromU8(unzipped['data/entries.ndjson']!));
-    } catch (e: any) {
-      errors.push(`Entries parse warning: ${e.message}`);
+    } catch (e: unknown) {
+      const err = e as Error;
+      errors.push(`Entries parse warning: ${err.message}`);
     }
   }
 
   if (unzipped['data/reminders.ndjson']) {
     try {
       reminders = parseNdjson<Reminder>(strFromU8(unzipped['data/reminders.ndjson']!));
-    } catch (e: any) {
-      errors.push(`Reminders parse warning: ${e.message}`);
+    } catch (e: unknown) {
+      const err = e as Error;
+      errors.push(`Reminders parse warning: ${err.message}`);
     }
   }
 
   if (unzipped['data/notes.ndjson']) {
     try {
       notes = parseNdjson<Note>(strFromU8(unzipped['data/notes.ndjson']!));
-    } catch (e: any) {
-      errors.push(`Notes parse warning: ${e.message}`);
+    } catch (e: unknown) {
+      const err = e as Error;
+      errors.push(`Notes parse warning: ${err.message}`);
     }
   }
 

@@ -43,8 +43,9 @@ export function WheelsScanner({ onParsed }: Props) {
       } else {
         setError(res.error || 'Failed to parse wheel/tire image');
       }
-    } catch (err: any) {
-      setError(err.message || 'Error uploading wheel image');
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message || 'Error uploading wheel image');
     } finally {
       setLoading(false);
     }

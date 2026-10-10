@@ -12,15 +12,13 @@ import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { useAppStore } from '@/app/store';
 import { data } from '@/data/client';
 import { createExportZip, downloadExportZip, parseImportZip } from '@/data/compute/export-import';
 import { AiSettingsCard } from '@/features/ai/components/AiSettingsCard/AiSettingsCard';
-import { vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import {
   getPushSubscription,
   isPushSupported,
@@ -130,8 +128,9 @@ function SettingsPage() {
       } else {
         setTestPushStatus(`Error sending push: ${json.error || json.message}`);
       }
-    } catch (e: any) {
-      setTestPushStatus(`Failed to send test push: ${e.message}`);
+    } catch (e: unknown) {
+      const err = e as Error;
+      setTestPushStatus(`Failed to send test push: ${err.message}`);
     }
   };
 
@@ -146,8 +145,9 @@ function SettingsPage() {
         type: 'success',
         text: `Exported ${fullData.vehicles.length} vehicle(s), ${fullData.entries.length} entries, ${fullData.reminders.length} reminders.`,
       });
-    } catch (err: any) {
-      setBackupMessage({ type: 'error', text: `Export failed: ${err.message}` });
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setBackupMessage({ type: 'error', text: `Export failed: ${errorObj.message}` });
     } finally {
       setIsExporting(false);
     }
@@ -174,8 +174,9 @@ function SettingsPage() {
         type: 'success',
         text: `Successfully imported ${res.importedCount} records from ${file.name}.`,
       });
-    } catch (err: any) {
-      setBackupMessage({ type: 'error', text: `Import failed: ${err.message}` });
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setBackupMessage({ type: 'error', text: `Import failed: ${errorObj.message}` });
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -196,8 +197,9 @@ function SettingsPage() {
         type: 'success',
         text: 'TanStack Query cache purged successfully.',
       });
-    } catch (err: any) {
-      setBackupMessage({ type: 'error', text: `Failed to purge query cache: ${err.message}` });
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setBackupMessage({ type: 'error', text: `Failed to purge query cache: ${errorObj.message}` });
     }
   };
 
@@ -220,8 +222,9 @@ function SettingsPage() {
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-    } catch (err: any) {
-      setBackupMessage({ type: 'error', text: `Failed to clear cache: ${err.message}` });
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setBackupMessage({ type: 'error', text: `Failed to clear cache: ${errorObj.message}` });
     }
   };
 

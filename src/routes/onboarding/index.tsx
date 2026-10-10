@@ -237,7 +237,7 @@ function OnboardingPage() {
               select
               label="Powertrain"
               value={powertrain}
-              onChange={(e) => setPowertrain(e.target.value as any)}
+              onChange={(e) => setPowertrain(e.target.value as 'ev' | 'hybrid' | 'phev' | 'ice')}
               fullWidth
               size="small"
             >

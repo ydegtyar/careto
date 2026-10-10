@@ -2,13 +2,11 @@ import type React from 'react';
 
 interface Props extends React.SVGProps<SVGSVGElement> {
   size?: number | string;
-  variant?: 'emblem' | 'full';
   animated?: boolean;
 }
 
 export const CaretoLogo: React.FC<Props> = ({
   size = 32,
-  variant = 'emblem',
   animated = true,
   className,
   style,

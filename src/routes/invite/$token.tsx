@@ -35,7 +35,7 @@ function InviteAcceptPage() {
         body: JSON.stringify({ token }),
       });
 
-      const data = (await res.json()) as any;
+      const data = (await res.json()) as { error?: string; vehicleId?: string };
       if (!res.ok) {
         throw new Error(data.error || 'Failed to accept invitation');
       }
@@ -44,8 +44,9 @@ function InviteAcceptPage() {
       if (data.vehicleId) {
         setActiveVehicleId(data.vehicleId);
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message);
     } finally {
       setLoading(false);
     }

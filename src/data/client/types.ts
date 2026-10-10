@@ -1,10 +1,32 @@
+export enum TankType {
+  Petrol = 'petrol',
+  Diesel = 'diesel',
+  Lpg = 'lpg',
+  Cng = 'cng',
+  Ev = 'ev',
+  Hydrogen = 'hydrogen',
+  Other = 'other',
+}
+
+export type VehicleTankType = `${TankType}`;
+
 export interface VehicleTank {
   id: string;
   name: string;
-  type: 'petrol' | 'diesel' | 'lpg' | 'cng' | 'ev' | 'hydrogen' | 'other';
+  type: VehicleTankType | TankType;
   capacity_ml_or_wh?: number;
   primary_fuel_grade?: string;
 }
+
+export enum PowertrainType {
+  Ice = 'ice',
+  Hybrid = 'hybrid',
+  Phev = 'phev',
+  Ev = 'ev',
+  Hydrogen = 'hydrogen',
+}
+
+export type VehiclePowertrain = `${PowertrainType}`;
 
 export interface Vehicle {
   id: string;
@@ -16,7 +38,7 @@ export interface Vehicle {
   plate?: string;
   vin?: string;
   color?: string;
-  powertrain: 'ice' | 'hybrid' | 'phev' | 'ev' | 'hydrogen';
+  powertrain: VehiclePowertrain | PowertrainType;
   initial_odometer_m: number;
   tank_ml?: number;
   battery_wh?: number;
@@ -28,9 +50,21 @@ export interface Vehicle {
   efficiency_unit: string;
 }
 
+export enum EntryKind {
+  Refuel = 'refuel',
+  Charge = 'charge',
+  Expense = 'expense',
+  Income = 'income',
+  Service = 'service',
+  Route = 'route',
+  Odometer = 'odometer',
+}
+
+export type EntryKindType = `${EntryKind}`;
+
 export interface Entry {
   id: string;
-  kind: 'refuel' | 'charge' | 'expense' | 'income' | 'service' | 'route' | 'odometer';
+  kind: EntryKindType | EntryKind;
   occurred_on: string;
   occurred_time?: string;
   odometer_m?: number;
@@ -64,11 +98,20 @@ export interface Note {
   created_at: string;
 }
 
+export enum ReminderMode {
+  Km = 'km',
+  Time = 'time',
+  Earlier = 'earlier',
+  Later = 'later',
+}
+
+export type ReminderModeType = `${ReminderMode}`;
+
 export interface Reminder {
   id: string;
   kind: string;
   title: string;
-  mode: 'km' | 'time' | 'earlier' | 'later';
+  mode: ReminderModeType | ReminderMode;
   interval_m?: number;
   interval_days?: number;
   base_odometer_m?: number;
@@ -79,8 +122,16 @@ export interface Reminder {
   est_cost_usd_minor?: number;
 }
 
+export enum SyncState {
+  Idle = 'idle',
+  Syncing = 'syncing',
+  Error = 'error',
+}
+
+export type SyncStateType = `${SyncState}`;
+
 export interface SyncStatus {
-  state: 'idle' | 'syncing' | 'error';
+  state: SyncStateType | SyncState;
   lastSyncedAt?: string;
   pendingOpsCount: number;
   lastError?: string;

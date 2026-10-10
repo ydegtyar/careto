@@ -79,8 +79,9 @@ export function EmailPasswordForm() {
       }
 
       router.navigate({ to: '/garage' });
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed. Please verify your details.');
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message || 'Authentication failed. Please verify your details.');
     } finally {
       setLoading(false);
     }

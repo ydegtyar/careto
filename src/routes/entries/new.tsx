@@ -354,7 +354,9 @@ function NewEntryPage() {
               <FuelGradeSelector
                 selectedGrade={fuelGrade}
                 onSelectGrade={handleFuelGradeChange}
-                filterCategory={selectedTank?.type as any}
+                filterCategory={
+                  selectedTank?.type as 'petrol' | 'diesel' | 'gas' | 'ev' | 'alternative' | 'all'
+                }
               />
             )}
 

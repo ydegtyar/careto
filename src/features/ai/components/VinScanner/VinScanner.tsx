@@ -45,8 +45,9 @@ export function VinScanner({ onParsed }: Props) {
       } else {
         setError(res.error || 'Failed to parse VIN from image');
       }
-    } catch (err: any) {
-      setError(err.message || 'Error uploading VIN image');
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message || 'Error uploading VIN image');
     } finally {
       setLoading(false);
     }

@@ -32,8 +32,17 @@ export function GoogleOneTap() {
       unmounted = true;
       // Cancel GIS prompt if present on unmount
       try {
-        if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
-          (window as any).google.accounts.id.cancel();
+        const win = window as Window & {
+          google?: {
+            accounts?: {
+              id?: {
+                cancel: () => void;
+              };
+            };
+          };
+        };
+        if (typeof window !== 'undefined' && win.google?.accounts?.id) {
+          win.google.accounts.id.cancel();
         }
       } catch {
         // Ignore cancel errors

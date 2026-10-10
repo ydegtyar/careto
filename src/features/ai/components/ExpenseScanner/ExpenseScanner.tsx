@@ -43,8 +43,9 @@ export function ExpenseScanner({ onParsed }: Props) {
       } else {
         setError(res.error || 'Failed to parse receipt image');
       }
-    } catch (err: any) {
-      setError(err.message || 'Error uploading receipt image');
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message || 'Error uploading receipt image');
     } finally {
       setLoading(false);
     }

@@ -201,7 +201,7 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               labelId="trigger-mode-label"
               value={mode}
               label="Trigger Rule Mode"
-              onChange={(e) => setMode(e.target.value as any)}
+              onChange={(e) => setMode(e.target.value as 'km' | 'time' | 'earlier' | 'later')}
             >
               <MenuItem value="earlier">Whichever comes first (km or time)</MenuItem>
               <MenuItem value="later">Whichever comes later (km and time)</MenuItem>

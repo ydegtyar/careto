@@ -35,8 +35,9 @@ export function MagicLinkForm() {
       }
 
       setSent(true);
-    } catch (err: any) {
-      setError(err.message || 'Error sending magic link');
+    } catch (err: unknown) {
+      const errorObj = err as Error;
+      setError(errorObj.message || 'Error sending magic link');
     } finally {
       setLoading(false);
     }
