@@ -115,20 +115,7 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      slotProps={{
-        paper: {
-          sx: {
-            borderRadius: 4,
-            padding: 1,
-            width: '100%',
-            maxWidth: 440,
-          },
-        },
-      }}
-    >
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle sx={{ fontWeight: 700 }}>
         {isEditing ? 'Edit Maintenance Schedule' : 'Add Maintenance Schedule'}
       </DialogTitle>

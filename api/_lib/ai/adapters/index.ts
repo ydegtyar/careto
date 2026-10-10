@@ -44,7 +44,7 @@ export class OpenRouterGeminiAdapter implements LlmAdapter {
         'X-Title': 'Careto Automotive App',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash-001',
+        model: 'openrouter/auto',
         messages: [
           {
             role: 'user',
@@ -102,7 +102,7 @@ export class OpenRouterDeepSeekAdapter implements LlmAdapter {
         'X-Title': 'Careto Automotive App',
       },
       body: JSON.stringify({
-        model: 'qwen/qwen-2.5-vl-72b-instruct:free',
+        model: 'openrouter/auto',
         messages: [
           {
             role: 'user',

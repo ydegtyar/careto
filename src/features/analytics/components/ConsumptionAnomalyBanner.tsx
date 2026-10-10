@@ -31,11 +31,7 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
             </Typography>
           </div>
         </div>
-        <Chip
-          label="+19% SPIKE"
-          size="small"
-          color={'error'}
-        />
+        <Chip label="+19% SPIKE" size="small" color={'error'} />
       </div>
 
       <div style={styles.recBox}>

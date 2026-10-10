@@ -19,11 +19,7 @@ export const PaymentOptionButton: React.FC<Props> = ({
   styleFn,
 }) => {
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(id)}
-      style={styleFn(isSelected)}
-    >
+    <button type="button" onClick={() => onSelect(id)} style={styleFn(isSelected)}>
       <Icon sx={{ fontSize: 18 }} />
       <Typography variant="body2" sx={{ fontSize: '0.8rem', fontWeight: isSelected ? 700 : 500 }}>
         {label}

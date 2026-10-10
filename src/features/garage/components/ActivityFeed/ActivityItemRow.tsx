@@ -12,11 +12,7 @@ interface Props {
 
 export function ActivityItemRow({ entry, onOpen, getIcon }: Props) {
   return (
-    <button
-      type="button"
-      className={styles.item}
-      onClick={() => onOpen(entry)}
-    >
+    <button type="button" className={styles.item} onClick={() => onOpen(entry)}>
       <div className={`${styles.iconDisc} ${styles[entry.kind]}`}>{getIcon(entry.kind)}</div>
       <div className={styles.details}>
         <Typography variant="body2" sx={{ fontWeight: 600, textTransform: 'capitalize' }}>

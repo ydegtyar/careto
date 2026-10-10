@@ -1,4 +1,5 @@
 import { createTheme } from '@mui/material/styles';
+import { MuiDialog } from './MuiDialog.styles';
 import { glacier as g, glacierLight as gl } from './tokens';
 
 declare module '@mui/material/styles' {
@@ -116,6 +117,7 @@ export const theme = createTheme({
     },
   },
   components: {
+    MuiDialog: MuiDialog,
     MuiCard: {
       defaultProps: {
         elevation: 0,

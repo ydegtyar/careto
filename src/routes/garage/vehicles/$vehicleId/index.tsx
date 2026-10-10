@@ -505,20 +505,7 @@ function VehicleDetailPage() {
       </GlassCard>
 
       {/* Confirmation Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        slotProps={{
-          paper: {
-            style: {
-              backgroundColor: '#0f1524',
-              border: '1px solid rgba(248, 113, 113, 0.3)',
-              borderRadius: 16,
-              padding: 8,
-            },
-          },
-        }}
-      >
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <DialogTitle
           sx={{
             fontWeight: 700,

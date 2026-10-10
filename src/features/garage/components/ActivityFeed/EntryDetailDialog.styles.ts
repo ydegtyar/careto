@@ -2,18 +2,6 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import type { CSSProperties } from 'react';
 
 export const styles = {
-  paper: {
-    borderRadius: 4,
-    width: '100%',
-    maxWidth: 440,
-  } satisfies SxProps<Theme>,
-
-  deletePaper: {
-    borderRadius: 4,
-    width: '100%',
-    maxWidth: 400,
-  } satisfies SxProps<Theme>,
-
   dialogTitle: {
     fontWeight: 700,
     pb: 1,

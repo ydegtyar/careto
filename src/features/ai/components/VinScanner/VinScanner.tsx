@@ -147,4 +147,3 @@ export function VinScanner({ onParsed, variant = 'button' }: Props) {
     </div>
   );
 }
-

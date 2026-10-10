@@ -114,17 +114,7 @@ export function EntryDetailDialog({ entry, open, onClose }: Props) {
 
   return (
     <>
-      <Dialog
-        open={open && !deleteConfirmOpen}
-        onClose={handleCloseDialog}
-        fullWidth
-        maxWidth="xs"
-        slotProps={{
-          paper: {
-            sx: styles.paper,
-          },
-        }}
-      >
+      <Dialog open={open && !deleteConfirmOpen} onClose={handleCloseDialog} fullWidth maxWidth="xs">
         <DialogTitle sx={styles.dialogTitle}>
           <span>{isEditing ? 'Edit Activity Entry' : 'Activity Details'}</span>
           {!isEditing && (
@@ -321,15 +311,7 @@ export function EntryDetailDialog({ entry, open, onClose }: Props) {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={deleteConfirmOpen}
-        onClose={() => setDeleteConfirmOpen(false)}
-        slotProps={{
-          paper: {
-            sx: styles.deletePaper,
-          },
-        }}
-      >
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
         <DialogTitle sx={{ fontWeight: 700 }}>Confirm Deletion</DialogTitle>
         <DialogContent>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>

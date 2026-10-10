@@ -2,7 +2,9 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -16,6 +18,7 @@ import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { useForm } from '@tanstack/react-form';
 import { useState } from 'react';
@@ -31,6 +34,8 @@ import {
 } from '@/shared/lib/fuel-grades';
 import { GradeChip } from './GradeChip';
 import { ColorSwatchButton } from './VehicleFormHelpers';
+import { VinDecodeDialog } from '../VinDecodeDialog/VinDecodeDialog';
+import { decodeVinWithNhtsa, type DecodedVehicleSpecs } from '../../lib/vin-decoder';
 
 const COLOR_SWATCHES = [
   '#7dd3fc', // Ice Blue
@@ -145,6 +150,10 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
   const [customCategory, setCustomCategory] = useState<FuelGrade['category']>('petrol');
   const [customColor, _setCustomColor] = useState('#7dd3fc');
 
+  const [decodingVin, setDecodingVin] = useState(false);
+  const [decodedSpecs, setDecodedSpecs] = useState<DecodedVehicleSpecs | null>(null);
+  const [decodeDialogOpen, setDecodeDialogOpen] = useState(false);
+
   const initialPowertrain = initialVehicle?.powertrain ?? 'ev';
   const initialTanks =
     initialVehicle?.tanks && initialVehicle.tanks.length > 0
@@ -196,6 +205,38 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
     navigator.clipboard.writeText(vinStr);
     setCopiedVin(true);
     setTimeout(() => setCopiedVin(false), 2000);
+  };
+
+  const handleDecodeVin = async (vinStr: string) => {
+    if (!vinStr || vinStr.trim().length < 11) return;
+    setDecodingVin(true);
+    try {
+      const specs = await decodeVinWithNhtsa(vinStr);
+      if (specs && (specs.make || specs.model || specs.year || specs.trim || specs.powertrain)) {
+        setDecodedSpecs(specs);
+        setDecodeDialogOpen(true);
+      }
+    } finally {
+      setDecodingVin(false);
+    }
+  };
+
+  const handleAcceptDecodedSpecs = (specs: DecodedVehicleSpecs) => {
+    if (specs.make) form.setFieldValue('make', specs.make);
+    if (specs.model) form.setFieldValue('model', specs.model);
+    if (specs.year) form.setFieldValue('year', specs.year);
+    if (specs.trim) form.setFieldValue('trim', specs.trim);
+    if (specs.powertrain) {
+      form.setFieldValue('powertrain', specs.powertrain);
+      form.setFieldValue('efficiencyUnit', specs.powertrain === 'ev' ? 'kwh100km' : 'l100km');
+      form.setFieldValue('capacity', specs.powertrain === 'ev' ? '82' : '55');
+      form.setFieldValue('tanks', getDefaultTanksForPowertrain(specs.powertrain));
+      form.setFieldValue(
+        'fuelGrades',
+        getDefaultFuelGradesForPowertrain(specs.powertrain, allGrades),
+      );
+    }
+    setDecodeDialogOpen(false);
   };
 
   const handleAddCustomGrade = (currentFuelGrades: string[], _currentPowertrain: string) => {
@@ -563,13 +604,36 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                       <VinScanner
                         variant="icon-button"
                         onParsed={(parsed: VinParseResult) => {
-                          if (parsed.vin) form.setFieldValue('vin', parsed.vin);
-                          if (parsed.make) form.setFieldValue('make', parsed.make);
-                          if (parsed.model) form.setFieldValue('model', parsed.model);
-                          if (parsed.year) form.setFieldValue('year', parsed.year.toString());
-                          if (parsed.plate) form.setFieldValue('plate', parsed.plate);
+                          if (parsed.vin) {
+                            form.setFieldValue('vin', parsed.vin);
+                            handleDecodeVin(parsed.vin);
+                          } else {
+                            if (parsed.make) form.setFieldValue('make', parsed.make);
+                            if (parsed.model) form.setFieldValue('model', parsed.model);
+                            if (parsed.year) form.setFieldValue('year', parsed.year.toString());
+                            if (parsed.plate) form.setFieldValue('plate', parsed.plate);
+                          }
                         }}
                       />
+                      {field.state.value && field.state.value.length >= 11 && (
+                        <Tooltip title="Decode VIN Specs (NHTSA VPIC)">
+                          <span>
+                            <IconButton
+                              size="small"
+                              aria-label="Decode VIN Specs"
+                              onClick={() => handleDecodeVin(field.state.value)}
+                              disabled={decodingVin}
+                              sx={{ color: 'primary.main' }}
+                            >
+                              {decodingVin ? (
+                                <CircularProgress size={18} />
+                              ) : (
+                                <SearchIcon sx={{ fontSize: 18 }} />
+                              )}
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      )}
                       {field.state.value && (
                         <IconButton
                           size="small"
@@ -669,20 +733,7 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                     ))}
                   </div>
 
-                  <Dialog
-                    open={customDialogOpen}
-                    onClose={() => setCustomDialogOpen(false)}
-                    slotProps={{
-                      paper: {
-                        sx: {
-                          borderRadius: 3,
-                          backgroundColor: 'background.paper',
-                          border: '1px solid var(--mui-palette-divider)',
-                          p: 1,
-                        },
-                      },
-                    }}
-                  >
+                  <Dialog open={customDialogOpen} onClose={() => setCustomDialogOpen(false)}>
                     <DialogTitle sx={{ color: 'text.primary', fontWeight: 700 }}>
                       Add Custom Fuel / Charge Grade
                     </DialogTitle>
@@ -822,6 +873,13 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
           {submitting ? 'Saving...' : initialVehicle ? 'Save Changes' : 'Add Vehicle'}
         </Button>
       </div>
+
+      <VinDecodeDialog
+        open={decodeDialogOpen}
+        specs={decodedSpecs}
+        onAccept={handleAcceptDecodedSpecs}
+        onDecline={() => setDecodeDialogOpen(false)}
+      />
     </form>
   );
 }

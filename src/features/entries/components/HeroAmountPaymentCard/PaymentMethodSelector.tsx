@@ -1,10 +1,9 @@
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import PaymentsIcon from '@mui/icons-material/Payments';
-import Typography from '@mui/material/Typography';
 import type React from 'react';
-import { PaymentOptionButton } from './PaymentOptionButton';
 import { getPaymentOptionButtonStyle, styles } from './PaymentMethodSelector.styles';
+import { PaymentOptionButton } from './PaymentOptionButton';
 
 export interface Props {
   paymentMethod: string;

@@ -14,9 +14,7 @@ export const getPaymentOptionButtonStyle = (isSelected: boolean): CSSProperties 
   backgroundColor: isSelected
     ? 'color-mix(in srgb, var(--mui-palette-primary-main) 15%, transparent)'
     : 'var(--mui-palette-action-hover, rgba(0, 0, 0, 0.02))',
-  color: isSelected
-    ? 'var(--mui-palette-primary-main)'
-    : 'var(--mui-palette-text-primary)',
+  color: isSelected ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-text-primary)',
   cursor: 'pointer',
   transition: 'all 0.2s ease',
   font: 'inherit',
