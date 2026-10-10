@@ -25,10 +25,7 @@ export function CostDonut({ data = [] }: { data?: CostSlice[] }) {
               borderRadius: 8,
               color: '#e0e8f0',
             }}
-            formatter={(value: number | string | undefined) => [
-              `$${Number(value ?? 0).toFixed(2)}`,
-              'Cost',
-            ]}
+            formatter={(value) => [`$${Number(value ?? 0).toFixed(2)}`, 'Cost']}
           />
         </PieChart>
       </ResponsiveContainer>

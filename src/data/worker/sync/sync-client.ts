@@ -7,7 +7,7 @@ export interface SyncOp {
   id: string;
   hlc: string;
   deleted?: boolean;
-  patch: Record<string, unknown>;
+  patch: Record<string, any>;
   colHlc?: Record<string, string>;
   attempts?: number;
 }
@@ -42,7 +42,7 @@ export class SyncEngine {
     vehicleId: string,
     tbl: string,
     id: string,
-    patch: Record<string, unknown>,
+    patch: Record<string, any>,
     deleted = false,
   ): SyncOp {
     const opId = crypto.randomUUID();
@@ -127,7 +127,7 @@ export class SyncEngine {
 
   public async pull(
     vehicleId: string,
-  ): Promise<{ records: Record<string, unknown>[]; currentSeq: number } | null> {
+  ): Promise<{ records: Record<string, any>[]; currentSeq: number } | null> {
     const since = this.cursors[vehicleId] || 0;
     try {
       this.status.state = 'syncing';
@@ -143,7 +143,7 @@ export class SyncEngine {
       }
 
       const data = (await res.json()) as {
-        records: Record<string, unknown>[];
+        records: Record<string, any>[];
         currentSeq: number;
       };
       if (data.currentSeq !== undefined) {

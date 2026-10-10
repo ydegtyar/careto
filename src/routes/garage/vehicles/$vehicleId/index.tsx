@@ -91,7 +91,7 @@ function VehicleDetailPage() {
     try {
       const res = await fetch(`/api/vehicles/members?vehicle_id=${vehicleId}`);
       if (res.ok) {
-        const data = (await res.json()) as { members?: VehicleMember[] };
+        const data = (await res.json()) as { members?: Member[] };
         setMembers(data.members || []);
       }
     } finally {
