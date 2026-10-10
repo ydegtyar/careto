@@ -23,13 +23,28 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 12px 14px;
   border-radius: 14px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  outline: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
 
   &:hover {
     background: rgb(125 211 252 / 8%);
+  }
+
+  &:focus-visible {
+    border-color: color-mix(in srgb, var(--mui-palette-primary-main, #7dd3fc) 60%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--mui-palette-primary-main, #7dd3fc) 25%, transparent);
+  }
+
+  &:active {
+    transform: scale(0.99);
+    background: rgb(125 211 252 / 12%);
   }
 }
 

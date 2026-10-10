@@ -329,6 +329,42 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               fullWidth
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <WheelsScanner
+                        variant="icon-button"
+                        onParsed={(parsed: WheelsParseResult) => {
+                          if (parsed.tireSize) {
+                            form.setFieldValue('tireSize', parsed.tireSize);
+                          }
+                          const brandModel = [parsed.brand, parsed.season && `(${parsed.season})`]
+                            .filter(Boolean)
+                            .join(' ');
+                          if (brandModel) {
+                            form.setFieldValue('tireModel', brandModel);
+                          }
+                          const wheelParts = [
+                            parsed.tireSize && `Tires: ${parsed.tireSize}`,
+                            parsed.brand && parsed.brand,
+                            parsed.season && `(${parsed.season})`,
+                          ]
+                            .filter(Boolean)
+                            .join(' ');
+                          if (wheelParts) {
+                            const currentTrim = form.getFieldValue('trim');
+                            form.setFieldValue(
+                              'trim',
+                              currentTrim ? `${currentTrim} | ${wheelParts}` : wheelParts,
+                            );
+                          }
+                        }}
+                      />
+                    </InputAdornment>
+                  ),
+                },
+              }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
@@ -492,41 +528,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
         />
       </div>
 
-      <VinScanner
-        onParsed={(parsed: VinParseResult) => {
-          if (parsed.vin) form.setFieldValue('vin', parsed.vin);
-          if (parsed.make) form.setFieldValue('make', parsed.make);
-          if (parsed.model) form.setFieldValue('model', parsed.model);
-          if (parsed.year) form.setFieldValue('year', parsed.year.toString());
-          if (parsed.plate) form.setFieldValue('plate', parsed.plate);
-        }}
-      />
-
-      <WheelsScanner
-        onParsed={(parsed: WheelsParseResult) => {
-          if (parsed.tireSize) {
-            form.setFieldValue('tireSize', parsed.tireSize);
-          }
-          const brandModel = [parsed.brand, parsed.season && `(${parsed.season})`]
-            .filter(Boolean)
-            .join(' ');
-          if (brandModel) {
-            form.setFieldValue('tireModel', brandModel);
-          }
-          const wheelParts = [
-            parsed.tireSize && `Tires: ${parsed.tireSize}`,
-            parsed.brand && parsed.brand,
-            parsed.season && `(${parsed.season})`,
-          ]
-            .filter(Boolean)
-            .join(' ');
-          if (wheelParts) {
-            const currentTrim = form.getFieldValue('trim');
-            form.setFieldValue('trim', currentTrim ? `${currentTrim} | ${wheelParts}` : wheelParts);
-          }
-        }}
-      />
-
       <div style={{ display: 'flex', gap: 12 }}>
         <form.Field
           name="plate"
@@ -557,22 +558,34 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               fullWidth
               slotProps={{
                 input: {
-                  endAdornment: field.state.value ? (
-                    <InputAdornment position="end">
-                      <IconButton
-                        size="small"
-                        aria-label="Copy VIN"
-                        onClick={() => copyVinToClipboard(field.state.value)}
-                        sx={{ color: copiedVin ? 'success.main' : 'primary.main' }}
-                      >
-                        {copiedVin ? (
-                          <CheckIcon sx={{ fontSize: 18 }} />
-                        ) : (
-                          <ContentCopyIcon sx={{ fontSize: 18 }} />
-                        )}
-                      </IconButton>
+                  endAdornment: (
+                    <InputAdornment position="end" sx={{ gap: 0.5 }}>
+                      <VinScanner
+                        variant="icon-button"
+                        onParsed={(parsed: VinParseResult) => {
+                          if (parsed.vin) form.setFieldValue('vin', parsed.vin);
+                          if (parsed.make) form.setFieldValue('make', parsed.make);
+                          if (parsed.model) form.setFieldValue('model', parsed.model);
+                          if (parsed.year) form.setFieldValue('year', parsed.year.toString());
+                          if (parsed.plate) form.setFieldValue('plate', parsed.plate);
+                        }}
+                      />
+                      {field.state.value && (
+                        <IconButton
+                          size="small"
+                          aria-label="Copy VIN"
+                          onClick={() => copyVinToClipboard(field.state.value)}
+                          sx={{ color: copiedVin ? 'success.main' : 'primary.main' }}
+                        >
+                          {copiedVin ? (
+                            <CheckIcon sx={{ fontSize: 18 }} />
+                          ) : (
+                            <ContentCopyIcon sx={{ fontSize: 18 }} />
+                          )}
+                        </IconButton>
+                      )}
                     </InputAdornment>
-                  ) : null,
+                  ),
                 },
               }}
               sx={{

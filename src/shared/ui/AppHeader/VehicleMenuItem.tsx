@@ -48,10 +48,15 @@ export function VehicleMenuItem({ vehicle: v, activeVehicle, onSelect, onEdit }:
         display: 'flex',
         alignItems: 'center',
         gap: 1.5,
-        backgroundColor: isSelected ? 'rgba(125, 211, 252, 0.08) !important' : 'transparent',
-        border: isSelected ? '1px solid rgba(125, 211, 252, 0.25)' : '1px solid transparent',
+        backgroundColor: isSelected
+          ? 'color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 12%, transparent) !important'
+          : 'transparent',
+        border: isSelected
+          ? '1px solid color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 30%, transparent)'
+          : '1px solid transparent',
         '&:hover': {
-          backgroundColor: 'rgba(125, 211, 252, 0.06) !important',
+          backgroundColor:
+            'color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 8%, transparent) !important',
         },
         transition: 'all 0.15s ease',
       }}
@@ -61,8 +66,22 @@ export function VehicleMenuItem({ vehicle: v, activeVehicle, onSelect, onEdit }:
       </div>
 
       <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#e0e8f0' }}>{v.name}</span>
-        <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+        <span
+          style={{
+            fontWeight: 700,
+            fontSize: '0.88rem',
+            color: 'var(--mui-palette-text-primary, inherit)',
+          }}
+        >
+          {v.name}
+        </span>
+        <span
+          style={{
+            fontSize: '0.72rem',
+            color: 'var(--mui-palette-text-secondary, #64748b)',
+            fontFamily: 'monospace',
+          }}
+        >
           {getSubtext(v)}
         </span>
       </div>
@@ -76,9 +95,13 @@ export function VehicleMenuItem({ vehicle: v, activeVehicle, onSelect, onEdit }:
             onEdit(v.id);
           }}
           sx={{
-            color: '#94a3b8',
+            color: 'var(--mui-palette-text-secondary, #64748b)',
             p: 0.5,
-            '&:hover': { color: '#7dd3fc', backgroundColor: 'rgba(125, 211, 252, 0.1)' },
+            '&:hover': {
+              color: 'var(--mui-palette-primary-main, #0284c7)',
+              backgroundColor:
+                'color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 12%, transparent)',
+            },
           }}
         >
           <SettingsOutlinedIcon sx={{ fontSize: 18 }} />

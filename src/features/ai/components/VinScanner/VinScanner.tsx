@@ -1,9 +1,12 @@
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type React from 'react';
 import { useRef, useState } from 'react';
@@ -11,9 +14,10 @@ import { parseImageWithAi, type VinParseResult } from '../../lib/ai-client';
 
 interface Props {
   onParsed: (data: VinParseResult) => void;
+  variant?: 'button' | 'icon-button';
 }
 
-export function VinScanner({ onParsed }: Props) {
+export function VinScanner({ onParsed, variant = 'button' }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{
@@ -52,6 +56,34 @@ export function VinScanner({ onParsed }: Props) {
       setLoading(false);
     }
   };
+
+  if (variant === 'icon-button') {
+    return (
+      <>
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          capture="environment"
+          style={{ display: 'none' }}
+          onChange={handleFileSelect}
+        />
+        <Tooltip title="Scan VIN from Photo">
+          <span>
+            <IconButton
+              size="small"
+              aria-label="Scan VIN from Photo"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading}
+              sx={{ color: 'primary.main' }}
+            >
+              {loading ? <CircularProgress size={18} /> : <CameraAltIcon sx={{ fontSize: 18 }} />}
+            </IconButton>
+          </span>
+        </Tooltip>
+      </>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -115,3 +147,4 @@ export function VinScanner({ onParsed }: Props) {
     </div>
   );
 }
+

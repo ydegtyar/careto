@@ -34,13 +34,7 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
         <Chip
           label="+19% SPIKE"
           size="small"
-          sx={{
-            backgroundColor: 'error.light',
-            color: 'error.main',
-            fontWeight: 700,
-            fontSize: '0.65rem',
-            opacity: 0.9,
-          }}
+          color={'error'}
         />
       </div>
 

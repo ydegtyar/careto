@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import type React from 'react';
+import { formatAmount } from '@/shared/lib/currencies';
 import type { EntryRecord } from './ActivityFeed';
 import styles from './ActivityFeed.module.scss';
 
@@ -7,23 +8,14 @@ interface Props {
   entry: EntryRecord;
   onOpen: (entry: EntryRecord) => void;
   getIcon: (kind: string) => React.ReactNode;
-  formatAmount: (entry: EntryRecord) => string;
 }
 
-export function ActivityItemRow({ entry, onOpen, getIcon, formatAmount }: Props) {
+export function ActivityItemRow({ entry, onOpen, getIcon }: Props) {
   return (
     <button
       type="button"
       className={styles.item}
       onClick={() => onOpen(entry)}
-      style={{
-        width: '100%',
-        textIndent: 0,
-        textAlign: 'left',
-        background: 'none',
-        border: 'none',
-        padding: 0,
-      }}
     >
       <div className={`${styles.iconDisc} ${styles[entry.kind]}`}>{getIcon(entry.kind)}</div>
       <div className={styles.details}>

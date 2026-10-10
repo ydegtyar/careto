@@ -1,6 +1,3 @@
-import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import PaymentsIcon from '@mui/icons-material/Payments';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -14,9 +11,9 @@ import {
 } from '@/shared/lib/currencies';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './HeroAmountPaymentCard.styles';
-import { PaymentOptionButton } from './PaymentOptionButton';
+import { PaymentMethodSelector } from './PaymentMethodSelector';
 
-interface Props {
+export interface Props {
   amount: string;
   onAmountChange: (val: string) => void;
   currency: string;
@@ -24,12 +21,6 @@ interface Props {
   paymentMethod: string;
   onPaymentMethodChange: (method: string) => void;
 }
-
-const PAYMENT_OPTIONS = [
-  { id: 'card', label: 'Card', icon: CreditCardIcon },
-  { id: 'cash', label: 'Cash', icon: PaymentsIcon },
-  { id: 'company', label: 'Company', icon: BusinessCenterIcon },
-] as const;
 
 export const HeroAmountPaymentCard: React.FC<Props> = ({
   amount,
@@ -102,21 +93,10 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
       </div>
 
       {/* Payment Method Selector (Button Group with Icons) */}
-      <div style={styles.paymentSection}>
-        <div style={styles.paymentButtonGroup}>
-          {PAYMENT_OPTIONS.map(({ id, label, icon }) => (
-            <PaymentOptionButton
-              key={id}
-              id={id}
-              label={label}
-              icon={icon}
-              isSelected={paymentMethod === id}
-              onSelect={handlePaymentSelect}
-              styleFn={styles.paymentOptionButton}
-            />
-          ))}
-        </div>
-      </div>
+      <PaymentMethodSelector
+        paymentMethod={paymentMethod}
+        onPaymentMethodChange={handlePaymentSelect}
+      />
     </GlassCard>
   );
 };

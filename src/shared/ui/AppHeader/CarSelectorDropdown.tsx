@@ -151,7 +151,7 @@ export const CarSelectorDropdown: React.FC<Props> = ({
           }}
           sx={{
             fontSize: '0.85rem',
-            color: 'primary.main',
+            color: 'var(--mui-palette-primary-main)',
             fontWeight: 600,
             borderRadius: '12px',
             mt: !isLoading && vehicles.length > 0 ? '8px' : 0,
@@ -161,12 +161,13 @@ export const CarSelectorDropdown: React.FC<Props> = ({
               !isLoading && vehicles.length > 0 ? '1px solid var(--mui-palette-divider)' : 'none',
             '&:hover': {
               backgroundColor:
-                'color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent) !important',
+                'color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent) !important',
+              color: 'var(--mui-palette-primary-main) !important',
             },
           }}
         >
           <ListItemIcon sx={{ minWidth: '32px !important' }}>
-            <AddIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+            <AddIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           </ListItemIcon>
           Add New Vehicle
         </MenuItem>

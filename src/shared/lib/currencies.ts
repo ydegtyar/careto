@@ -63,3 +63,16 @@ export function convertToUsdMinor(
   // rate is (Foreign Currency / USD). USD = Foreign Amount / rate
   return Math.round(amountMinor / rate);
 }
+
+export interface FormattableAmount {
+  amount_minor?: number | null;
+  currency?: string | null;
+}
+
+/**
+ * Formats minor currency units into a human-readable string with currency code.
+ */
+export function formatAmount(entry: FormattableAmount): string {
+  if (!entry.amount_minor || !entry.currency) return '';
+  return `${(entry.amount_minor / 100).toFixed(2)} ${entry.currency}`;
+}

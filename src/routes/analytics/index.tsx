@@ -14,7 +14,7 @@ import { PriceVolatilityCard } from '@/features/analytics/components/PriceVolati
 import { SpendingTrendCard } from '@/features/analytics/components/SpendingTrendCard';
 import { TcoSummaryCard } from '@/features/analytics/components/TcoSummaryCard';
 import { entriesQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
-import { styles } from './index.styles';
+import { styles } from './-index.styles';
 
 export const Route = createFileRoute('/analytics/')({
   component: AnalyticsPage,
