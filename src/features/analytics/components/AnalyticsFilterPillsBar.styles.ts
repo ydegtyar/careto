@@ -15,12 +15,12 @@ export const styles = {
   },
   select: {
     borderRadius: '16px',
-    backgroundColor: 'rgba(15, 21, 36, 0.6)',
-    color: '#e0e8f0',
+    backgroundColor: 'var(--mui-palette-surfaceContainer)',
+    color: 'var(--mui-palette-text-primary)',
     fontSize: '0.82rem',
     fontWeight: 600,
     height: 34,
-    border: '1px solid rgba(125, 211, 252, 0.2)',
+    border: '1px solid var(--mui-palette-divider)',
   },
   customRangeCard: {
     padding: '12px 14px',
@@ -32,7 +32,7 @@ export const styles = {
     flex: 1,
     '& .MuiOutlinedInput-root': {
       borderRadius: 2,
-      backgroundColor: 'rgba(15, 21, 36, 0.6)',
+      backgroundColor: 'var(--mui-palette-surfaceContainer)',
       fontSize: '0.8rem',
     },
   },

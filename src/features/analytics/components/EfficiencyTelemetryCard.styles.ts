@@ -20,6 +20,7 @@ export const styles = {
   },
   metricCard: {
     padding: '10px 6px',
-    backgroundColor: 'rgba(15, 21, 36, 0.5)',
+    backgroundColor: 'var(--mui-palette-surfaceContainer)',
+    border: '1px solid var(--mui-palette-divider)',
   },
 } as const satisfies Record<string, CSSProperties>;

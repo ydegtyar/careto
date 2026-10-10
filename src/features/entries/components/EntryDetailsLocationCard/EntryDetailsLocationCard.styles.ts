@@ -17,19 +17,17 @@ export const styles = {
     display: 'flex',
     gap: 12,
   },
-  inputRoot: {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 3,
-      backgroundColor: 'rgba(15, 21, 36, 0.6)',
-    },
-  },
   switchContainer: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 21, 36, 0.4)',
     padding: '8px 14px',
     borderRadius: 12,
-    border: '1px solid rgba(125, 211, 252, 0.1)',
+    border: '1px solid var(--mui-palette-divider)',
+  },
+  inputRoot: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 3,
+    },
   },
 } as const satisfies Record<string, CSSProperties | object>;

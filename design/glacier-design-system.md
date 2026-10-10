@@ -1,4 +1,4 @@
-# Glacier — Glassmorphism Design System
+# Glacier — Glassmorphism Design System (Dark)
 
 Sourced directly from Stitch Project `15374606287284007947` ("Auto Expense Manager").
 

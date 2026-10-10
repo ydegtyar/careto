@@ -18,12 +18,6 @@ export function SubItemRow({ item, onUpdate, onRemove }: Props) {
         onChange={(e) => onUpdate(item.id, 'name', e.target.value)}
         fullWidth
         size="small"
-        sx={{
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 2,
-            backgroundColor: 'rgba(15, 21, 36, 0.6)',
-          },
-        }}
       />
       <TextField
         placeholder="Cost"
@@ -31,13 +25,7 @@ export function SubItemRow({ item, onUpdate, onRemove }: Props) {
         value={item.cost}
         onChange={(e) => onUpdate(item.id, 'cost', e.target.value)}
         size="small"
-        sx={{
-          width: 110,
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 2,
-            backgroundColor: 'rgba(15, 21, 36, 0.6)',
-          },
-        }}
+        sx={{ width: 110 }}
       />
       <IconButton
         size="small"

@@ -2,11 +2,11 @@ import type { CSSProperties } from 'react';
 
 export const styles = {
   menuPaper: {
-    backgroundColor: '#0f1524',
+    backgroundColor: 'var(--mui-palette-background-paper)',
     backgroundImage: 'none',
-    border: '1px solid rgba(125, 211, 252, 0.2)',
+    border: '1px solid var(--mui-palette-divider)',
     borderRadius: '12px',
-    color: '#e0e8f0',
+    color: 'var(--mui-palette-text-primary)',
     minWidth: '200px',
   } as CSSProperties,
 
@@ -20,7 +20,7 @@ export const styles = {
   userName: {
     fontSize: '0.875rem',
     fontWeight: 600,
-    color: '#f8fafc',
+    color: 'var(--mui-palette-text-primary)',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -28,7 +28,7 @@ export const styles = {
 
   userEmail: {
     fontSize: '0.75rem',
-    color: '#94a3b8',
+    color: 'var(--mui-palette-text-secondary)',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',

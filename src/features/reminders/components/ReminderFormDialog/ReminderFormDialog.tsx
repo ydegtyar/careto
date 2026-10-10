@@ -121,11 +121,7 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
       slotProps={{
         paper: {
           sx: {
-            backgroundColor: '#0f1524',
-            backgroundImage: 'none',
-            border: '1px solid rgba(125, 211, 252, 0.2)',
             borderRadius: 4,
-            color: '#e0e8f0',
             padding: 1,
             width: '100%',
             maxWidth: 440,
@@ -145,12 +141,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
             onChange={(e) => setTitle(e.target.value)}
             required
             fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 3,
-                backgroundColor: 'rgba(15, 21, 36, 0.6)',
-              },
-            }}
           />
 
           <FormControl fullWidth>
@@ -160,7 +150,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               value={kind}
               label="Maintenance Type"
               onChange={(e) => setKind(e.target.value)}
-              sx={{ borderRadius: 3, backgroundColor: 'rgba(15, 21, 36, 0.6)' }}
             >
               {DEFAULT_MAINTENANCE_TYPES.map((t) => (
                 <MenuItem key={t.id} value={t.id}>
@@ -186,12 +175,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               onChange={(e) => setCustomKindInput(e.target.value)}
               required
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                },
-              }}
             />
           )}
 
@@ -202,12 +185,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               value={intervalKm}
               onChange={(e) => setIntervalKm(e.target.value)}
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                },
-              }}
             />
             <TextField
               label="Interval (days)"
@@ -215,12 +192,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               value={intervalDays}
               onChange={(e) => setIntervalDays(e.target.value)}
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                },
-              }}
             />
           </div>
 
@@ -231,7 +202,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               value={mode}
               label="Trigger Rule Mode"
               onChange={(e) => setMode(e.target.value as any)}
-              sx={{ borderRadius: 3, backgroundColor: 'rgba(15, 21, 36, 0.6)' }}
             >
               <MenuItem value="earlier">Whichever comes first (km or time)</MenuItem>
               <MenuItem value="later">Whichever comes later (km and time)</MenuItem>
@@ -252,12 +222,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               onChange={(e) => setBaseDate(e.target.value)}
               slotProps={{ inputLabel: { shrink: true } }}
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                },
-              }}
             />
             <TextField
               label="Last Odometer (km)"
@@ -265,12 +229,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               value={baseOdometerKm}
               onChange={(e) => setBaseOdometerKm(e.target.value)}
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                },
-              }}
             />
           </div>
 
@@ -280,12 +238,6 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
             value={estCost}
             onChange={(e) => setEstCost(e.target.value)}
             fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 3,
-                backgroundColor: 'rgba(15, 21, 36, 0.6)',
-              },
-            }}
           />
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 1 }}>

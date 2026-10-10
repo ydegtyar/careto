@@ -113,8 +113,9 @@ export const EmptyVehicleState: React.FC<Props> = ({ onAddVehicle }) => {
             <ActiveIcon
               sx={{
                 fontSize: 48,
-                color: '#7dd3fc',
-                filter: 'drop-shadow(0 0 10px rgba(125, 211, 252, 0.7))',
+                color: 'primary.main',
+                filter:
+                  'drop-shadow(0 0 10px color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 50%, transparent))',
               }}
             />
           </div>
@@ -135,9 +136,9 @@ export const EmptyVehicleState: React.FC<Props> = ({ onAddVehicle }) => {
               height: 4,
               borderRadius: 2,
               mb: 1.5,
-              backgroundColor: 'rgba(255,255,255,0.08)',
+              backgroundColor: 'action.hover',
               '& .MuiLinearProgress-bar': {
-                background: 'linear-gradient(to right, #c8a0f0, #88b4cc, #7dd3fc)',
+                backgroundColor: 'primary.main',
                 borderRadius: 2,
               },
             }}
@@ -204,8 +205,9 @@ export const EmptyVehicleState: React.FC<Props> = ({ onAddVehicle }) => {
             <div
               style={{
                 ...styles.capabilityIconContainer,
-                backgroundColor: 'rgba(14, 77, 110, 0.8)',
-                color: '#7dd3fc',
+                backgroundColor:
+                  'color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 15%, transparent)',
+                color: 'var(--mui-palette-primary-main, #0284c7)',
               }}
             >
               <SpeedIcon />
@@ -225,8 +227,9 @@ export const EmptyVehicleState: React.FC<Props> = ({ onAddVehicle }) => {
             <div
               style={{
                 ...styles.capabilityIconContainer,
-                backgroundColor: 'rgba(26, 58, 78, 0.8)',
-                color: '#88b4cc',
+                backgroundColor:
+                  'color-mix(in srgb, var(--mui-palette-secondary-main, #006591) 15%, transparent)',
+                color: 'var(--mui-palette-secondary-main, #006591)',
               }}
             >
               <QueryStatsIcon />
@@ -246,8 +249,9 @@ export const EmptyVehicleState: React.FC<Props> = ({ onAddVehicle }) => {
             <div
               style={{
                 ...styles.capabilityIconContainer,
-                backgroundColor: 'rgba(61, 32, 96, 0.8)',
-                color: '#c8a0f0',
+                backgroundColor:
+                  'color-mix(in srgb, var(--mui-palette-tertiary-main, #006387) 15%, transparent)',
+                color: 'var(--mui-palette-tertiary-main, #006387)',
               }}
             >
               <ReceiptLongIcon />

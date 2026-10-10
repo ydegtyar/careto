@@ -6,11 +6,13 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import PaidIcon from '@mui/icons-material/Paid';
 import SecurityIcon from '@mui/icons-material/Security';
 import SendIcon from '@mui/icons-material/Send';
+import StorageIcon from '@mui/icons-material/Storage';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -18,6 +20,7 @@ import { useAppStore } from '@/app/store';
 import { data } from '@/data/client';
 import { createExportZip, downloadExportZip, parseImportZip } from '@/data/compute/export-import';
 import { AiSettingsCard } from '@/features/ai/components/AiSettingsCard/AiSettingsCard';
+import { vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import {
   getPushSubscription,
   isPushSupported,
@@ -25,7 +28,6 @@ import {
   unsubscribeFromPush,
 } from '@/features/reminders/lib/push-client';
 import { CurrencyChip } from '@/features/settings/components/CurrencyChip/CurrencyChip';
-import { DistanceUnitCard } from '@/features/settings/components/DistanceUnitCard/DistanceUnitCard';
 import { SyncStatusCard } from '@/features/settings/components/SyncStatusCard/SyncStatusCard';
 import { ThemeSelectionCard } from '@/features/settings/components/ThemeSelectionCard/ThemeSelectionCard';
 import {
@@ -33,6 +35,7 @@ import {
   useFavoriteCurrencies,
   useLastUsedCurrency,
 } from '@/shared/lib/currencies';
+import { clearQueryCacheStorage, getQueryCacheStorageType } from '@/shared/lib/queryPersister';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 
 export const Route = createFileRoute('/settings/')({
@@ -40,7 +43,8 @@ export const Route = createFileRoute('/settings/')({
 });
 
 function SettingsPage() {
-  const { isPremium, setIsPremium } = useAppStore();
+  const queryClient = useQueryClient();
+
   const [favoriteCurrencies, setFavoriteCurrencies] = useFavoriteCurrencies();
   const [lastUsedCurrency, setLastUsedCurrency] = useLastUsedCurrency();
 
@@ -57,7 +61,6 @@ function SettingsPage() {
     }
   };
 
-  const [useMiles, setUseMiles] = useState(false);
   const [_offlineSync, _setOfflineSync] = useState(true);
 
   // Push Notifications state
@@ -65,6 +68,11 @@ function SettingsPage() {
   const [pushSubscribed, setPushSubscribed] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
   const [testPushStatus, setTestPushStatus] = useState<string | null>(null);
+
+  // Storage Cache State
+  const [cacheStorageType, setCacheStorageType] = useState<'IndexedDB' | 'localStorage' | 'None'>(
+    'IndexedDB',
+  );
 
   // Export / Import state
   const [backupMessage, setBackupMessage] = useState<{
@@ -81,6 +89,7 @@ function SettingsPage() {
         getPushSubscription().then((sub) => setPushSubscribed(!!sub));
       }
     });
+    getQueryCacheStorageType().then(setCacheStorageType);
   }, []);
 
   const handleTogglePush = async (enable: boolean) => {
@@ -172,11 +181,32 @@ function SettingsPage() {
     }
   };
 
+  const handlePurgeQueryCache = async () => {
+    if (
+      !window.confirm(
+        'Are you sure you want to purge local query cache? Cached API responses will be cleared.',
+      )
+    ) {
+      return;
+    }
+    try {
+      await clearQueryCacheStorage();
+      queryClient.clear();
+      setBackupMessage({
+        type: 'success',
+        text: 'TanStack Query cache purged successfully.',
+      });
+    } catch (err: any) {
+      setBackupMessage({ type: 'error', text: `Failed to purge query cache: ${err.message}` });
+    }
+  };
+
   const handleClearCache = async () => {
     if (!window.confirm('Are you sure you want to clear all local cache and reset state?')) {
       return;
     }
     try {
+      await clearQueryCacheStorage();
       localStorage.clear();
       sessionStorage.clear();
       if ('caches' in window) {
@@ -297,9 +327,6 @@ function SettingsPage() {
           </div>
         </GlassCard>
 
-        {/* Distance Unit Card */}
-        <DistanceUnitCard useMiles={useMiles} onUseMilesChange={setUseMiles} />
-
         {/* AI Vision & LLM Waterfall Settings */}
         <AiSettingsCard />
 
@@ -363,6 +390,17 @@ function SettingsPage() {
               sx={{ textTransform: 'none', color: 'text.secondary' }}
             >
               Download GDPR Data (JSON)
+            </Button>
+
+            <Button
+              size="small"
+              variant="outlined"
+              color="warning"
+              startIcon={<StorageIcon />}
+              onClick={handlePurgeQueryCache}
+              sx={{ textTransform: 'none', borderRadius: 2 }}
+            >
+              Purge Query Cache ({cacheStorageType})
             </Button>
 
             <Button

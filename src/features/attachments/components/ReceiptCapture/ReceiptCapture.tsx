@@ -64,12 +64,12 @@ export function ReceiptCapture({ onImageReady }: Props) {
           onClick={() => fileInputRef.current?.click()}
           disabled={compressing}
           sx={{
-            borderColor: 'rgba(125, 211, 252, 0.3)',
+            borderColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
             color: 'primary.main',
             textTransform: 'none',
             borderRadius: 2,
             py: 1,
-            backgroundColor: 'rgba(15, 21, 36, 0.5)',
+            backgroundColor: 'var(--mui-palette-surfaceContainer)',
           }}
         >
           {compressing ? 'Compressing receipt...' : 'Attach Receipt / Photo'}
@@ -80,8 +80,8 @@ export function ReceiptCapture({ onImageReady }: Props) {
             position: 'relative',
             borderRadius: 12,
             overflow: 'hidden',
-            border: '1px solid rgba(125, 211, 252, 0.3)',
-            backgroundColor: 'rgba(15, 21, 36, 0.8)',
+            border: '1px solid var(--mui-palette-divider)',
+            backgroundColor: 'var(--mui-palette-surfaceContainer)',
             padding: 8,
             display: 'flex',
             alignItems: 'center',

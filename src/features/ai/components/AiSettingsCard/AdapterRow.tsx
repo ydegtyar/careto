@@ -19,8 +19,8 @@ export function AdapterRow({ id, idx, totalLength, labels, onMove }: Props) {
         justifyContent: 'space-between',
         padding: '10px 14px',
         borderRadius: 10,
-        backgroundColor: 'rgba(15, 23, 42, 0.6)',
-        border: '1px solid rgba(125, 211, 252, 0.15)',
+        backgroundColor: 'var(--mui-palette-surfaceContainer)',
+        border: '1px solid var(--mui-palette-divider)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -29,8 +29,11 @@ export function AdapterRow({ id, idx, totalLength, labels, onMove }: Props) {
           size="small"
           sx={{
             fontWeight: 700,
-            backgroundColor: idx === 0 ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.08)',
-            color: idx === 0 ? '#38bdf8' : 'text.primary',
+            backgroundColor:
+              idx === 0
+                ? 'color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent)'
+                : 'var(--mui-palette-surface3)',
+            color: idx === 0 ? 'primary.main' : 'text.primary',
           }}
         />
         <div>

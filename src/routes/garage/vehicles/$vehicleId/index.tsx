@@ -372,27 +372,11 @@ function VehicleDetailPage() {
             required
             fullWidth
             size="small"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: 'rgba(15, 21, 36, 0.7)',
-                color: 'text.primary',
-                '& fieldset': { borderColor: 'rgba(125, 211, 252, 0.2)' },
-              },
-            }}
           />
 
           <FormControl size="small" fullWidth>
-            <InputLabel sx={{ color: 'text.secondary' }}>Role</InputLabel>
-            <Select
-              value={role}
-              label="Role"
-              onChange={(e) => setRole(e.target.value as any)}
-              sx={{
-                backgroundColor: 'rgba(15, 21, 36, 0.7)',
-                color: 'text.primary',
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(125, 211, 252, 0.2)' },
-              }}
-            >
+            <InputLabel>Role</InputLabel>
+            <Select value={role} label="Role" onChange={(e) => setRole(e.target.value as any)}>
               <MenuItem value="editor">Editor — Can log refuels, services, notes</MenuItem>
               <MenuItem value="viewer">Viewer — Read-only telemetry and stats</MenuItem>
             </Select>

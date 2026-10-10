@@ -20,6 +20,8 @@ import {
 } from '@/features/garage/queries/vehicles';
 import { ReminderCard } from '@/features/reminders/components/ReminderCard/ReminderCard';
 import { ReminderFormDialog } from '@/features/reminders/components/ReminderFormDialog/ReminderFormDialog';
+import { SuggestedRemindersBlock } from '@/features/reminders/components/SuggestedRemindersBlock/SuggestedRemindersBlock';
+import type { SuggestedReminderPreset } from '@/features/reminders/data/suggestedReminders';
 import { computeDue } from '@/features/reminders/lib/compute-due';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 
@@ -42,6 +44,39 @@ function RemindersPage() {
   const [customTypes, setCustomTypes] = useState<string[]>(
     activeVehicle?.custom_reminder_types ?? [],
   );
+
+  const handleSetupSuggested = (preset: SuggestedReminderPreset) => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const draft: Reminder = {
+      id: crypto.randomUUID(),
+      kind: preset.kind,
+      title: preset.title,
+      mode: preset.mode,
+      interval_m: preset.interval_m,
+      interval_days: preset.interval_days,
+      base_odometer_m: activeVehicle?.initial_odometer_m ?? 42150000,
+      base_date: todayStr,
+      lead_m: 500_000,
+      lead_days: 14,
+      est_cost_usd_minor: preset.est_cost_usd_minor,
+    };
+    setEditingReminder(draft);
+    setDialogOpen(true);
+  };
+
+  const handleDismissSuggested = async (presetId: string) => {
+    if (!activeVehicle) return;
+    const currentDismissed = activeVehicle.dismissed_suggested_reminders ?? [];
+    if (!currentDismissed.includes(presetId)) {
+      const updatedDismissed = [...currentDismissed, presetId];
+      await data.upsertVehicle({
+        ...activeVehicle,
+        dismissed_suggested_reminders: updatedDismissed,
+      });
+      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+      setToastMessage('Suggestion dismissed forever for this vehicle.');
+    }
+  };
 
   const evaluatedReminders = reminders.map((r) => {
     const dueRes = computeDue(
@@ -190,40 +225,19 @@ function RemindersPage() {
         </div>
       </GlassCard>
 
+      {/* Vehicle Powertrain Suggested Reminders */}
+      <SuggestedRemindersBlock
+        vehicle={activeVehicle}
+        existingReminders={reminders}
+        onSetup={handleSetupSuggested}
+        onDismiss={handleDismissSuggested}
+      />
+
       {/* Filter Tabs & Add Button */}
       <div
         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}
       >
-        <Tabs
-          value={filterTab}
-          onChange={(_, val) => setFilterTab(val)}
-          sx={{
-            minHeight: 34,
-            backgroundColor: 'rgba(15, 21, 36, 0.4)',
-            borderRadius: '12px',
-            padding: '2px',
-            border: '1px solid rgba(125, 211, 252, 0.12)',
-            '& .MuiTabs-indicator': {
-              backgroundColor: 'primary.main',
-              height: '100%',
-              borderRadius: '10px',
-              opacity: 0.18,
-            },
-            '& .MuiTab-root': {
-              minHeight: 30,
-              padding: '4px 12px',
-              textTransform: 'none',
-              fontWeight: 600,
-              fontSize: '0.78rem',
-              color: 'text.secondary',
-              zIndex: 1,
-              '&.Mui-selected': {
-                color: 'primary.main',
-                fontWeight: 700,
-              },
-            },
-          }}
-        >
+        <Tabs value={filterTab} onChange={(_, val) => setFilterTab(val)}>
           <Tab value="all" label={`All (${reminders.length})`} />
           <Tab value="due" label="Due" />
           <Tab value="upcoming" label="Upcoming" />

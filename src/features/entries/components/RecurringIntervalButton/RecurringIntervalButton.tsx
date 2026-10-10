@@ -17,8 +17,11 @@ export function RecurringIntervalButton({ inv, isSelected, onSelect }: Props) {
         borderRadius: 3,
         textTransform: 'capitalize',
         fontWeight: 600,
-        backgroundColor: isSelected ? 'primary.main' : 'rgba(32, 44, 66, 0.6)',
+        backgroundColor: isSelected ? 'primary.main' : 'var(--mui-palette-surfaceContainer)',
         color: isSelected ? 'primary.contrastText' : 'text.primary',
+        '&:hover': {
+          backgroundColor: isSelected ? 'primary.main' : 'var(--mui-palette-surface2)',
+        },
       }}
     >
       {inv}

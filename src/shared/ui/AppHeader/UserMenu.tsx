@@ -93,7 +93,7 @@ export const UserMenu: React.FC<Props> = ({ userName, userEmail }) => {
               {displayName && <div style={styles.userName}>{displayName}</div>}
               {displayEmail && <div style={styles.userEmail}>{displayEmail}</div>}
             </div>
-            <Divider sx={{ borderColor: 'rgba(125, 211, 252, 0.15)', my: 0.5 }} />
+            <Divider sx={{ borderColor: 'divider', my: 0.5 }} />
           </div>
         )}
 

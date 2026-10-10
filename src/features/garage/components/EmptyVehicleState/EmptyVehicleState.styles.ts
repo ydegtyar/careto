@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 
 export const getOrbShadowStyle = (glowColor: string): CSSProperties => ({
-  boxShadow: `0 0 45px ${glowColor}, inset 0 0 15px rgba(255, 255, 255, 0.1)`,
+  boxShadow: `0 0 45px ${glowColor}, inset 0 0 15px rgba(255, 255, 255, 0.2)`,
   transition: 'box-shadow 0.5s ease-in-out',
 });
 
@@ -53,9 +53,9 @@ export const styles = {
     height: 144,
     borderRadius: '50%',
     background:
-      'linear-gradient(to top right, rgba(125,211,252,0.2), transparent, rgba(200,160,240,0.2))',
+      'linear-gradient(to top right, color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 20%, transparent), transparent, color-mix(in srgb, var(--mui-palette-secondary-main, #006591) 20%, transparent))',
     backdropFilter: 'blur(4px)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    border: '1px solid var(--mui-palette-divider, rgba(255, 255, 255, 0.1))',
   },
   ambientGlow: {
     position: 'absolute',
@@ -63,6 +63,7 @@ export const styles = {
     height: 112,
     borderRadius: '50%',
     filter: 'blur(24px)',
+    opacity: 0.6,
   },
   orbContainer: {
     position: 'relative',
@@ -73,9 +74,11 @@ export const styles = {
     width: 112,
     height: 112,
     borderRadius: '50%',
-    backgroundColor: 'rgba(32, 44, 66, 0.8)',
+    backgroundColor:
+      'color-mix(in srgb, var(--mui-palette-background-paper, #ffffff) 80%, transparent)',
     backdropFilter: 'blur(16px)',
-    border: '1px solid rgba(125, 211, 252, 0.3)',
+    border:
+      '1px solid color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 30%, transparent)',
   },
   categoryBadge: {
     position: 'absolute',
@@ -89,14 +92,15 @@ export const styles = {
   categoryBadgeInner: {
     padding: '2px 10px',
     borderRadius: 9999,
-    backgroundColor: 'rgba(10, 14, 26, 0.8)',
-    border: '1px solid rgba(42, 58, 72, 0.6)',
+    backgroundColor:
+      'color-mix(in srgb, var(--mui-palette-background-paper, #ffffff) 90%, transparent)',
+    border: '1px solid var(--mui-palette-divider)',
     backdropFilter: 'blur(8px)',
   },
   categoryBadgeText: {
     fontSize: '11px',
     fontWeight: 600,
-    color: '#7dd3fc',
+    color: 'var(--mui-palette-primary-main, #0284c7)',
     letterSpacing: '0.025em',
   },
   pillsContainer: {
@@ -120,6 +124,7 @@ export const styles = {
     padding: '4px 12px',
     minWidth: 'auto',
     flexShrink: 0,
+    color: 'text.secondary',
   },
   activePillButton: {
     textTransform: 'none',
@@ -129,10 +134,13 @@ export const styles = {
     padding: '4px 12px',
     minWidth: 'auto',
     flexShrink: 0,
-    backgroundColor: 'rgba(125, 211, 252, 0.2)',
-    color: '#7dd3fc',
-    border: '1px solid rgba(125, 211, 252, 0.4)',
-    boxShadow: '0 0 12px rgba(125, 211, 252, 0.3)',
+    backgroundColor:
+      'color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 15%, transparent)',
+    color: 'var(--mui-palette-primary-main, #0284c7)',
+    border:
+      '1px solid color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 40%, transparent)',
+    boxShadow:
+      '0 0 12px color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 20%, transparent)',
   },
   textSection: {
     marginTop: 8,
@@ -140,9 +148,7 @@ export const styles = {
   },
   title: {
     fontWeight: 700,
-    background: 'linear-gradient(to right, #e0e8f0, #c8eaff, #e0e8f0)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
+    color: 'text.primary',
   },
   subtitle: {
     color: 'text.secondary',
@@ -164,13 +170,15 @@ export const styles = {
     fontWeight: 600,
     fontSize: '0.875rem',
     textTransform: 'none',
-    color: '#001f2e',
-    background: 'linear-gradient(to right, #c8a0f0, #88b4cc, #7dd3fc)',
-    boxShadow: '0 0 35px rgba(125, 211, 252, 0.35), 0 0 20px rgba(200, 160, 240, 0.3)',
+    color: 'primary.contrastText',
+    backgroundColor: 'primary.main',
+    boxShadow:
+      '0 4px 20px color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 35%, transparent)',
     transition: 'all 0.2s ease-in-out',
     '&:hover': {
-      background: 'linear-gradient(to right, #e8d0ff, #c0d8e8, #c8eaff)',
-      boxShadow: '0 0 45px rgba(125, 211, 252, 0.5), 0 0 25px rgba(200, 160, 240, 0.4)',
+      backgroundColor: 'primary.dark',
+      boxShadow:
+        '0 6px 24px color-mix(in srgb, var(--mui-palette-primary-main, #0284c7) 50%, transparent)',
       transform: 'scale(1.01)',
     },
   },
@@ -182,11 +190,13 @@ export const styles = {
     fontWeight: 500,
     fontSize: '0.75rem',
     textTransform: 'none',
-    color: '#7dd3fc',
-    backgroundColor: 'rgba(32, 44, 66, 0.6)',
+    color: 'text.primary',
+    backgroundColor: 'color-mix(in srgb, var(--mui-palette-action-hover, #000000) 8%, transparent)',
+    border: '1px solid var(--mui-palette-divider)',
     backdropFilter: 'blur(8px)',
     '&:hover': {
-      backgroundColor: 'rgba(32, 44, 66, 0.9)',
+      backgroundColor:
+        'color-mix(in srgb, var(--mui-palette-action-hover, #000000) 15%, transparent)',
     },
   },
   capabilitiesHeader: {
@@ -206,7 +216,7 @@ export const styles = {
   capabilitiesBadge: {
     fontSize: '11px',
     fontWeight: 500,
-    color: '#7dd3fc',
+    color: 'primary.main',
     display: 'flex',
     alignItems: 'center',
     gap: 4,

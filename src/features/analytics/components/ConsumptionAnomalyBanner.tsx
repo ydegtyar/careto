@@ -18,9 +18,9 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
     <GlassCard style={styles.card}>
       <div style={styles.header}>
         <div style={styles.titleGroup}>
-          <WarningAmberIcon sx={{ color: '#fbbf24', fontSize: 24 }} />
+          <WarningAmberIcon sx={{ color: 'warning.main', fontSize: 24 }} />
           <div>
-            <Typography variant="body2" sx={{ fontWeight: 700, color: '#ffffff' }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
               Consumption Anomaly Detected
             </Typography>
             <Typography
@@ -35,10 +35,11 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
           label="+19% SPIKE"
           size="small"
           sx={{
-            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-            color: '#f87171',
+            backgroundColor: 'error.light',
+            color: 'error.main',
             fontWeight: 700,
             fontSize: '0.65rem',
+            opacity: 0.9,
           }}
         />
       </div>
@@ -60,8 +61,6 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
             textTransform: 'none',
             fontWeight: 600,
             fontSize: '0.78rem',
-            backgroundColor: 'rgba(125, 211, 252, 0.2)',
-            color: 'primary.main',
           }}
         >
           Check Tire Specs
@@ -75,7 +74,7 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
             textTransform: 'none',
             fontSize: '0.78rem',
             color: 'text.secondary',
-            borderColor: 'rgba(255, 255, 255, 0.15)',
+            borderColor: 'divider',
           }}
         >
           Dismiss

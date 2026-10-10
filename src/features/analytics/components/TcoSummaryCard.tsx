@@ -21,12 +21,17 @@ export const TcoSummaryCard: React.FC<Props> = ({ entries, vehicle }) => {
         <div>
           <Typography
             variant="caption"
-            sx={{ textTransform: 'uppercase', letterSpacing: 1, color: '#7dd3fc', fontWeight: 700 }}
+            sx={{
+              textTransform: 'uppercase',
+              letterSpacing: 1,
+              color: 'primary.main',
+              fontWeight: 700,
+            }}
           >
             True Total Cost of Ownership
           </Typography>
           <div style={styles.tcoAmountRow}>
-            <Typography variant="h4" sx={{ fontWeight: 800, color: '#ffffff' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary' }}>
               ${tcoSummary.tcoPerKm.toFixed(2)}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -45,7 +50,9 @@ export const TcoSummaryCard: React.FC<Props> = ({ entries, vehicle }) => {
       </div>
 
       <Chip
-        icon={<ShowChartIcon sx={{ fontSize: '14px !important', color: '#7dd3fc !important' }} />}
+        icon={
+          <ShowChartIcon sx={{ fontSize: '14px !important', color: 'primary.main !important' }} />
+        }
         label="12% lower than hybrid avg ($0.38/km)"
         size="small"
         sx={styles.chip}
@@ -72,5 +79,3 @@ export const TcoSummaryCard: React.FC<Props> = ({ entries, vehicle }) => {
     </GlassCard>
   );
 };
-
-export default TcoSummaryCard;

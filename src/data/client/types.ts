@@ -23,6 +23,7 @@ export interface Vehicle {
   tanks?: VehicleTank[];
   fuel_grades?: string[];
   custom_reminder_types?: string[];
+  dismissed_suggested_reminders?: string[];
   distance_unit: string;
   efficiency_unit: string;
 }
@@ -90,7 +91,7 @@ export interface ConflictRecord {
   id: string;
   tbl: string;
   rowId: string;
-  localData: Record<string, any>;
-  remoteData: Record<string, any>;
+  localData: Record<string, unknown>;
+  remoteData: Record<string, unknown>;
   conflictedAt: string;
 }

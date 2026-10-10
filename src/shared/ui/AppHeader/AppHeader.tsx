@@ -17,7 +17,7 @@ export function AppHeader() {
   const router = useRouter();
   const { activeVehicleId } = useAppStore();
 
-  const { data: vehicles = [] } = useQuery(vehiclesQueryOptions());
+  const { data: vehicles = [], isLoading } = useQuery(vehiclesQueryOptions());
   const { data: reminders = [] } = useQuery(remindersQueryOptions(activeVehicleId ?? undefined));
 
   const activeVehicle = vehicles.find((v) => v.id === activeVehicleId) || vehicles[0];
@@ -76,7 +76,11 @@ export function AppHeader() {
           </button>
         </div>
         {/* Center: Car Selector Dropdown */}
-        <CarSelectorDropdown vehicles={vehicles} activeVehicle={activeVehicle} />
+        <CarSelectorDropdown
+          vehicles={vehicles}
+          activeVehicle={activeVehicle}
+          isLoading={isLoading}
+        />
 
         {/* Right: Notifications & User Profile */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

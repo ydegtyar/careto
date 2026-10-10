@@ -234,7 +234,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 3,
-                backgroundColor: 'rgba(15, 21, 36, 0.6)',
               },
             }}
           />
@@ -255,7 +254,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -275,7 +273,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -297,7 +294,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -316,7 +312,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -337,7 +332,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -356,7 +350,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -405,11 +398,11 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   color: 'text.secondary',
-                  border: '1px solid rgba(125, 211, 252, 0.15) !important',
+                  borderColor: 'divider',
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(125, 211, 252, 0.15) !important',
+                    backgroundColor: 'action.selected',
                     color: 'primary.main',
-                    borderColor: 'rgba(125, 211, 252, 0.4) !important',
+                    borderColor: 'primary.main',
                   },
                 },
               }}
@@ -471,7 +464,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 3,
-                      backgroundColor: 'rgba(15, 21, 36, 0.6)',
                     },
                   }}
                 />
@@ -493,7 +485,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -549,7 +540,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -588,7 +578,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  backgroundColor: 'rgba(15, 21, 36, 0.6)',
                 },
               }}
             />
@@ -674,8 +663,8 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                       paper: {
                         sx: {
                           borderRadius: 3,
-                          backgroundColor: '#0f172a',
-                          border: '1px solid rgba(125, 211, 252, 0.2)',
+                          backgroundColor: 'background.paper',
+                          border: '1px solid var(--mui-palette-divider)',
                           p: 1,
                         },
                       },
@@ -693,12 +682,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                         value={customLabel}
                         onChange={(e) => setCustomLabel(e.target.value)}
                         fullWidth
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: 3,
-                            backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                          },
-                        }}
                       />
                       <FormControl fullWidth>
                         <InputLabel id="custom-category-label">Category</InputLabel>
@@ -709,7 +692,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                           onChange={(e) =>
                             setCustomCategory(e.target.value as FuelGrade['category'])
                           }
-                          sx={{ borderRadius: 3, backgroundColor: 'rgba(15, 21, 36, 0.6)' }}
                         >
                           <MenuItem value="petrol">Petrol / Gasoline</MenuItem>
                           <MenuItem value="diesel">Diesel</MenuItem>
@@ -759,7 +741,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                 value={field.state.value}
                 label="Distance Unit"
                 onChange={(e) => field.handleChange(e.target.value)}
-                sx={{ borderRadius: 3, backgroundColor: 'rgba(15, 21, 36, 0.6)' }}
               >
                 <MenuItem value="km">Kilometers (km)</MenuItem>
                 <MenuItem value="mi">Miles (mi)</MenuItem>
@@ -778,7 +759,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                 value={field.state.value}
                 label="Efficiency Unit"
                 onChange={(e) => field.handleChange(e.target.value)}
-                sx={{ borderRadius: 3, backgroundColor: 'rgba(15, 21, 36, 0.6)' }}
               >
                 <MenuItem value="kwh100km">kWh / 100km</MenuItem>
                 <MenuItem value="l100km">L / 100km</MenuItem>

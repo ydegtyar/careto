@@ -32,7 +32,7 @@ export const EfficiencyTelemetryCard: React.FC<Props> = ({ entries, vehicle }) =
           >
             BEST
           </Typography>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: '#7dd3fc' }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
             {efficiency.best ?? '-'}
           </Typography>
         </GlassCard>
@@ -43,7 +43,7 @@ export const EfficiencyTelemetryCard: React.FC<Props> = ({ entries, vehicle }) =
           >
             AVG
           </Typography>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: '#ffffff' }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
             {efficiency.avg ?? '-'}
           </Typography>
         </GlassCard>
@@ -54,7 +54,7 @@ export const EfficiencyTelemetryCard: React.FC<Props> = ({ entries, vehicle }) =
           >
             WORST
           </Typography>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: '#f87171' }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: 'error.main' }}>
             {efficiency.worst ?? '-'}
           </Typography>
         </GlassCard>

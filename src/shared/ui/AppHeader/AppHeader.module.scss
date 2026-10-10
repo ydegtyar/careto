@@ -44,20 +44,20 @@
   gap: 10px;
   max-width: 440px;
   padding: 6px 14px 6px 8px;
-  background: rgb(15 21 36 / 70%);
-  color: #e0e8f0;
+  background: color-mix(in srgb, var(--mui-palette-surfaceContainer, #152136) 80%, transparent);
+  color: var(--mui-palette-text-primary, #e0e8f0);
   font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid rgb(125 211 252 / 20%);
+  border: 1px solid color-mix(in srgb, var(--mui-palette-divider, #2a3a48) 80%, transparent);
   border-radius: 20px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(16px);
   cursor: pointer;
 
   &:hover {
-    background: rgb(15 21 36 / 85%);
-    border-color: rgb(125 211 252 / 40%);
-    box-shadow: 0 0 16px rgb(125 211 252 / 15%);
+    background: color-mix(in srgb, var(--mui-palette-surface2, #152136) 90%, transparent);
+    border-color: color-mix(in srgb, var(--mui-palette-primary-main) 40%, transparent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--mui-palette-primary-main) 15%, transparent);
   }
 
   &:active {
@@ -72,8 +72,8 @@
   align-items: center;
   width: 32px;
   height: 32px;
-  background: rgb(15 25 45 / 80%);
-  border: 1px solid rgb(255 255 255 / 10%);
+  background: color-mix(in srgb, var(--mui-palette-surface3, #152545) 80%, transparent);
+  border: 1px solid var(--mui-palette-divider, rgba(255, 255, 255, 0.1));
   border-radius: 10px;
 }
 
@@ -99,7 +99,7 @@
 
 .carSubtext {
   max-width: 140px;
-  color: #94a3b8;
+  color: var(--mui-palette-text-secondary, #94a3b8);
   font-family: monospace;
   font-size: 0.7rem;
   line-height: 1.1;
@@ -109,21 +109,18 @@
 }
 
 .arrowIcon {
-  color: #a0b4c4;
+  color: var(--mui-palette-text-secondary, #a0b4c4);
   font-size: 16px !important;
   transition: transform 0.2s ease;
 }
 
 .carMenuPaper {
-  // width: 100%;
   min-width: 320px !important;
-  background-color: rgb(11 16 28 / 92%) !important;
-  color: #e0e8f0 !important;
-  border: 1px solid rgb(125 211 252 / 20%) !important;
+  background-color: var(--mui-palette-background-paper) !important;
+  color: var(--mui-palette-text-primary) !important;
+  border: 1px solid var(--mui-palette-divider) !important;
   border-radius: 20px !important;
-
-  // max-width: 440px;
-  box-shadow: 0 12px 40px rgb(0 0 0 / 60%), 0 0 24px rgb(125 211 252 / 8%) !important;
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--mui-palette-text-primary, #000) 15%, transparent) !important;
   backdrop-filter: blur(24px) !important;
 }
 

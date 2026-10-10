@@ -1,19 +1,28 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import { QueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import React from 'react';
 import { theme } from '@/app/theme/theme';
 import { routeTree } from '@/routeTree.gen';
 import { useAutoUpdatePWA } from '@/shared/hooks/useAutoUpdatePWA';
+import { CACHE_KEY, customAsyncStorage } from '@/shared/lib/queryPersister';
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: Infinity,
       networkMode: 'always',
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours
     },
   },
+});
+
+const asyncPersister = createAsyncStoragePersister({
+  storage: customAsyncStorage,
+  key: CACHE_KEY,
 });
 
 const router = createRouter({
@@ -58,11 +67,14 @@ export function Providers() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister: asyncPersister, maxAge: 1000 * 60 * 60 * 24 }}
+    >
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <RouterProvider router={router} />
       </ThemeProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }

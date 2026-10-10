@@ -56,15 +56,16 @@ export function AiSettingsCard() {
       const json = await res.json();
       if (json.success) {
         const avail = json.adapters
-          .filter((a: any) => a.available)
-          .map((a: any) => a.name)
+          .filter((a: { available: boolean }) => a.available)
+          .map((a: { name: string }) => a.name)
           .join(', ');
         setTestResult(`Waterfall active! Available backend providers: ${avail || 'None'}`);
       } else {
         setTestResult(`Test error: ${json.error}`);
       }
-    } catch (e: any) {
-      setTestResult(`Failed to query AI API: ${e.message}`);
+    } catch (e: unknown) {
+      const err = e as Error;
+      setTestResult(`Failed to query AI API: ${err.message}`);
     } finally {
       setTestLoading(false);
     }

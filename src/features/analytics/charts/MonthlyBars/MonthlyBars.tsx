@@ -17,7 +17,10 @@ export function MonthlyBars({ data = [] }: { data?: MonthlyTrendItem[] }) {
               borderRadius: 8,
               color: '#e0e8f0',
             }}
-            formatter={(value: any, name: any) => [`$${value}`, name.toUpperCase()]}
+            formatter={(value: number | string | undefined, name: string | number) => [
+              `$${value ?? 0}`,
+              String(name).toUpperCase(),
+            ]}
           />
           <Bar dataKey="fuel" stackId="a" fill="#7dd3fc" radius={[0, 0, 0, 0]} />
           <Bar dataKey="service" stackId="a" fill="#88b4cc" radius={[0, 0, 0, 0]} />

@@ -340,7 +340,6 @@ function NewEntryPage() {
                   value={selectedTankId}
                   label="Vehicle Tank / Container"
                   onChange={(e) => handleTankChange(e.target.value)}
-                  sx={{ borderRadius: 3, backgroundColor: 'rgba(15, 21, 36, 0.6)' }}
                 >
                   {tanks.map((tank) => (
                     <MenuItem key={tank.id} value={tank.id}>
@@ -368,12 +367,6 @@ function NewEntryPage() {
                   value={volumeLiters}
                   onChange={(e) => handleVolumeChange(e.target.value)}
                   fullWidth
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 3,
-                      backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                    },
-                  }}
                 />
                 <TextField
                   label="Price / Unit"
@@ -382,12 +375,6 @@ function NewEntryPage() {
                   value={pricePerUnit}
                   onChange={(e) => handlePriceChange(e.target.value)}
                   fullWidth
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 3,
-                      backgroundColor: 'rgba(15, 21, 36, 0.6)',
-                    },
-                  }}
                 />
               </div>
             )}
@@ -568,12 +555,6 @@ function NewEntryPage() {
             multiline
             rows={2}
             fullWidth
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 3,
-                backgroundColor: 'rgba(15, 21, 36, 0.6)',
-              },
-            }}
           />
         </GlassCard>
 

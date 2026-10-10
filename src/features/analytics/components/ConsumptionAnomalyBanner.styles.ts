@@ -3,8 +3,9 @@ import type { CSSProperties } from 'react';
 export const styles = {
   card: {
     padding: 16,
-    border: '1px solid rgba(251, 191, 36, 0.3)',
-    backgroundColor: 'rgba(251, 191, 36, 0.04)',
+    border:
+      '1px solid color-mix(in srgb, var(--mui-palette-warning-main, #fbbf24) 40%, transparent)',
+    backgroundColor: 'color-mix(in srgb, var(--mui-palette-warning-main, #fbbf24) 8%, transparent)',
   },
   header: {
     display: 'flex',
@@ -17,11 +18,11 @@ export const styles = {
     alignItems: 'center',
   },
   recBox: {
-    backgroundColor: 'rgba(15, 21, 36, 0.6)',
+    backgroundColor: 'color-mix(in srgb, var(--mui-palette-action-hover, #000000) 5%, transparent)',
     padding: '10px 12px',
     borderRadius: 10,
     marginTop: 12,
-    border: '1px solid rgba(125, 211, 252, 0.1)',
+    border: '1px solid var(--mui-palette-divider, rgba(125, 211, 252, 0.15))',
   },
   actionsRow: {
     display: 'flex',
