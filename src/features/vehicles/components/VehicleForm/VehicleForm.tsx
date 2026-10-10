@@ -263,6 +263,99 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
       }}
       style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
     >
+      <div style={{ display: 'flex', gap: 12 }}>
+        <form.Field
+          name="vin"
+          children={(field) => (
+            <TextField
+              label="VIN (Optional)"
+              placeholder="17-digit VIN"
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              fullWidth
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end" sx={{ gap: 0.5 }}>
+                      <VinScanner
+                        variant="icon-button"
+                        onParsed={(parsed: VinParseResult) => {
+                          if (parsed.vin) {
+                            form.setFieldValue('vin', parsed.vin);
+                            handleDecodeVin(parsed.vin);
+                          } else {
+                            if (parsed.make) form.setFieldValue('make', parsed.make);
+                            if (parsed.model) form.setFieldValue('model', parsed.model);
+                            if (parsed.year) form.setFieldValue('year', parsed.year.toString());
+                            if (parsed.plate) form.setFieldValue('plate', parsed.plate);
+                          }
+                        }}
+                      />
+                      {field.state.value && field.state.value.length >= 11 && (
+                        <Tooltip title="Decode VIN Specs (NHTSA VPIC)">
+                          <span>
+                            <IconButton
+                              size="small"
+                              aria-label="Decode VIN Specs"
+                              onClick={() => handleDecodeVin(field.state.value)}
+                              disabled={decodingVin}
+                              sx={{ color: 'primary.main' }}
+                            >
+                              {decodingVin ? (
+                                <CircularProgress size={18} />
+                              ) : (
+                                <SearchIcon sx={{ fontSize: 18 }} />
+                              )}
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      )}
+                      {field.state.value && (
+                        <IconButton
+                          size="small"
+                          aria-label="Copy VIN"
+                          onClick={() => copyVinToClipboard(field.state.value)}
+                          sx={{ color: copiedVin ? 'success.main' : 'primary.main' }}
+                        >
+                          {copiedVin ? (
+                            <CheckIcon sx={{ fontSize: 18 }} />
+                          ) : (
+                            <ContentCopyIcon sx={{ fontSize: 18 }} />
+                          )}
+                        </IconButton>
+                      )}
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 3,
+                },
+              }}
+            />
+          )}
+        />
+
+        <form.Field
+          name="plate"
+          children={(field) => (
+            <TextField
+              label="License Plate"
+              placeholder="e.g. AB-123-CD"
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 3,
+                },
+              }}
+            />
+          )}
+        />
+      </div>
+
       <form.Field
         name="name"
         children={(field) => (
@@ -559,99 +652,6 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               onChange={(e) => field.handleChange(e.target.value)}
               required
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                },
-              }}
-            />
-          )}
-        />
-      </div>
-
-      <div style={{ display: 'flex', gap: 12 }}>
-        <form.Field
-          name="plate"
-          children={(field) => (
-            <TextField
-              label="License Plate"
-              placeholder="e.g. AB-123-CD"
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                },
-              }}
-            />
-          )}
-        />
-
-        <form.Field
-          name="vin"
-          children={(field) => (
-            <TextField
-              label="VIN (Optional)"
-              placeholder="17-digit VIN"
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              fullWidth
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end" sx={{ gap: 0.5 }}>
-                      <VinScanner
-                        variant="icon-button"
-                        onParsed={(parsed: VinParseResult) => {
-                          if (parsed.vin) {
-                            form.setFieldValue('vin', parsed.vin);
-                            handleDecodeVin(parsed.vin);
-                          } else {
-                            if (parsed.make) form.setFieldValue('make', parsed.make);
-                            if (parsed.model) form.setFieldValue('model', parsed.model);
-                            if (parsed.year) form.setFieldValue('year', parsed.year.toString());
-                            if (parsed.plate) form.setFieldValue('plate', parsed.plate);
-                          }
-                        }}
-                      />
-                      {field.state.value && field.state.value.length >= 11 && (
-                        <Tooltip title="Decode VIN Specs (NHTSA VPIC)">
-                          <span>
-                            <IconButton
-                              size="small"
-                              aria-label="Decode VIN Specs"
-                              onClick={() => handleDecodeVin(field.state.value)}
-                              disabled={decodingVin}
-                              sx={{ color: 'primary.main' }}
-                            >
-                              {decodingVin ? (
-                                <CircularProgress size={18} />
-                              ) : (
-                                <SearchIcon sx={{ fontSize: 18 }} />
-                              )}
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                      )}
-                      {field.state.value && (
-                        <IconButton
-                          size="small"
-                          aria-label="Copy VIN"
-                          onClick={() => copyVinToClipboard(field.state.value)}
-                          sx={{ color: copiedVin ? 'success.main' : 'primary.main' }}
-                        >
-                          {copiedVin ? (
-                            <CheckIcon sx={{ fontSize: 18 }} />
-                          ) : (
-                            <ContentCopyIcon sx={{ fontSize: 18 }} />
-                          )}
-                        </IconButton>
-                      )}
-                    </InputAdornment>
-                  ),
-                },
-              }}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,

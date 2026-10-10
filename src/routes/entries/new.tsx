@@ -15,7 +15,6 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { data } from '@/data/client';
-import { ExpenseScanner } from '@/features/ai/components/ExpenseScanner/ExpenseScanner';
 import { type ExpenseParseResult, parseImageWithAi } from '@/features/ai/lib/ai-client';
 import { ReceiptCapture } from '@/features/attachments/components/ReceiptCapture/ReceiptCapture';
 import type { CompressedImage } from '@/features/attachments/lib/image-compressor';
@@ -312,6 +311,31 @@ function NewEntryPage() {
           onCurrencyChange={handleCurrencyChange}
           paymentMethod={paymentMethod}
           onPaymentMethodChange={setPaymentMethod}
+          onAiParsed={(parsed: ExpenseParseResult) => {
+            if (parsed.amount) handleAmountChange(parsed.amount.toString());
+            if (parsed.date) setDate(parsed.date);
+            if (parsed.fuelVolume) handleVolumeChange(parsed.fuelVolume.toString());
+            if (parsed.category) setCategory(parsed.category);
+            if (parsed.vendorName || parsed.merchant) {
+              setVendorName(parsed.vendorName || parsed.merchant || '');
+              setVendorLocation(parsed.merchant || parsed.vendorName || '');
+            }
+            if (parsed.lat && parsed.lon) {
+              setLat(parsed.lat);
+              setLon(parsed.lon);
+            }
+            if (parsed.notes) setNotes(parsed.notes);
+            if (parsed.currency) handleCurrencyChange(parsed.currency);
+            if (parsed.subItems && parsed.subItems.length > 0) {
+              const convertedItems: EditableSubItem[] = parsed.subItems.map((sub) => ({
+                id: crypto.randomUUID(),
+                name: sub.name,
+                cost: sub.cost !== undefined ? sub.cost.toString() : '',
+                partNumber: sub.partNumber,
+              }));
+              setSubItems(convertedItems);
+            }
+          }}
         />
 
         {/* Sub-Items Editor for Service entries */}
@@ -413,33 +437,6 @@ function NewEntryPage() {
               Auto-Extract Active
             </Typography>
           </div>
-          <ExpenseScanner
-            onParsed={(parsed: ExpenseParseResult) => {
-              if (parsed.amount) handleAmountChange(parsed.amount.toString());
-              if (parsed.date) setDate(parsed.date);
-              if (parsed.fuelVolume) handleVolumeChange(parsed.fuelVolume.toString());
-              if (parsed.category) setCategory(parsed.category);
-              if (parsed.vendorName || parsed.merchant) {
-                setVendorName(parsed.vendorName || parsed.merchant || '');
-                setVendorLocation(parsed.merchant || parsed.vendorName || '');
-              }
-              if (parsed.lat && parsed.lon) {
-                setLat(parsed.lat);
-                setLon(parsed.lon);
-              }
-              if (parsed.notes) setNotes(parsed.notes);
-              if (parsed.currency) handleCurrencyChange(parsed.currency);
-              if (parsed.subItems && parsed.subItems.length > 0) {
-                const convertedItems: EditableSubItem[] = parsed.subItems.map((sub) => ({
-                  id: crypto.randomUUID(),
-                  name: sub.name,
-                  cost: sub.cost !== undefined ? sub.cost.toString() : '',
-                  partNumber: sub.partNumber,
-                }));
-                setSubItems(convertedItems);
-              }
-            }}
-          />
           <ReceiptCapture onImageReady={setReceiptImage} />
         </GlassCard>
 

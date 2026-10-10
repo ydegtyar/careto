@@ -211,7 +211,6 @@ export const theme = createTheme({
                 backgroundImage: 'none',
                 border: '1px solid var(--mui-palette-divider)',
                 color: 'var(--mui-palette-text-primary)',
-                borderRadius: 3,
                 boxShadow:
                   '0 8px 32px color-mix(in srgb, var(--mui-palette-text-primary) 12%, transparent)',
               },

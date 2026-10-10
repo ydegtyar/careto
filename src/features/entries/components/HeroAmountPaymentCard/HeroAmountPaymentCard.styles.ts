@@ -28,9 +28,4 @@ export const styles = {
     fontWeight: 600,
     color: 'var(--mui-palette-text-primary)',
   } as CSSProperties,
-  currencySelect: {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 2,
-    },
-  },
 } as const;

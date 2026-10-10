@@ -1,8 +1,14 @@
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import CircularProgress from '@mui/material/CircularProgress';
 import FormControl from '@mui/material/FormControl';
+import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type React from 'react';
+import { useRef, useState } from 'react';
+import { type ExpenseParseResult, parseImageWithAi } from '@/features/ai/lib/ai-client';
 import {
   ALL_CURRENCIES,
   useFavoriteCurrencies,
@@ -20,6 +26,7 @@ export interface Props {
   onCurrencyChange: (currency: string) => void;
   paymentMethod: string;
   onPaymentMethodChange: (method: string) => void;
+  onAiParsed?: (data: ExpenseParseResult) => void;
 }
 
 export const HeroAmountPaymentCard: React.FC<Props> = ({
@@ -29,10 +36,13 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
   onCurrencyChange,
   paymentMethod,
   onPaymentMethodChange,
+  onAiParsed,
 }) => {
   const [favoriteCurrencies] = useFavoriteCurrencies();
   const [, setLastUsedCurrency] = useLastUsedCurrency();
   const [, setLastUsedPaymentMethod] = useLastUsedPaymentMethod();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const handleCurrencySelect = (newCurrency: string) => {
     onCurrencyChange(newCurrency);
@@ -44,10 +54,35 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
     setLastUsedPaymentMethod(method);
   };
 
+  const handleAiFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAiLoading(true);
+    try {
+      const res = await parseImageWithAi('expense', file);
+      if (res.success && res.data && onAiParsed) {
+        onAiParsed(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to parse receipt image:', err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const currencySymbol = ALL_CURRENCIES.find((c) => c.code === currency)?.symbol ?? '$';
 
   return (
     <GlassCard style={styles.card}>
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        capture="environment"
+        style={{ display: 'none' }}
+        onChange={handleAiFileSelect}
+      />
       <div style={styles.header}>
         <Typography
           variant="caption"
@@ -60,20 +95,45 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
         >
           Amount Spent
         </Typography>
-        <FormControl size="small" variant="standard" sx={{ minWidth: 80 }}>
-          <Select
-            value={currency}
-            onChange={(e) => handleCurrencySelect(e.target.value)}
-            disableUnderline
-            sx={styles.currencySelect}
-          >
-            {favoriteCurrencies.map((code) => (
-              <MenuItem key={code} value={code}>
-                {code}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {onAiParsed && (
+            <Tooltip title="AI Autofill from receipt">
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={aiLoading}
+                  sx={{
+                    color: 'primary.main',
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                    },
+                  }}
+                >
+                  {aiLoading ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    <AutoAwesomeIcon fontSize="small" />
+                  )}
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
+          <FormControl size="small" variant="outlined" sx={{ minWidth: 80 }}>
+            <Select
+              value={currency}
+              onChange={(e) => handleCurrencySelect(e.target.value)}
+              disableUnderline
+            >
+              {favoriteCurrencies.map((code) => (
+                <MenuItem key={code} value={code}>
+                  {code}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
       </div>
 
       <div style={styles.amountRow}>
@@ -102,3 +162,4 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
 };
 
 export default HeroAmountPaymentCard;
+
