@@ -46,6 +46,7 @@
 | D15 | Export/import runs on-device from local replica | Instant, offline-capable |
 | D16 | SQLite kept over IndexedDB (IndexedDB considered) | Complex aggregate queries require SQL |
 | D17 | No `<Box>` without `sx` props — use plain `<div>` | MUI Box has Emotion overhead |
+| D18 | MCP tools synced with schema/business logic | Third-party AI tools must stay in 1:1 parity with DB schema and sync logic |
 
 ---
 
@@ -447,6 +448,26 @@ Stitch: `b6135099397e4e70808808f61cdead74` + `1b1126734d304cd8aae6b69015675d52` 
 - [x] `GET /api/vehicles/members` & `DELETE /api/vehicles/members` — member list & removal
 - [x] Role change ACL enforcement live in all sync & vehicle endpoints
 - [x] Unique membership index created in Neon Postgres
+
+---
+
+## M9 — Model Context Protocol (MCP) Server & API Key Integrations
+
+- [x] `api_keys` PostgreSQL table in `server/db/schema.ts` for managing secret AI Bearer tokens
+- [x] API Key session resolution in `api/_lib/auth.ts` supporting `careto_sk_...` tokens
+- [x] `/api/keys/create`, `/api/keys/list`, `/api/keys/revoke` endpoints (`api/keys/[action].ts`)
+- [x] `ApiKeysSettingsCard` UI component on Settings Page with one-click copy & pre-formatted MCP client config snippets
+- [x] MCP HTTP SSE (`/api/mcp/sse`) and JSON-RPC (`/api/mcp/messages`) server implementation (`api/mcp/[action].ts`)
+- [x] 8 MCP Tools implemented in `api/_lib/mcp/tools.ts`:
+  - `careto_list_vehicles`
+  - `careto_get_vehicle_details`
+  - `careto_analyze_spendings`
+  - `careto_get_reminders`
+  - `careto_add_entry`
+  - `careto_analyze_image_and_create_entry` (Vision AI OCR integration)
+  - `careto_manage_grades`
+  - `careto_get_filling_helpers`
+- [x] `.agents/skills/mcp-sync/SKILL.md` skill to enforce 1:1 synchronization between database schema, business logic, and MCP server tool signatures.
 
 ---
 

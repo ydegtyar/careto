@@ -290,6 +290,7 @@ function RemindersPage() {
         open={dialogOpen}
         reminder={editingReminder}
         customTypes={customTypes}
+        distanceUnit={activeVehicle?.distance_unit}
         onClose={() => setDialogOpen(false)}
         onSave={handleSaveReminder}
       />

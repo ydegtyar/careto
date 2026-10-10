@@ -20,6 +20,7 @@ interface Props {
   onDateChange: (val: string) => void;
   odometerKm: string;
   onOdometerKmChange: (val: string) => void;
+  distanceUnit?: string;
   vendorName?: string;
   onVendorNameChange?: (val: string) => void;
   vendorLocation: string;
@@ -41,6 +42,7 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
   onDateChange,
   odometerKm,
   onOdometerKmChange,
+  distanceUnit = 'km',
   vendorName = '',
   onVendorNameChange,
   vendorLocation,
@@ -94,7 +96,7 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
           sx={styles.inputRoot}
         />
         <TextField
-          label="Odometer (km)"
+          label={`Odometer (${distanceUnit})`}
           type="number"
           value={odometerKm}
           onChange={(e) => onOdometerKmChange(e.target.value)}

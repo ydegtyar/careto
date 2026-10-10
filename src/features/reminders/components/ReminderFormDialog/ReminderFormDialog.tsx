@@ -130,11 +130,19 @@ interface Props {
   open: boolean;
   reminder?: Reminder | null;
   customTypes?: string[];
+  distanceUnit?: string;
   onClose: () => void;
   onSave: (reminderData: Partial<Reminder>, newCustomType?: string) => void;
 }
 
-export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, onSave }: Props) {
+export function ReminderFormDialog({
+  open,
+  reminder,
+  customTypes = [],
+  distanceUnit = 'km',
+  onClose,
+  onSave,
+}: Props) {
   const isEditing = Boolean(reminder);
 
   const [title, setTitle] = useState(reminder?.title ?? '');
@@ -406,7 +414,7 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
               <div style={{ display: 'flex', gap: 12 }}>
                 {showKmFields && (
                   <TextField
-                    label="Interval (km)"
+                    label={`Interval (${distanceUnit})`}
                     type="number"
                     value={intervalKm}
                     onChange={(e) => setIntervalKm(e.target.value)}
@@ -438,7 +446,7 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
                       return (
                         <Chip
                           key={preset}
-                          label={`${preset.toLocaleString()} km`}
+                          label={`${preset.toLocaleString()} ${distanceUnit}`}
                           size="small"
                           clickable
                           color={isSelected ? 'primary' : 'default'}
@@ -498,7 +506,7 @@ export function ReminderFormDialog({ open, reminder, customTypes = [], onClose, 
             )}
             {showKmFields && (
               <TextField
-                label="Last Odometer (km)"
+                label={`Last Odometer (${distanceUnit})`}
                 type="number"
                 value={baseOdometerKm}
                 onChange={(e) => setBaseOdometerKm(e.target.value)}

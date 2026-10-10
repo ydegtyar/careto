@@ -84,11 +84,13 @@ export function useAccountFuelGrades() {
   const [allGrades, setAllGrades] = useLocalStorage<FuelGrade[]>(
     ACCOUNT_FUEL_GRADES_KEY,
     DEFAULT_FUEL_GRADES,
+    { initializeWithValue: false },
   );
 
   const [enabledIds, setEnabledIds] = useLocalStorage<string[]>(
     SELECTED_FUEL_GRADES_KEY,
     DEFAULT_FUEL_GRADES.map((g) => g.id),
+    { initializeWithValue: false },
   );
 
   const toggleGradeEnabled = (id: string) => {

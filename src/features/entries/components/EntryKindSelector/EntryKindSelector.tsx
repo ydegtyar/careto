@@ -1,3 +1,8 @@
+import BuildIcon from '@mui/icons-material/Build';
+import EvStationIcon from '@mui/icons-material/EvStation';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useQuery } from '@tanstack/react-query';
@@ -21,6 +26,7 @@ export const EntryKindSelector: React.FC<Props> = ({ value, onChange }) => {
   const isEv = activeVehicle?.powertrain === 'ev';
 
   const refuelLabel = isEv ? 'Charge' : activeVehicle?.powertrain ? 'Refuel' : 'Refuel / Charge';
+  const RefuelIcon = isEv ? EvStationIcon : LocalGasStationIcon;
 
   return (
     <ToggleButtonGroup
@@ -34,10 +40,22 @@ export const EntryKindSelector: React.FC<Props> = ({ value, onChange }) => {
       fullWidth
       sx={styles.toggleGroup}
     >
-      <ToggleButton value="refuel">{refuelLabel}</ToggleButton>
-      <ToggleButton value="service">Service</ToggleButton>
-      <ToggleButton value="expense">Expense</ToggleButton>
-      <ToggleButton value="note">Note</ToggleButton>
+      <ToggleButton value="refuel">
+        <RefuelIcon />
+        <span>{refuelLabel}</span>
+      </ToggleButton>
+      <ToggleButton value="service">
+        <BuildIcon />
+        <span>Service</span>
+      </ToggleButton>
+      <ToggleButton value="expense">
+        <ReceiptIcon />
+        <span>Expense</span>
+      </ToggleButton>
+      <ToggleButton value="note">
+        <StickyNote2Icon />
+        <span>Note</span>
+      </ToggleButton>
     </ToggleButtonGroup>
   );
 };

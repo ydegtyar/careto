@@ -25,7 +25,9 @@ import {
   subscribeToPush,
   unsubscribeFromPush,
 } from '@/features/reminders/lib/push-client';
+import { ApiKeysSettingsCard } from '@/features/settings/components/ApiKeysSettingsCard/ApiKeysSettingsCard';
 import { CurrencyChip } from '@/features/settings/components/CurrencyChip/CurrencyChip';
+import { DateTimePreferenceCard } from '@/features/settings/components/DateTimePreferenceCard/DateTimePreferenceCard';
 import { SyncStatusCard } from '@/features/settings/components/SyncStatusCard/SyncStatusCard';
 import { ThemeSelectionCard } from '@/features/settings/components/ThemeSelectionCard/ThemeSelectionCard';
 import {
@@ -253,6 +255,9 @@ function SettingsPage() {
         {/* Theme Selection Card */}
         <ThemeSelectionCard />
 
+        {/* Date & Time Format Preference Card */}
+        <DateTimePreferenceCard />
+
         {/* Web Push Notifications Card */}
         <GlassCard style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -419,6 +424,9 @@ function SettingsPage() {
           </div>
         </GlassCard>
       </div>
+
+      {/* Integrations & API Keys */}
+      <ApiKeysSettingsCard />
 
       {/* Legal & Compliance */}
       <GlassCard style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>

@@ -92,13 +92,17 @@ export const LocationMapDialog: React.FC<LocationMapDialogProps> = ({
 
   const { loading: gpsLoading, getCurrentLocation } = useGeolocation();
 
+  const NOMINATIM_BASE_URL = import.meta.env.DEV
+    ? '/nominatim'
+    : 'https://nominatim.openstreetmap.org';
+
   // Reverse geocode lat/lon into address name using Nominatim API
   const reverseGeocode = useCallback(
     async (lat: number, lon: number) => {
       setIsGeocoding(true);
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
+          `${NOMINATIM_BASE_URL}/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
           {
             headers: {
               'Accept-Language': 'en-US,en;q=0.9',
@@ -162,7 +166,7 @@ export const LocationMapDialog: React.FC<LocationMapDialogProps> = ({
     setShowResults(false);
 
     // Timeout allows DOM element in Dialog to be laid out before initializing Leaflet
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       if (!mapContainerRef.current) return;
 
       if (mapInstanceRef.current) {
@@ -170,9 +174,27 @@ export const LocationMapDialog: React.FC<LocationMapDialogProps> = ({
         mapInstanceRef.current = null;
       }
 
+      let startLat = initialLat ?? DEFAULT_LAT;
+      let startLon = initialLon ?? DEFAULT_LON;
+      let hasCustomStart = Boolean(initialLat && initialLon);
+
+      if (!hasCustomStart) {
+        const loc = await getCurrentLocation();
+        if (loc) {
+          startLat = loc.latitude;
+          startLon = loc.longitude;
+          hasCustomStart = true;
+          setSelectedLat(startLat);
+          setSelectedLon(startLon);
+          if (loc.address) {
+            setAddress(loc.address);
+          }
+        }
+      }
+
       const map = L.map(mapContainerRef.current).setView(
-        [lat, lon],
-        initialLat && initialLon ? 16 : 13,
+        [startLat, startLon],
+        hasCustomStart ? 16 : 13,
       );
       mapInstanceRef.current = map;
 
@@ -182,7 +204,7 @@ export const LocationMapDialog: React.FC<LocationMapDialogProps> = ({
         maxZoom: 19,
       }).addTo(map);
 
-      const marker = L.marker([lat, lon], {
+      const marker = L.marker([startLat, startLon], {
         icon: createCustomIcon(),
         draggable: true,
       }).addTo(map);
@@ -224,7 +246,7 @@ export const LocationMapDialog: React.FC<LocationMapDialogProps> = ({
     setIsSearching(true);
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(
+        `${NOMINATIM_BASE_URL}/search?format=jsonv2&q=${encodeURIComponent(
           searchQuery.trim(),
         )}&limit=5`,
         {

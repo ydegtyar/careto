@@ -98,6 +98,7 @@ export default defineConfig({
     format: 'es',
   },
   resolve: {
+    dedupe: ['react', 'react-dom', '@mui/material', '@emotion/react', '@emotion/styled'],
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
@@ -111,6 +112,14 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/nominatim': {
+        target: 'https://nominatim.openstreetmap.org',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/nominatim/, ''),
+        headers: {
+          'User-Agent': 'CaretoApp/1.0',
+        },
+      },
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,

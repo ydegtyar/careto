@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography';
 import type React from 'react';
 import { formatAmount } from '@/shared/lib/currencies';
+import { formatDatePreference, useDateFormatPreference } from '@/shared/lib/date-format-preference';
 import type { EntryRecord } from './ActivityFeed';
 import styles from './ActivityFeed.module.scss';
 
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export function ActivityItemRow({ entry, onOpen, getIcon }: Props) {
+  const [dateFormat] = useDateFormatPreference();
+
   return (
     <button type="button" className={styles.item} onClick={() => onOpen(entry)}>
       <div className={`${styles.iconDisc} ${styles[entry.kind]}`}>{getIcon(entry.kind)}</div>
@@ -19,7 +22,7 @@ export function ActivityItemRow({ entry, onOpen, getIcon }: Props) {
           {entry.kind}
         </Typography>
         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          {entry.occurred_on}
+          {formatDatePreference(entry.occurred_on, dateFormat)}
           {entry.odometer_m && ` · ${(entry.odometer_m / 1000).toLocaleString()} km`}
         </Typography>
       </div>

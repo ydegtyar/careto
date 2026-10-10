@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { data } from '@/data/client';
 import type { Entry } from '@/data/client/types';
 import { convertToUsdMinor, formatAmount } from '@/shared/lib/currencies';
+import { formatDatePreference, useDateFormatPreference } from '@/shared/lib/date-format-preference';
 import { styles } from './EntryDetailDialog.styles';
 
 export interface Props {
@@ -35,6 +36,7 @@ export interface ActivityEntryFormValues {
 
 export function EntryDetailDialog({ entry, open, onClose }: Props) {
   const queryClient = useQueryClient();
+  const [dateFormat] = useDateFormatPreference();
   const [isEditing, setIsEditing] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -157,7 +159,7 @@ export function EntryDetailDialog({ entry, open, onClose }: Props) {
                   Date
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {entry.occurred_on}
+                  {formatDatePreference(entry.occurred_on, dateFormat)}
                 </Typography>
               </div>
 
@@ -315,8 +317,8 @@ export function EntryDetailDialog({ entry, open, onClose }: Props) {
         <DialogTitle sx={{ fontWeight: 700 }}>Confirm Deletion</DialogTitle>
         <DialogContent>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Are you sure you want to delete this activity entry ({entry.kind} on {entry.occurred_on}
-            )? This action cannot be undone.
+            Are you sure you want to delete this activity entry ({entry.kind} on{' '}
+            {formatDatePreference(entry.occurred_on, dateFormat)})? This action cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>

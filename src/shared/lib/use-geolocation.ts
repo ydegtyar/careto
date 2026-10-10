@@ -31,26 +31,37 @@ export function useGeolocation(): UseGeolocationResult {
         async (position) => {
           try {
             const { latitude, longitude } = position.coords;
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
-              {
-                headers: {
-                  'Accept-Language': 'en-US,en;q=0.9',
+            const nominatimUrl = import.meta.env.DEV
+              ? '/nominatim'
+              : 'https://nominatim.openstreetmap.org';
+
+            let address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            try {
+              const res = await fetch(
+                `${nominatimUrl}/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
+                {
+                  headers: {
+                    'Accept-Language': 'en-US,en;q=0.9',
+                  },
                 },
-              },
-            );
+              );
 
-            if (!res.ok) {
-              throw new Error('Failed to fetch address from location service.');
+              if (res.ok) {
+                const data = await res.json();
+                address =
+                  data.display_name ||
+                  [
+                    data.address?.road,
+                    data.address?.suburb,
+                    data.address?.city || data.address?.town,
+                  ]
+                    .filter(Boolean)
+                    .join(', ') ||
+                  address;
+              }
+            } catch {
+              // Gracefully fallback to coordinates string if reverse geocoding fails or rate limited
             }
-
-            const data = await res.json();
-            const address =
-              data.display_name ||
-              [data.address?.road, data.address?.suburb, data.address?.city || data.address?.town]
-                .filter(Boolean)
-                .join(', ') ||
-              `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 
             setLoading(false);
             resolve({ address, latitude, longitude });

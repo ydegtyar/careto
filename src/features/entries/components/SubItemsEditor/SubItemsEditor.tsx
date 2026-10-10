@@ -2,7 +2,10 @@ import AddIcon from '@mui/icons-material/Add';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import type React from 'react';
+import { useMemo } from 'react';
+import type { VehiclePowertrain } from '@/data/client/types';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
+import { getPredefinedSubItems } from '../../data/predefinedSubItems';
 import { SubItemRow } from './SubItemRow';
 
 export interface EditableSubItem {
@@ -16,9 +19,14 @@ interface Props {
   subItems: EditableSubItem[];
   onChange: (items: EditableSubItem[]) => void;
   onAutoSum: (totalCost: number) => void;
+  powertrain?: VehiclePowertrain | string;
 }
 
-export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum }) => {
+export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum, powertrain }) => {
+  const predefinedOptions = useMemo(() => {
+    return getPredefinedSubItems(powertrain).map((item) => item.name);
+  }, [powertrain]);
+
   const handleAddItem = () => {
     const newItem: EditableSubItem = {
       id: crypto.randomUUID(),
@@ -86,6 +94,7 @@ export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum 
             <SubItemRow
               key={item.id}
               item={item}
+              options={predefinedOptions}
               onUpdate={handleUpdateItem}
               onRemove={handleRemoveItem}
             />

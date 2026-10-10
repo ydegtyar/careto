@@ -8,7 +8,7 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useAppStore } from '@/app/store';
@@ -34,7 +34,7 @@ import {
   useLastPricesPerFuelGrade,
   useLastUsedFuelGrade,
 } from '@/features/entries/lib/fuel-grade-storage';
-import { vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
+import { entriesQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import {
   convertToUsdMinor,
   useLastUsedCurrency,
@@ -57,12 +57,14 @@ export const Route = createFileRoute('/entries/new')({
 });
 
 function NewEntryPage() {
-  const router = useRouter();
+  const navigate = useNavigate({ from: Route.id });
   const searchParams = Route.useSearch();
   const { activeVehicleId } = useAppStore();
   const { data: vehicles = [] } = useQuery(vehiclesQueryOptions());
   const activeVehicle = vehicles.find((v) => v.id === activeVehicleId);
   const tanks = activeVehicle?.tanks || [];
+
+  const { data: entries = [] } = useQuery(entriesQueryOptions(activeVehicleId ?? undefined));
 
   const [lastUsedCurrency, setLastUsedCurrency] = useLastUsedCurrency();
   const [lastUsedPaymentMethod, _setLastUsedPaymentMethod] = useLastUsedPaymentMethod();
@@ -71,11 +73,40 @@ function NewEntryPage() {
 
   const [selectedTankId, setSelectedTankId] = useState<string>(tanks[0]?.id || 'tank_1');
   const [kind, setKind] = useState<EntryKind>((searchParams.kind as EntryKind) || 'refuel');
+
+  useEffect(() => {
+    if (searchParams.kind && searchParams.kind !== kind) {
+      setKind(searchParams.kind as EntryKind);
+    }
+  }, [searchParams.kind, kind]);
   const [category, setCategory] = useState<string>('fuel');
   const [fuelGrade, setFuelGrade] = useState<string>(lastUsedFuelGrade);
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState(lastUsedCurrency);
-  const [odometerKm, setOdometerKm] = useState(kind === 'note' ? '' : '48250');
+
+  // Sync currency with latest entry that has a currency set (falling back to lastUsedCurrency)
+  useEffect(() => {
+    const latestEntryWithCurrency = entries.find((e) => Boolean(e.currency));
+    if (latestEntryWithCurrency?.currency) {
+      setCurrency(latestEntryWithCurrency.currency);
+    } else if (lastUsedCurrency) {
+      setCurrency(lastUsedCurrency);
+    }
+  }, [entries, lastUsedCurrency]);
+  const [odometerKm, setOdometerKm] = useState('');
+
+  useEffect(() => {
+    if (kind === 'note') return;
+    const maxEntryOdo = entries.reduce(
+      (max, e) => (e.odometer_m && e.odometer_m > max ? e.odometer_m : max),
+      0,
+    );
+    const lastOdoM = maxEntryOdo || activeVehicle?.initial_odometer_m || 0;
+    if (lastOdoM > 0) {
+      setOdometerKm((lastOdoM / 1000).toString());
+    }
+  }, [entries, activeVehicle?.initial_odometer_m, kind]);
+
   const [volumeLiters, setVolumeLiters] = useState('45.2');
   const [pricePerUnit, setPricePerUnit] = useState<string>(
     lastPricesPerGrade[lastUsedFuelGrade] || '1.44',
@@ -83,6 +114,21 @@ function NewEntryPage() {
   const [isFullTank, setIsFullTank] = useState(true);
   const [date, setDate] = useState('2026-10-08');
   const [paymentMethod, setPaymentMethod] = useState(lastUsedPaymentMethod);
+
+  // Sync payment method with latest entry that has a payment method set (falling back to lastUsedPaymentMethod)
+  useEffect(() => {
+    const latestEntryWithPaymentMethod = entries.find(
+      (e) => Boolean((e as any).payment_method) || Boolean((e as any).payment_id),
+    );
+    const method =
+      (latestEntryWithPaymentMethod as any)?.payment_method ||
+      (latestEntryWithPaymentMethod as any)?.payment_id;
+    if (method) {
+      setPaymentMethod(method);
+    } else if (lastUsedPaymentMethod) {
+      setPaymentMethod(lastUsedPaymentMethod);
+    }
+  }, [entries, lastUsedPaymentMethod]);
   const [isBusiness, setIsBusiness] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringInterval, setRecurringInterval] = useState('monthly');
@@ -305,7 +351,7 @@ function NewEntryPage() {
         lon: lon ?? undefined,
       });
 
-      router.navigate({ to: '/garage' });
+      navigate({ to: '/garage' });
     } catch (err) {
       console.error(err);
     } finally {
@@ -325,16 +371,18 @@ function NewEntryPage() {
     >
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Entry Kind Selector */}
-        <GlassCard style={{ padding: '16px 20px' }}>
-          <EntryKindSelector
-            value={kind}
-            onChange={(newKind) => {
-              setKind(newKind);
-              if (newKind === 'refuel') setCategory('fuel');
-              else if (newKind === 'service') setCategory('service');
-            }}
-          />
-        </GlassCard>
+        <EntryKindSelector
+          value={kind}
+          onChange={(newKind) => {
+            setKind(newKind);
+            if (newKind === 'refuel') setCategory('fuel');
+            else if (newKind === 'service') setCategory('service');
+            navigate({
+              search: (prev) => ({ ...prev, kind: newKind }),
+              replace: true,
+            });
+          }}
+        />
 
         {/* Hero Amount & Payment Card — Hidden for Notes unless specified */}
         {kind !== 'note' && (
@@ -345,6 +393,7 @@ function NewEntryPage() {
             onCurrencyChange={handleCurrencyChange}
             paymentMethod={paymentMethod}
             onPaymentMethodChange={setPaymentMethod}
+            showCompanyOption={Boolean(activeVehicle?.used_by_business)}
             onAiParsed={(parsed: ExpenseParseResult) => {
               if (parsed.amount) handleAmountChange(parsed.amount.toString());
               if (parsed.date) setDate(parsed.date);
@@ -379,6 +428,7 @@ function NewEntryPage() {
             subItems={subItems}
             onChange={setSubItems}
             onAutoSum={(total) => setAmount(total.toFixed(2))}
+            powertrain={activeVehicle?.powertrain}
           />
         )}
 
@@ -484,6 +534,7 @@ function NewEntryPage() {
           onDateChange={setDate}
           odometerKm={odometerKm}
           onOdometerKmChange={setOdometerKm}
+          distanceUnit={activeVehicle?.distance_unit}
           isOdometerRequired={kind !== 'note'}
           vendorName={vendorName}
           onVendorNameChange={setVendorName}
@@ -545,7 +596,7 @@ function NewEntryPage() {
           <Button
             variant="outlined"
             fullWidth
-            onClick={() => router.navigate({ to: '/garage' })}
+            onClick={() => navigate({ to: '/garage' })}
             sx={{
               borderRadius: 3,
               height: 48,

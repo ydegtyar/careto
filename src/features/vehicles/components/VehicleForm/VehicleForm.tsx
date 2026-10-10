@@ -668,8 +668,10 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
 
       {/* Tank / Container Management Editor */}
       <form.Subscribe
-        selector={(state) => [state.values.tanks, state.values.powertrain] as const}
-        children={([tanks = [], powertrain]) => (
+        selector={(state) =>
+          [state.values.tanks, state.values.powertrain, state.values.fuelGrades] as const
+        }
+        children={([tanks = [], powertrain, fuelGrades]) => (
           <form.Field
             name="tanks"
             children={(field) => {
@@ -815,18 +817,64 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                             }}
                             fullWidth
                           />
-                          <TextField
-                            label="Default Fuel / Charge Grade"
-                            size="small"
-                            placeholder="e.g. ron95 / ev_ac"
-                            value={tank.primary_fuel_grade || ''}
-                            onChange={(e) =>
-                              handleUpdateTank(tank.id, {
-                                primary_fuel_grade: e.target.value,
-                              })
-                            }
-                            fullWidth
-                          />
+                          {(() => {
+                            const whitelistedOptions = allGrades.filter((g) =>
+                              fuelGrades && fuelGrades.length > 0
+                                ? fuelGrades.includes(g.id)
+                                : getGradesForPowertrain(powertrain, allGrades).some(
+                                    (pg) => pg.id === g.id,
+                                  ),
+                            );
+                            const isCurrentGradeWhitelisted =
+                              !tank.primary_fuel_grade ||
+                              whitelistedOptions.some((g) => g.id === tank.primary_fuel_grade);
+                            const customGradeMatch =
+                              tank.primary_fuel_grade && !isCurrentGradeWhitelisted
+                                ? allGrades.find((g) => g.id === tank.primary_fuel_grade)
+                                : null;
+
+                            return (
+                              <FormControl size="small" fullWidth>
+                                <InputLabel id={`tank-grade-label-${tank.id}`}>
+                                  Default Fuel / Charge Grade
+                                </InputLabel>
+                                <Select
+                                  labelId={`tank-grade-label-${tank.id}`}
+                                  value={tank.primary_fuel_grade || ''}
+                                  label="Default Fuel / Charge Grade"
+                                  onChange={(e) =>
+                                    handleUpdateTank(tank.id, {
+                                      primary_fuel_grade: e.target.value,
+                                    })
+                                  }
+                                >
+                                  <MenuItem value="">
+                                    <em>None</em>
+                                  </MenuItem>
+                                  {whitelistedOptions.map((grade) => (
+                                    <MenuItem key={grade.id} value={grade.id}>
+                                      {grade.label}
+                                    </MenuItem>
+                                  ))}
+                                  {customGradeMatch && (
+                                    <MenuItem key={customGradeMatch.id} value={customGradeMatch.id}>
+                                      {customGradeMatch.label}
+                                    </MenuItem>
+                                  )}
+                                  {tank.primary_fuel_grade &&
+                                    !isCurrentGradeWhitelisted &&
+                                    !customGradeMatch && (
+                                      <MenuItem
+                                        key={tank.primary_fuel_grade}
+                                        value={tank.primary_fuel_grade}
+                                      >
+                                        {tank.primary_fuel_grade}
+                                      </MenuItem>
+                                    )}
+                                </Select>
+                              </FormControl>
+                            );
+                          })()}
                         </div>
                       </div>
                     ))}

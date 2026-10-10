@@ -26,6 +26,7 @@ export interface Props {
   onCurrencyChange: (currency: string) => void;
   paymentMethod: string;
   onPaymentMethodChange: (method: string) => void;
+  showCompanyOption?: boolean;
   onAiParsed?: (data: ExpenseParseResult) => void;
 }
 
@@ -36,6 +37,7 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
   onCurrencyChange,
   paymentMethod,
   onPaymentMethodChange,
+  showCompanyOption = true,
   onAiParsed,
 }) => {
   const [favoriteCurrencies] = useFavoriteCurrencies();
@@ -156,6 +158,7 @@ export const HeroAmountPaymentCard: React.FC<Props> = ({
       <PaymentMethodSelector
         paymentMethod={paymentMethod}
         onPaymentMethodChange={handlePaymentSelect}
+        showCompanyOption={showCompanyOption}
       />
     </GlassCard>
   );

@@ -8,6 +8,7 @@ import { PaymentOptionButton } from './PaymentOptionButton';
 export interface Props {
   paymentMethod: string;
   onPaymentMethodChange: (method: string) => void;
+  showCompanyOption?: boolean;
 }
 
 const PAYMENT_OPTIONS = [
@@ -19,11 +20,16 @@ const PAYMENT_OPTIONS = [
 export const PaymentMethodSelector: React.FC<Props> = ({
   paymentMethod,
   onPaymentMethodChange,
+  showCompanyOption = true,
 }) => {
+  const displayedOptions = PAYMENT_OPTIONS.filter(
+    (opt) => opt.id !== 'company' || showCompanyOption,
+  );
+
   return (
     <div style={styles.paymentSection}>
       <div style={styles.paymentButtonGroup}>
-        {PAYMENT_OPTIONS.map(({ id, label, icon }) => (
+        {displayedOptions.map(({ id, label, icon }) => (
           <PaymentOptionButton
             key={id}
             id={id}

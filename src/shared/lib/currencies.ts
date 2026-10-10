@@ -23,15 +23,21 @@ export const LAST_USED_CURRENCY_KEY = 'careto_last_used_currency';
 export const LAST_USED_PAYMENT_METHOD_KEY = 'careto_last_used_payment_method';
 
 export function useFavoriteCurrencies() {
-  return useLocalStorage<string[]>(FAVORITE_CURRENCIES_KEY, DEFAULT_FAVORITE_CURRENCIES);
+  return useLocalStorage<string[]>(FAVORITE_CURRENCIES_KEY, DEFAULT_FAVORITE_CURRENCIES, {
+    initializeWithValue: false,
+  });
 }
 
 export function useLastUsedCurrency() {
-  return useLocalStorage<string>(LAST_USED_CURRENCY_KEY, DEFAULT_CURRENCY);
+  return useLocalStorage<string>(LAST_USED_CURRENCY_KEY, DEFAULT_CURRENCY, {
+    initializeWithValue: false,
+  });
 }
 
 export function useLastUsedPaymentMethod() {
-  return useLocalStorage<string>(LAST_USED_PAYMENT_METHOD_KEY, 'card');
+  return useLocalStorage<string>(LAST_USED_PAYMENT_METHOD_KEY, 'card', {
+    initializeWithValue: false,
+  });
 }
 
 // Fixed FX rate approximations relative to USD as a fallback for standard conversion calculations.

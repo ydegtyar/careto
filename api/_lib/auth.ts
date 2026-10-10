@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { sql } from './db.js';
 
 export interface UserSession {
@@ -57,38 +58,79 @@ export async function getSession(headers: Headers | Record<string, any>): Promis
   const token = extractSessionToken(headers);
 
   if (token) {
-    try {
-      const rows = await sql`
-        SELECT 
-          s.id as session_id,
-          s.token as session_token,
-          s."expiresAt" as session_expires_at,
-          u.id as user_id,
-          u.email as user_email,
-          u.name as user_name
-        FROM neon_auth.session s
-        JOIN neon_auth."user" u ON s."userId" = u.id
-        WHERE s.token = ${token} AND s."expiresAt" > now()
-        LIMIT 1
-      `;
+    if (token.startsWith('careto_sk_')) {
+      try {
+        const keyHash = crypto.createHash('sha256').update(token).digest('hex');
+        const keyRows = await sql`
+          SELECT 
+            k.id as key_id,
+            k.user_id,
+            k.expires_at,
+            u.email as user_email,
+            u.name as user_name
+          FROM api_keys k
+          JOIN neon_auth."user" u ON k.user_id = u.id
+          WHERE k.key_hash = ${keyHash}
+            AND k.revoked_at IS NULL
+            AND (k.expires_at IS NULL OR k.expires_at > now())
+          LIMIT 1
+        `;
 
-      if (rows.length > 0) {
-        const row = rows[0]!;
-        return {
-          user: {
-            id: row.user_id,
-            email: row.user_email,
-            name: row.user_name,
-          },
-          session: {
-            id: row.session_id,
-            token: row.session_token,
-            expiresAt: new Date(row.session_expires_at),
-          },
-        };
+        if (keyRows.length > 0) {
+          const key = keyRows[0]!;
+          // Update last_used_at in background
+          sql`UPDATE api_keys SET last_used_at = now() WHERE id = ${key.key_id}::uuid`.catch(() => {});
+
+          return {
+            user: {
+              id: key.user_id,
+              email: key.user_email,
+              name: key.user_name,
+            },
+            session: {
+              id: key.key_id,
+              token,
+              expiresAt: key.expires_at ? new Date(key.expires_at) : new Date(Date.now() + 365 * 86400000),
+            },
+          };
+        }
+      } catch (err) {
+        console.error('Failed to resolve API key session:', err);
       }
-    } catch (err) {
-      console.error('Failed to resolve session:', err);
+    } else {
+      try {
+        const rows = await sql`
+          SELECT 
+            s.id as session_id,
+            s.token as session_token,
+            s."expiresAt" as session_expires_at,
+            u.id as user_id,
+            u.email as user_email,
+            u.name as user_name
+          FROM neon_auth.session s
+          JOIN neon_auth."user" u ON s."userId" = u.id
+          WHERE s.token = ${token} AND s."expiresAt" > now()
+          LIMIT 1
+        `;
+
+        if (rows.length > 0) {
+          const row = rows[0]!;
+          return {
+            user: {
+              id: row.user_id,
+              email: row.user_email,
+              name: row.user_name,
+            },
+            session: {
+              id: row.session_id,
+              token: row.session_token,
+              expiresAt: new Date(row.session_expires_at),
+            },
+          };
+        }
+      } catch (err) {
+        console.error('Failed to resolve session:', err);
+      }
     }
   }
 

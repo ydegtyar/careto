@@ -13,12 +13,15 @@ export const DEFAULT_PRICES_PER_GRADE: Record<string, string> = {
 };
 
 export function useLastUsedFuelGrade() {
-  return useLocalStorage<string>(LAST_USED_FUEL_GRADE_KEY, 'ron95');
+  return useLocalStorage<string>(LAST_USED_FUEL_GRADE_KEY, 'ron95', {
+    initializeWithValue: false,
+  });
 }
 
 export function useLastPricesPerFuelGrade() {
   return useLocalStorage<Record<string, string>>(
     LAST_PRICES_PER_FUEL_GRADE_KEY,
     DEFAULT_PRICES_PER_GRADE,
+    { initializeWithValue: false },
   );
 }
