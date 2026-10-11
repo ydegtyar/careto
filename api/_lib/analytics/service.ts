@@ -83,6 +83,16 @@ export async function getRefuelingAnalytics(
   `;
   const tankCapacityL = Number(vehicleRows[0]?.tank_capacity_l || 50);
 
+  // Fetch all odometer readings in period
+  const odoRows = await sql`
+    SELECT km::float as km
+    FROM odometer_readings
+    WHERE vehicle_id = ${vehicleId}::uuid
+      ${from ? sql`AND date >= ${from}::date` : sql``}
+      ${to ? sql`AND date <= ${to}::date` : sql``}
+    ORDER BY date ASC
+  `;
+
   // Time period days
   let periodDays = 30;
   if (refuels.length >= 2) {
@@ -91,9 +101,14 @@ export async function getRefuelingAnalytics(
     periodDays = Math.max(1, Math.round((lastDate - firstDate) / (1000 * 3600 * 24)));
   }
 
-  // Distance driven in period
-  const minOdo = refuels.length > 0 ? Math.min(...refuels.map((r) => r.odometer_km)) : 0;
-  const maxOdo = refuels.length > 0 ? Math.max(...refuels.map((r) => r.odometer_km)) : 0;
+  // Distance driven in period using all entries with odometer (refuels + readings)
+  const allOdos = [
+    ...refuels.map((r) => r.odometer_km),
+    ...odoRows.map((o: any) => Number(o.km)),
+  ].filter((km) => km > 0);
+
+  const minOdo = allOdos.length > 0 ? Math.min(...allOdos) : 0;
+  const maxOdo = allOdos.length > 0 ? Math.max(...allOdos) : 0;
   const kmDrivenInPeriod = maxOdo - minOdo;
 
   // 1. Summary KPI calculation
@@ -440,8 +455,14 @@ export async function getServicesAnalytics(
     periodDays = Math.max(1, Math.round((lastDate - firstDate) / (1000 * 3600 * 24)));
   }
 
-  const minOdo = eventRows.length > 0 ? Math.min(...eventRows.map((e: any) => Number(e.odometer_km))) : 0;
-  const maxOdo = eventRows.length > 0 ? Math.max(...eventRows.map((e: any) => Number(e.odometer_km))) : 0;
+  // Combine all odometers in period (service events + odometer readings)
+  const allServiceOdos = [
+    ...eventRows.map((e: any) => Number(e.odometer_km)),
+    ...odoRows.map((o: any) => Number(o.km)),
+  ].filter((km) => km > 0);
+
+  const minOdo = allServiceOdos.length > 0 ? Math.min(...allServiceOdos) : 0;
+  const maxOdo = allServiceOdos.length > 0 ? Math.max(...allServiceOdos) : 0;
   const kmDriven = maxOdo - minOdo;
 
   const costPerDay = eventRows.length > 0 && periodDays > 0 ? Number((totalServiceCost / periodDays).toFixed(2)) : null;

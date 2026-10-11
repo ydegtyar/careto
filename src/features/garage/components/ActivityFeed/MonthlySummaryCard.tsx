@@ -75,9 +75,9 @@ export const MonthlySummaryCard = ({ stats }: Props) => {
   const [yearStr = '2026', monthStr = '01'] = stats.monthKey.split('-');
   const year = Number.parseInt(yearStr, 10);
   const month = Number.parseInt(monthStr, 10);
-  const startDate = `${yearStr}-${monthStr.padStart(2, '0')}-01`;
+  const from = `${yearStr}-${monthStr.padStart(2, '0')}-01`;
   const lastDay = new Date(year, month, 0).getDate();
-  const endDate = `${yearStr}-${monthStr.padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+  const to = `${yearStr}-${monthStr.padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
   return (
     <div className={styles.card}>
@@ -90,9 +90,9 @@ export const MonthlySummaryCard = ({ stats }: Props) => {
           <Link
             to="/analytics"
             search={{
-              timeRange: 'custom',
-              startDate,
-              endDate,
+              preset: 'custom',
+              from,
+              to,
             }}
             className={styles.analyticsLink}
           >

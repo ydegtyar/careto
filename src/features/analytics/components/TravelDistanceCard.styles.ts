@@ -1,0 +1,91 @@
+import type { CSSProperties } from 'react';
+
+export const styles = {
+  card: {
+    padding: '16px 20px',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: '20px',
+    background: 'rgba(15, 21, 36, 0.65)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(125, 211, 252, 0.12)',
+    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '16px',
+  },
+  title: {
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    color: '#94a3b8',
+    letterSpacing: '-0.2px',
+  },
+  iconBadge: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '12px',
+    background: 'rgba(56, 189, 248, 0.12)',
+    border: '1px solid rgba(56, 189, 248, 0.25)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#7dd3fc',
+  },
+  metricSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+    marginBottom: '20px',
+  },
+  label: {
+    fontSize: '0.95rem',
+    fontWeight: 600,
+    color: '#cbd5e1',
+  },
+  valueRow: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: '6px',
+  },
+  primaryValue: {
+    fontSize: '1.85rem',
+    fontWeight: 800,
+    color: '#7dd3fc',
+    letterSpacing: '-0.5px',
+    lineHeight: 1.1,
+  },
+  unit: {
+    fontSize: '1.1rem',
+    fontWeight: 600,
+    color: '#94a3b8',
+  },
+  subMetricsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    padding: '10px 14px',
+    borderRadius: '16px',
+    background: 'rgba(0, 0, 0, 0.25)',
+    border: '1px solid rgba(255, 255, 255, 0.04)',
+  },
+  subMetricRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontSize: '0.85rem',
+  },
+  subMetricLabel: {
+    color: '#94a3b8',
+    fontWeight: 500,
+  },
+  subMetricValue: {
+    color: '#f8fafc',
+    fontWeight: 700,
+  },
+} as const satisfies Record<string, CSSProperties>;

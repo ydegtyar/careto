@@ -29,6 +29,12 @@ import { SpendingTrendCard } from '@/features/analytics/components/SpendingTrend
 import { EfficiencyTelemetryCard } from '@/features/analytics/components/EfficiencyTelemetryCard';
 import { PriceVolatilityCard } from '@/features/analytics/components/PriceVolatilityCard';
 import { BusinessDeductibleCard } from '@/features/analytics/components/BusinessDeductibleCard';
+import { TravelDistanceCard } from '@/features/analytics/components/TravelDistanceCard';
+import { OdometerProgressionCard } from '@/features/analytics/components/OdometerProgressionCard';
+import {
+  computeClientRefuelingAnalytics,
+  computeClientServicesAnalytics,
+} from '@/features/analytics/lib/analytics-math';
 
 import { styles } from './-index.styles';
 
@@ -38,11 +44,9 @@ export interface AnalyticsSearchParams {
   from?: string;
   to?: string;
   timeRange?: string;
-  startDate?: string;
-  endDate?: string;
 }
 
-const VALID_TABS: AnalyticsTab[] = ['general', 'refueling', 'services', 'expenses'];
+const VALID_TABS: AnalyticsTab[] = ['general', 'refueling', 'services'];
 const VALID_PRESETS: PeriodPreset[] = ['1M', '3M', '6M', '1Y', 'all', 'custom'];
 
 export const Route = createFileRoute('/analytics/')({
@@ -53,8 +57,8 @@ export const Route = createFileRoute('/analytics/')({
     const rawPreset = typeof search.preset === 'string' ? search.preset : undefined;
     const preset = VALID_PRESETS.includes(rawPreset as PeriodPreset) ? (rawPreset as PeriodPreset) : undefined;
 
-    const from = typeof search.from === 'string' ? search.from : typeof search.startDate === 'string' ? search.startDate : undefined;
-    const to = typeof search.to === 'string' ? search.to : typeof search.endDate === 'string' ? search.endDate : undefined;
+    const from = typeof search.from === 'string' ? search.from : undefined;
+    const to = typeof search.to === 'string' ? search.to : undefined;
 
     return {
       tab,
@@ -62,8 +66,6 @@ export const Route = createFileRoute('/analytics/')({
       from,
       to,
       timeRange: typeof search.timeRange === 'string' ? search.timeRange : undefined,
-      startDate: from,
-      endDate: to,
     };
   },
   component: AnalyticsPage,
@@ -137,66 +139,75 @@ function AnalyticsPage() {
     });
   }, [rawEntries, fromDate, toDate]);
 
+  // Derive effective refueling analytics data (prefer server calculation, fallback to client calculation)
+  const effectiveRefuelingData = useMemo(() => {
+    if (refuelingQuery.data && refuelingQuery.data.summary.totalCost !== null) {
+      return refuelingQuery.data;
+    }
+    return computeClientRefuelingAnalytics(filteredEntries, activeVehicle, rawEntries);
+  }, [refuelingQuery.data, filteredEntries, activeVehicle, rawEntries]);
+
+  // Derive effective services analytics data (prefer server calculation, fallback to client calculation)
+  const effectiveServicesData = useMemo(() => {
+    if (servicesQuery.data && servicesQuery.data.summary.totalServiceCost !== null) {
+      return servicesQuery.data;
+    }
+    return computeClientServicesAnalytics(filteredEntries, activeVehicle, rawEntries);
+  }, [servicesQuery.data, filteredEntries, activeVehicle, rawEntries]);
+
   return (
     <div style={styles.container}>
       {/* 2. Tabs Switcher: General | Refueling | Services | Expenses */}
-      {/*<AnalyticsTabs currentTab={currentTab} onChange={handleTabChange} />*/}
+      <AnalyticsTabs currentTab={currentTab} onChange={handleTabChange} />
 
       {/* 3. Period Filter (1M, 3M, 6M, 1Y, All Time, Custom) */}
       <PeriodFilter
         currentPreset={currentPreset}
-        startDate={fromDate}
-        endDate={toDate}
+        from={fromDate}
+        to={toDate}
         onChange={handlePeriodChange}
       />
 
       {/* 4. Tab Views */}
       {currentTab === 'refueling' && (
         <>
-          {refuelingQuery.isLoading ? (
+          {refuelingQuery.isLoading && !effectiveRefuelingData ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
               <CircularProgress sx={{ color: '#38bdf8' }} />
             </div>
-          ) : refuelingQuery.isError ? (
-            <Alert severity="error" sx={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#fca5a5' }}>
-              Failed to load refueling analytics. Please try again.
-            </Alert>
-          ) : refuelingQuery.data ? (
+          ) : (
             <RefuelingTabContent
-              data={refuelingQuery.data}
+              data={effectiveRefuelingData}
               vehicle={activeVehicle}
               isLoading={refuelingQuery.isFetching}
             />
-          ) : null}
+          )}
         </>
       )}
 
       {currentTab === 'services' && (
         <>
-          {servicesQuery.isLoading ? (
+          {servicesQuery.isLoading && !effectiveServicesData ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
               <CircularProgress sx={{ color: '#c8a0f0' }} />
             </div>
-          ) : servicesQuery.isError ? (
-            <Alert severity="error" sx={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#fca5a5' }}>
-              Failed to load service analytics. Please try again.
-            </Alert>
-          ) : servicesQuery.data ? (
+          ) : (
             <ServicesTabContent
-              data={servicesQuery.data}
+              data={effectiveServicesData}
               vehicle={activeVehicle}
               isLoading={servicesQuery.isFetching}
             />
-          ) : null}
+          )}
         </>
       )}
 
-      {(currentTab === 'general' || currentTab === 'expenses') && (
+      {(currentTab === 'general') && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
           <TcoSummaryCard entries={filteredEntries} vehicle={activeVehicle} />
           <ConsumptionAnomalyBanner entries={rawEntries} vehicle={activeVehicle} />
 
           <div style={styles.grid}>
+            <TravelDistanceCard entries={filteredEntries} vehicle={activeVehicle} />
             <CostDistributionCard entries={filteredEntries} />
             <SpendingTrendCard entries={filteredEntries} timeRange={currentPreset === 'all' ? 'all' : '6months'} />
             <EfficiencyTelemetryCard entries={filteredEntries} vehicle={activeVehicle} />
@@ -204,6 +215,7 @@ function AnalyticsPage() {
             {activeVehicle?.used_by_business && (
               <BusinessDeductibleCard entries={filteredEntries} vehicle={activeVehicle} />
             )}
+            <OdometerProgressionCard entries={filteredEntries} vehicle={activeVehicle} />
           </div>
         </div>
       )}

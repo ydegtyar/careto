@@ -1,14 +1,15 @@
 import Button from '@mui/material/Button';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import type { CSSProperties } from 'react';
+import { formatDatePreference, useDateFormatPreference } from '@/shared/lib/date-format-preference';
 
 export type PeriodPreset = '1M' | '3M' | '6M' | '1Y' | 'all' | 'custom';
 
 export interface PeriodFilterProps {
   currentPreset: PeriodPreset;
-  startDate?: string;
-  endDate?: string;
-  onChange: (preset: PeriodPreset, start?: string, end?: string) => void;
+  from?: string;
+  to?: string;
+  onChange: (preset: PeriodPreset, from?: string, to?: string) => void;
 }
 
 const PRESETS: Array<{ id: PeriodPreset; label: string }> = [
@@ -37,8 +38,8 @@ const pillsStyle: CSSProperties = {
   border: '1px solid rgba(125, 211, 252, 0.08)',
   gap: '2px',
 };
-export function PeriodFilter({ currentPreset, startDate, endDate, onChange }: PeriodFilterProps) {
-
+export function PeriodFilter({ currentPreset, from, to, onChange }: PeriodFilterProps) {
+  const [dateFormat] = useDateFormatPreference();
 
   const handleSelectPreset = (preset: PeriodPreset) => {
     if (preset === 'all') {
@@ -47,17 +48,20 @@ export function PeriodFilter({ currentPreset, startDate, endDate, onChange }: Pe
     }
 
     const now = new Date();
-    const end = now.toISOString().slice(0, 10);
-    const startObj = new Date(now);
+    const toDate = now.toISOString().slice(0, 10);
+    const fromObj = new Date(now);
 
-    if (preset === '1M') startObj.setMonth(now.getMonth() - 1);
-    if (preset === '3M') startObj.setMonth(now.getMonth() - 3);
-    if (preset === '6M') startObj.setMonth(now.getMonth() - 6);
-    if (preset === '1Y') startObj.setFullYear(now.getFullYear() - 1);
+    if (preset === '1M') fromObj.setMonth(now.getMonth() - 1);
+    if (preset === '3M') fromObj.setMonth(now.getMonth() - 3);
+    if (preset === '6M') fromObj.setMonth(now.getMonth() - 6);
+    if (preset === '1Y') fromObj.setFullYear(now.getFullYear() - 1);
 
-    const start = startObj.toISOString().slice(0, 10);
-    onChange(preset, start, end);
+    const fromDate = fromObj.toISOString().slice(0, 10);
+    onChange(preset, fromDate, toDate);
   };
+
+  const formattedFrom = from ? formatDatePreference(from, dateFormat) : '';
+  const formattedTo = to ? formatDatePreference(to, dateFormat) : '';
 
   return (
     <div style={containerStyle}>
@@ -92,7 +96,7 @@ export function PeriodFilter({ currentPreset, startDate, endDate, onChange }: Pe
         })}
       </div>
 
-      {startDate && endDate && (
+      {from && to && (
         <div
           style={{
             display: 'flex',
@@ -107,7 +111,7 @@ export function PeriodFilter({ currentPreset, startDate, endDate, onChange }: Pe
           }}
         >
           <CalendarTodayIcon sx={{ fontSize: 13, color: '#7dd3fc' }} />
-          <span>{startDate} — {endDate}</span>
+          <span>{formattedFrom} — {formattedTo}</span>
         </div>
       )}
     </div>

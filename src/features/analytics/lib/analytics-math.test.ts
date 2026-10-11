@@ -8,6 +8,10 @@ import {
   computeMonthlyTrends,
   computePriceVolatility,
   computeTCO,
+  computeTravelDistance,
+  computeOdometerProgression,
+  computeClientRefuelingAnalytics,
+  computeClientServicesAnalytics,
 } from './analytics-math';
 
 const mockVehicle: Vehicle = {
@@ -273,4 +277,222 @@ describe('analytics-math', () => {
       expect(anomaly?.spikePercentage).toBeGreaterThanOrEqual(26);
     });
   });
+
+  describe('computeTravelDistance', () => {
+    it('computes logged distance, daily avg, and current odometer accurately', () => {
+      const vehicle: Vehicle = {
+        id: 'v-1',
+        name: 'Honda CR-V',
+        powertrain: 'ice',
+        initial_odometer_m: 54561000, // 54,561 km
+        distance_unit: 'km',
+        efficiency_unit: 'l100km',
+      };
+
+      const entries: Entry[] = [
+        {
+          id: '1',
+          kind: 'refuel',
+          occurred_on: '2026-05-01',
+          odometer_m: 55000000,
+        },
+        {
+          id: '2',
+          kind: 'refuel',
+          occurred_on: '2026-05-31',
+          odometer_m: 68410000, // +13,849 km from initial
+        },
+      ];
+
+      const result = computeTravelDistance(entries, vehicle);
+      expect(result.distanceLogged).toBe(13849);
+      expect(result.currentOdometer).toBe(68410);
+      expect(result.distanceUnit).toBe('km');
+      expect(result.dailyAvg).toBeGreaterThan(0);
+    });
+
+    it('handles vehicle in miles mode correctly', () => {
+      const vehicle: Vehicle = {
+        id: 'v-2',
+        name: 'Ford F-150',
+        powertrain: 'ice',
+        initial_odometer_m: 16093440, // 10,000 miles (16,093.44 km)
+        distance_unit: 'mi',
+        efficiency_unit: 'mpg',
+      };
+
+      const entries: Entry[] = [
+        {
+          id: '1',
+          kind: 'refuel',
+          occurred_on: '2026-06-01',
+          odometer_m: 24140160, // 15,000 miles (+5,000 miles)
+        },
+      ];
+
+      const result = computeTravelDistance(entries, vehicle);
+      expect(result.distanceLogged).toBe(5000);
+      expect(result.currentOdometer).toBe(15000);
+      expect(result.distanceUnit).toBe('mi');
+    });
+  });
+
+  describe('computeOdometerProgression', () => {
+    it('computes progression points, start, current, logged delta and milestone days', () => {
+      const vehicle: Vehicle = {
+        id: 'v-1',
+        name: 'Honda CR-V',
+        powertrain: 'ice',
+        initial_odometer_m: 56800000, // 56,800 km
+        distance_unit: 'km',
+        efficiency_unit: 'l100km',
+      };
+
+      const entries: Entry[] = [
+        {
+          id: '1',
+          kind: 'refuel',
+          occurred_on: '2025-05-01',
+          odometer_m: 56800000,
+        },
+        {
+          id: '2',
+          kind: 'service',
+          occurred_on: '2025-09-01',
+          odometer_m: 60000000,
+        },
+        {
+          id: '3',
+          kind: 'refuel',
+          occurred_on: '2026-08-01',
+          odometer_m: 68410000, // 68,410 km
+        },
+      ];
+
+      const result = computeOdometerProgression(entries, vehicle);
+      expect(result.startOdometer).toBe(56800);
+      expect(result.currentOdometer).toBe(68410);
+      expect(result.distanceLogged).toBe(11610);
+      expect(result.points).toHaveLength(3);
+      expect(result.points[1]?.isService).toBe(true);
+      expect(result.nextMilestoneKm).toBe(70000);
+      expect(result.daysToNextMilestone).toBeGreaterThan(0);
+    });
+  });
+
+  describe('computeClientRefuelingAnalytics', () => {
+    it('computes complete refueling analytics payload with real values from client entries', () => {
+      const refuelEntries: Entry[] = [
+        {
+          id: 'rf-1',
+          kind: 'refuel',
+          occurred_on: '2026-08-01',
+          odometer_m: 60000000, // 60,000 km
+          amount_minor: 6500, // $65.00
+          fuel_volume: 45, // 45 L
+          unit_price: 144, // $1.44/L
+          vendor_name: 'Shell',
+          fuel_grade: 'Gasoline 95',
+          is_full_tank: true,
+        },
+        {
+          id: 'rf-2',
+          kind: 'refuel',
+          occurred_on: '2026-08-15',
+          odometer_m: 60600000, // 60,600 km (delta = 600 km)
+          amount_minor: 7000, // $70.00
+          fuel_volume: 48, // 48 L -> 48 / 600 * 100 = 8.0 L/100km
+          unit_price: 146,
+          vendor_name: 'BP',
+          fuel_grade: 'Gasoline 95',
+          is_full_tank: true,
+        },
+      ];
+
+      const res = computeClientRefuelingAnalytics(refuelEntries, mockVehicle);
+
+      // Summary
+      expect(res.summary.totalCost).toBe(135);
+      expect(res.summary.totalVolumeLiters).toBe(93);
+      expect(res.summary.avgEfficiencyL100km).toBe(8);
+      expect(res.summary.bestEfficiencyL100km).toBe(8);
+      expect(res.summary.worstEfficiencyL100km).toBe(8);
+
+      // Routine
+      expect(res.routine.fullTankIndexPercent).toBe(100);
+      expect(res.routine.fullTankRatioText).toBe('2/2');
+
+      // Stations
+      expect(res.stations.stations.length).toBe(2);
+
+      // Fuel types
+      expect(res.fuelTypes.items.length).toBe(1);
+      expect(res.fuelTypes.items[0]?.name).toBe('Gasoline 95');
+
+      // Benchmark
+      expect(res.benchmark.efficiencyL100km).toBe(8);
+    });
+  });
+
+  describe('computeClientServicesAnalytics', () => {
+    it('computes complete services analytics payload with real values from client entries', () => {
+      const serviceEntries: Entry[] = [
+        {
+          id: 'srv-1',
+          kind: 'service',
+          occurred_on: '2026-03-10',
+          odometer_m: 50000000,
+          amount_minor: 12000, // $120.00
+          notes: 'Oil change and filter',
+          vendor_name: 'Brembo Master Auto',
+          sub_items: [
+            { id: 'sub-1', name: 'Engine Oil', cost: '70' },
+            { id: 'sub-2', name: 'Labor', cost: '50' },
+          ],
+        },
+        {
+          id: 'srv-2',
+          kind: 'service',
+          occurred_on: '2026-09-15',
+          odometer_m: 60000000,
+          amount_minor: 35000, // $350.00
+          notes: 'Brake pads replacement',
+          vendor_name: 'Brembo Master Auto',
+          sub_items: [
+            { id: 'sub-3', name: 'Front Brake Pads', cost: '220' },
+            { id: 'sub-4', name: 'Labor', cost: '130' },
+          ],
+        },
+      ];
+
+      const res = computeClientServicesAnalytics(serviceEntries, mockVehicle);
+
+      // Summary
+      expect(res.summary.totalServiceCost).toBe(470);
+      expect(res.summary.maintenanceRatePercent).toBe(100);
+      expect(res.summary.breakdownIncidentsCount).toBe(0);
+      expect(res.summary.serviceCadenceKm).toBe(10000);
+
+      // Allocation
+      expect(res.allocation.taskCount).toBe(4);
+      expect(res.allocation.partsCost).toBe(290);
+      expect(res.allocation.laborCost).toBe(180);
+
+      // Trajectory
+      expect(res.monthlyTrajectory.points.length).toBe(2);
+      expect(res.monthlyTrajectory.peakCost).toBe(350);
+
+      // Component Life
+      expect(res.componentLife.length).toBeGreaterThan(0);
+
+      // Workshop
+      expect(res.workshopEfficiency.hasData).toBe(true);
+      expect(res.workshopEfficiency.workshopName).toBe('Brembo Master Auto');
+
+      // Odometer progression
+      expect(res.costProgression.points.length).toBe(2);
+    });
+  });
 });
+
+
