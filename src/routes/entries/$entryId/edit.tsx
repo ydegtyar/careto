@@ -33,6 +33,10 @@ function EditEntryPage() {
       id: entry.id, // Preserve existing ID
     };
 
+    if (!updatedData.image_data) {
+      delete mergedEntry.image_data;
+    }
+
     await data.upsertEntry(mergedEntry);
     navigate({ to: `/entries/${entry.id}` });
   };

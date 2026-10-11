@@ -10,8 +10,14 @@ import { MagicLinkForm } from '@/features/auth/components/MagicLinkForm/MagicLin
 import { CaretoLogo } from '@/shared/ui/CaretoLogo/CaretoLogo';
 import styles from './SignIn.module.scss';
 
+import { OnlyGuestGuard } from '@/features/auth/components/OnlyGuestGuard/OnlyGuestGuard';
+
 export const Route = createFileRoute('/sign-in/')({
-  component: SignInPage,
+  component: () => (
+    <OnlyGuestGuard>
+      <SignInPage />
+    </OnlyGuestGuard>
+  ),
 });
 
 import { GoogleLogo } from '@/features/auth/components/GoogleLogo/GoogleLogo';

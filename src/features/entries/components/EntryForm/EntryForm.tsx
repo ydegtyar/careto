@@ -339,7 +339,7 @@ export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, sub
         is_full_tank: kind === 'refuel' ? isFullTank : undefined,
         sub_items: kind === 'service' ? subItems : undefined,
         payment_method: paymentMethod || undefined,
-        image_data: finalImageData || undefined,
+        image_data: receiptImage ? receiptImage.dataUrl : (existingImageData || undefined),
       });
     } catch (err) {
       console.error('Failed to submit entry form:', err);

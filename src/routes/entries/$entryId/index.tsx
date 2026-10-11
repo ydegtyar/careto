@@ -38,6 +38,7 @@ import { entriesQueryOptions, vehiclesQueryOptions } from '@/features/garage/que
 import { formatAmount } from '@/shared/lib/currencies';
 import { formatDatePreference, useDateFormatPreference } from '@/shared/lib/date-format-preference';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
+import styles from './EntryDetail.module.scss';
 
 export const Route = createFileRoute('/entries/$entryId/')({
   component: EntryDetailPage,
@@ -59,6 +60,8 @@ function EntryDetailPage() {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteAttachmentDialogOpen, setDeleteAttachmentDialogOpen] = useState(false);
+  const [deletingAttachment, setDeletingAttachment] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
   const handleDelete = async () => {
@@ -75,9 +78,27 @@ function EntryDetailPage() {
     }
   };
 
+  const handleRemoveAttachment = async () => {
+    if (!entry) return;
+    setDeletingAttachment(true);
+    try {
+      const updatedEntry: Entry = {
+        ...entry,
+      };
+      delete updatedEntry.image_data;
+      await data.upsertEntry(updatedEntry);
+      setImageModalOpen(false);
+      setDeleteAttachmentDialogOpen(false);
+    } catch (err) {
+      console.error('Failed to remove attachment:', err);
+    } finally {
+      setDeletingAttachment(false);
+    }
+  };
+
   if (entriesLoading) {
     return (
-      <div style={{ padding: 24, maxWidth: 440, margin: '0 auto', textAlign: 'center' }}>
+      <div className={styles.container} style={{ textAlign: 'center', paddingTop: 32 }}>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           Loading entry details...
         </Typography>
@@ -87,7 +108,7 @@ function EntryDetailPage() {
 
   if (!entry) {
     return (
-      <div style={{ padding: 24, maxWidth: 440, margin: '0 auto', textAlign: 'center' }}>
+      <div className={styles.container} style={{ textAlign: 'center', paddingTop: 32 }}>
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
           Entry not found
         </Typography>
@@ -95,7 +116,7 @@ function EntryDetailPage() {
           variant="outlined"
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate({ to: '/garage' })}
-          sx={{ textTransform: 'none', borderRadius: 9999 }}
+          sx={{ textTransform: 'none', borderRadius: 9999, alignSelf: 'center' }}
         >
           Back to Garage
         </Button>
@@ -172,18 +193,7 @@ function EntryDetailPage() {
   }, 0) ?? 0;
 
   return (
-    <div
-      style={{
-        padding: '12px 16px 36px 16px',
-        maxWidth: 440,
-        margin: '0 auto',
-        width: '100%',
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 14,
-      }}
-    >
+    <div className={styles.container}>
       {/* Sub-Header / Quick Navigation & Top Actions */}
       <div
         style={{
@@ -508,7 +518,9 @@ function EntryDetailPage() {
         </div>
       </div>
 
-      {/* Type-Specific: Refuel / Charge Details Breakdown (Hidden if empty) */}
+      {/* Details Grid: 1 column on mobile, 2 columns on desktop */}
+      <div className={styles.detailsGrid}>
+        {/* Type-Specific: Refuel / Charge Details Breakdown (Hidden if empty) */}
       {hasFuelDetails && (
         <GlassCard style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -574,7 +586,7 @@ function EntryDetailPage() {
 
       {/* Type-Specific: Service Parts & Labor Breakdown (Stitch Design Card) */}
       {hasServiceItems && (
-        <GlassCard style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <GlassCard className={styles.fullWidthSpan} style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <ReceiptLongIcon sx={{ fontSize: 17, color: 'primary.main' }} />
@@ -895,21 +907,42 @@ function EntryDetailPage() {
                 Attached Receipt &amp; Work Order
               </Typography>
             </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                fontSize: '0.65rem',
-                fontWeight: 600,
-                color: '#7dd3fc',
-                padding: '2px 8px',
-                borderRadius: 9999,
-                backgroundColor: 'rgba(14, 77, 110, 0.35)',
-              }}
-            >
-              <VerifiedIcon sx={{ fontSize: 13 }} />
-              <span>Attached</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: '0.65rem',
+                  fontWeight: 600,
+                  color: '#7dd3fc',
+                  padding: '2px 8px',
+                  borderRadius: 9999,
+                  backgroundColor: 'rgba(14, 77, 110, 0.35)',
+                }}
+              >
+                <VerifiedIcon sx={{ fontSize: 13 }} />
+                <span>Attached</span>
+              </div>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteAttachmentDialogOpen(true);
+                }}
+                title="Remove attachment"
+                sx={{
+                  color: 'error.main',
+                  padding: '4px',
+                  backgroundColor: 'rgba(61, 20, 20, 0.4)',
+                  border: '1px solid rgba(255, 107, 107, 0.2)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(61, 20, 20, 0.7)',
+                  },
+                }}
+              >
+                <DeleteIcon sx={{ fontSize: 15 }} />
+              </IconButton>
             </div>
           </div>
 
@@ -995,6 +1028,7 @@ function EntryDetailPage() {
           </div>
         </GlassCard>
       )}
+      </div>
 
       {/* Lightbox Modal for Full Image View */}
       <Dialog
@@ -1014,7 +1048,16 @@ function EntryDetailPage() {
           },
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px' }}>
+          <Button
+            size="small"
+            color="error"
+            startIcon={<DeleteIcon fontSize="small" />}
+            onClick={() => setDeleteAttachmentDialogOpen(true)}
+            sx={{ textTransform: 'none', fontWeight: 600 }}
+          >
+            Remove Attachment
+          </Button>
           <IconButton onClick={() => setImageModalOpen(false)} sx={{ color: 'white' }}>
             <CloseIcon />
           </IconButton>
@@ -1028,6 +1071,42 @@ function EntryDetailPage() {
             />
           )}
         </div>
+      </Dialog>
+
+      {/* Remove Attachment Confirmation Dialog */}
+      <Dialog
+        open={deleteAttachmentDialogOpen}
+        onClose={() => setDeleteAttachmentDialogOpen(false)}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: '#0f1524',
+              borderRadius: 3,
+              border: '1px solid rgba(125, 211, 252, 0.1)',
+            },
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>Remove Attachment?</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: 'text.secondary' }}>
+            Are you sure you want to remove this receipt photo from this entry? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ pb: 2, px: 2 }}>
+          <Button onClick={() => setDeleteAttachmentDialogOpen(false)} sx={{ textTransform: 'none', borderRadius: 9999 }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRemoveAttachment}
+            color="error"
+            variant="contained"
+            disabled={deletingAttachment}
+            sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 9999 }}
+          >
+            {deletingAttachment ? 'Removing...' : 'Remove Attachment'}
+          </Button>
+        </DialogActions>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
