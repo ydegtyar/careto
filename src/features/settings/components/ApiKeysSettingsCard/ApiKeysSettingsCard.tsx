@@ -154,8 +154,8 @@ export function ApiKeysSettingsCard() {
                 justifyContent: 'space-between',
                 padding: '8px 12px',
                 borderRadius: 8,
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'var(--mui-palette-surfaceContainer)',
+                border: '1px solid var(--mui-palette-divider)',
               }}
             >
               <div>
@@ -225,7 +225,9 @@ export function ApiKeysSettingsCard() {
                     justifyContent: 'space-between',
                     padding: '8px 12px',
                     borderRadius: 8,
-                    backgroundColor: 'rgba(0,0,0,0.3)',
+                    backgroundColor: 'var(--mui-palette-surfaceContainer)',
+                    border: '1px solid var(--mui-palette-divider)',
+                    color: 'var(--mui-palette-text-primary)',
                     fontFamily: 'monospace',
                     marginTop: 4,
                   }}
@@ -248,7 +250,9 @@ export function ApiKeysSettingsCard() {
                   style={{
                     padding: 12,
                     borderRadius: 8,
-                    backgroundColor: 'rgba(0,0,0,0.4)',
+                    backgroundColor: 'var(--mui-palette-surfaceContainer)',
+                    border: '1px solid var(--mui-palette-divider)',
+                    color: 'var(--mui-palette-text-primary)',
                     fontSize: 12,
                     overflowX: 'auto',
                     marginTop: 4,

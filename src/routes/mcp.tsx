@@ -93,7 +93,8 @@ function McpDocumentationPage() {
               1. Get Your API Key
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Generate a secret <code style={{ color: '#7dd3fc' }}>careto_sk_...</code> key in your
+              Generate a secret{' '}
+              <code style={{ color: 'var(--mui-palette-primary-main)' }}>careto_sk_...</code> key in your
               Careto settings.
             </Typography>
           </div>
@@ -121,7 +122,7 @@ function McpDocumentationPage() {
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Add this block to your Claude Desktop (
-              <code style={{ color: '#7dd3fc' }}>claude_desktop_config.json</code>) or Cursor
+              <code style={{ color: 'var(--mui-palette-primary-main)' }}>claude_desktop_config.json</code>) or Cursor
               settings:
             </Typography>
           </div>
@@ -133,12 +134,13 @@ function McpDocumentationPage() {
             elevation={0}
             sx={{
               p: 2,
-              bgcolor: 'rgba(0, 0, 0, 0.4)',
+              bgcolor: 'var(--mui-palette-surfaceContainer)',
               borderRadius: 2,
               fontFamily: 'monospace',
               fontSize: '0.85rem',
               overflowX: 'auto',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              border: '1px solid var(--mui-palette-divider)',
+              color: 'var(--mui-palette-text-primary)',
             }}
           >
             <pre style={{ margin: 0 }}>{claudeConfig}</pre>
@@ -153,7 +155,9 @@ function McpDocumentationPage() {
               position: 'absolute',
               top: 12,
               right: 12,
-              bgcolor: 'rgba(0, 0, 0, 0.6)',
+              bgcolor: 'var(--mui-palette-background-paper)',
+              backdropFilter: 'blur(8px)',
+              borderColor: 'var(--mui-palette-divider)',
             }}
           >
             {copiedKey === 'config' ? 'Copied!' : 'Copy'}
@@ -206,24 +210,25 @@ function McpDocumentationPage() {
                     elevation={0}
                     sx={{
                       p: 1.5,
-                      bgcolor: 'rgba(0, 0, 0, 0.3)',
+                      bgcolor: 'var(--mui-palette-surfaceContainer)',
                       borderRadius: 1.5,
                       fontSize: '0.8rem',
                       fontFamily: 'monospace',
+                      border: '1px solid var(--mui-palette-divider)',
                     }}
                   >
                     {Object.entries(tool.inputSchema.properties).map(
                       ([param, spec]: [string, any]) => (
                         <div key={param} style={{ marginBottom: 4 }}>
-                          <span style={{ color: '#7dd3fc', fontWeight: 600 }}>{param}</span>
+                          <span style={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}>{param}</span>
                           {tool.inputSchema.required?.includes(param) && (
-                            <span style={{ color: '#ef4444' }}>*</span>
+                            <span style={{ color: 'var(--mui-palette-error-main)' }}>*</span>
                           )}
-                          <span style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                          <span style={{ color: 'var(--mui-palette-text-secondary)', opacity: 0.85 }}>
                             {' '}
                             ({spec.type}):{' '}
                           </span>
-                          <span style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                          <span style={{ color: 'var(--mui-palette-text-primary)' }}>
                             {spec.description}
                           </span>
                         </div>
