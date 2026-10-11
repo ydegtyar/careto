@@ -73,11 +73,7 @@ export function convertToUsdMinor(
 /**
  * Converts a numeric amount from one currency to another using fallback FX rates.
  */
-export function convertCurrency(
-  amount: number,
-  fromCurrency: string,
-  toCurrency: string,
-): number {
+export function convertCurrency(amount: number, fromCurrency: string, toCurrency: string): number {
   if (!amount || Number.isNaN(amount)) return 0;
   const fromCode = fromCurrency.toUpperCase();
   const toCode = toCurrency.toUpperCase();

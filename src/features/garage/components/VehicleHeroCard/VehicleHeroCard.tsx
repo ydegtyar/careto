@@ -40,16 +40,13 @@ export function VehicleHeroCard({
               </Typography>
               {daysSinceRefuel !== undefined && daysSinceRefuel !== null && (
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {daysSinceRefuel === 0
-                    ? 'Refueled today'
-                    : `${daysSinceRefuel}d since refuel`}
+                  {daysSinceRefuel === 0 ? 'Refueled today' : `${daysSinceRefuel}d since refuel`}
                 </Typography>
               )}
             </div>
             {tanks.map((tank) => {
               const isTankEv = tank.type === 'ev';
-              const specificPercent =
-                tankPercentages?.[tank.id] ?? fuelOrBatteryPercent;
+              const specificPercent = tankPercentages?.[tank.id] ?? fuelOrBatteryPercent;
               const roundedTankPercent =
                 specificPercent !== undefined ? Math.round(specificPercent) : null;
 

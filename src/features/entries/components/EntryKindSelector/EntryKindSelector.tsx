@@ -26,7 +26,10 @@ export const EntryKindSelector: React.FC<Props> = ({ value, onChange, disabled }
   const activeVehicle = vehicles.find((v) => v.id === activeVehicleId);
   const isEv = activeVehicle?.powertrain === 'ev';
 
-  const refuelLabel = isEv && 'Charge' || ['ice', 'hybrid'].includes(activeVehicle?.powertrain!) && 'Refuel' || 'Refuel / Charge';
+  const refuelLabel =
+    (isEv && 'Charge') ||
+    (['ice', 'hybrid'].includes(activeVehicle?.powertrain!) && 'Refuel') ||
+    'Refuel / Charge';
   const RefuelIcon = isEv ? EvStationIcon : LocalGasStationIcon;
 
   return (

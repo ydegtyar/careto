@@ -106,9 +106,7 @@ export const MonthlySummaryCard = ({ stats }: Props) => {
         <div className={styles.statItem}>
           <span className={styles.statLabel}>Mileage</span>
           <div className={styles.statValueRow}>
-            <span className={styles.statValue}>
-              {mileage > 0 ? mileage.toLocaleString() : '0'}
-            </span>
+            <span className={styles.statValue}>{mileage > 0 ? mileage.toLocaleString() : '0'}</span>
             <span className={styles.statUnit}>{distanceUnit}</span>
           </div>
         </div>
@@ -117,9 +115,7 @@ export const MonthlySummaryCard = ({ stats }: Props) => {
           <span className={styles.statLabel}>Avg Consumption</span>
           <div className={styles.statValueRow}>
             <span className={styles.statValue}>{avgConsumption}</span>
-            {avgConsumption !== '-' && (
-              <span className={styles.statUnit}>{consumptionUnit}</span>
-            )}
+            {avgConsumption !== '-' && <span className={styles.statUnit}>{consumptionUnit}</span>}
           </div>
         </div>
 
@@ -154,14 +150,9 @@ export const MonthlySummaryCard = ({ stats }: Props) => {
           <div className={styles.breakdownPills}>
             {categoryBreakdown.map((cat) => (
               <div key={cat.name} className={styles.breakdownPill}>
-                <span
-                  className={styles.breakdownDot}
-                  style={{ backgroundColor: cat.color }}
-                />
+                <span className={styles.breakdownDot} style={{ backgroundColor: cat.color }} />
                 <span className={styles.breakdownCategory}>{cat.name}</span>
-                <span className={styles.breakdownAmount}>
-                  {cat.percentage}%
-                </span>
+                <span className={styles.breakdownAmount}>{cat.percentage}%</span>
               </div>
             ))}
           </div>

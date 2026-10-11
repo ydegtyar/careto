@@ -98,7 +98,15 @@ function EditEntryPage() {
         >
           Cancel & Return
         </Button>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
+        <Typography
+          variant="subtitle2"
+          sx={{
+            fontWeight: 700,
+            color: 'text.secondary',
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+          }}
+        >
           Edit {entry.kind} Entry
         </Typography>
       </div>

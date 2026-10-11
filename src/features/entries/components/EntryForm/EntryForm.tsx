@@ -93,10 +93,7 @@ export const EntryForm: React.FC<Props> = ({
 
   const getHistoricalPriceForGrade = (targetGrade: string, targetCurrency: string): string => {
     const historicalEntry = entries.find(
-      (e) =>
-        e.fuel_grade === targetGrade &&
-        e.unit_price !== undefined &&
-        Number(e.unit_price) > 0,
+      (e) => e.fuel_grade === targetGrade && e.unit_price !== undefined && Number(e.unit_price) > 0,
     );
 
     if (historicalEntry && historicalEntry.unit_price !== undefined) {
@@ -391,7 +388,7 @@ export const EntryForm: React.FC<Props> = ({
         is_full_tank: kind === 'refuel' ? isFullTank : undefined,
         sub_items: kind === 'service' ? subItems : undefined,
         payment_method: paymentMethod || undefined,
-        image_data: receiptImage ? receiptImage.dataUrl : (existingImageData || undefined),
+        image_data: receiptImage ? receiptImage.dataUrl : existingImageData || undefined,
       });
     } catch (err) {
       console.error('Failed to submit entry form:', err);
@@ -544,9 +541,7 @@ export const EntryForm: React.FC<Props> = ({
                       startAdornment: currencySymbol ? (
                         <InputAdornment position="start">{currencySymbol}</InputAdornment>
                       ) : undefined,
-                      endAdornment: (
-                        <InputAdornment position="end">/{volumeUnit}</InputAdornment>
-                      ),
+                      endAdornment: <InputAdornment position="end">/{volumeUnit}</InputAdornment>,
                     },
                   }}
                   value={pricePerUnit}

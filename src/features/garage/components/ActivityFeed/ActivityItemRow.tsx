@@ -39,9 +39,7 @@ export function ActivityItemRow({
 
     // 2. Service -> breakdown item titles.join(', ')
     if (entry.kind === 'service' && entry.sub_items && entry.sub_items.length > 0) {
-      const titles = entry.sub_items
-        .map((item) => item.name.trim())
-        .filter(Boolean);
+      const titles = entry.sub_items.map((item) => item.name.trim()).filter(Boolean);
       if (titles.length > 0) {
         return titles.join(', ');
       }

@@ -7,10 +7,9 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { EmailPasswordForm } from '@/features/auth/components/EmailPasswordForm/EmailPasswordForm';
 import { MagicLinkForm } from '@/features/auth/components/MagicLinkForm/MagicLinkForm';
+import { OnlyGuestGuard } from '@/features/auth/components/OnlyGuestGuard/OnlyGuestGuard';
 import { CaretoLogo } from '@/shared/ui/CaretoLogo/CaretoLogo';
 import styles from './SignIn.module.scss';
-
-import { OnlyGuestGuard } from '@/features/auth/components/OnlyGuestGuard/OnlyGuestGuard';
 
 export const Route = createFileRoute('/sign-in/')({
   component: () => (

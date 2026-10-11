@@ -96,8 +96,8 @@ function McpDocumentationPage() {
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Generate a secret{' '}
-              <code style={{ color: 'var(--mui-palette-primary-main)' }}>careto_sk_...</code> key in your
-              settings, or connect directly using Gemini / ChatGPT OAuth 2.1.
+              <code style={{ color: 'var(--mui-palette-primary-main)' }}>careto_sk_...</code> key in
+              your settings, or connect directly using Gemini / ChatGPT OAuth 2.1.
             </Typography>
           </div>
         </div>
@@ -114,7 +114,11 @@ function McpDocumentationPage() {
               </Button>
             </RouterLink>
           ) : (
-            <RouterLink to="/sign-in" search={{ redirect: '/mcp' }} style={{ textDecoration: 'none' }}>
+            <RouterLink
+              to="/sign-in"
+              search={{ redirect: '/mcp' }}
+              style={{ textDecoration: 'none' }}
+            >
               <Button
                 variant="contained"
                 color="primary"
@@ -136,8 +140,10 @@ function McpDocumentationPage() {
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Add this block to your Claude Desktop (
-              <code style={{ color: 'var(--mui-palette-primary-main)' }}>claude_desktop_config.json</code>) or Cursor
-              settings:
+              <code style={{ color: 'var(--mui-palette-primary-main)' }}>
+                claude_desktop_config.json
+              </code>
+              ) or Cursor settings:
             </Typography>
           </div>
         </div>
@@ -234,11 +240,17 @@ function McpDocumentationPage() {
                     {Object.entries(tool.inputSchema.properties).map(
                       ([param, spec]: [string, any]) => (
                         <div key={param} style={{ marginBottom: 4 }}>
-                          <span style={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}>{param}</span>
+                          <span
+                            style={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}
+                          >
+                            {param}
+                          </span>
                           {tool.inputSchema.required?.includes(param) && (
                             <span style={{ color: 'var(--mui-palette-error-main)' }}>*</span>
                           )}
-                          <span style={{ color: 'var(--mui-palette-text-secondary)', opacity: 0.85 }}>
+                          <span
+                            style={{ color: 'var(--mui-palette-text-secondary)', opacity: 0.85 }}
+                          >
                             {' '}
                             ({spec.type}):{' '}
                           </span>
@@ -288,7 +300,8 @@ function McpDocumentationPage() {
           </div>
 
           <Alert severity="success" sx={{ borderRadius: 2, mt: 1 }}>
-            Fully compatible with <strong>Gemini & ChatGPT OAuth 2.1</strong> standard discovery as well as static{' '}
+            Fully compatible with <strong>Gemini & ChatGPT OAuth 2.1</strong> standard discovery as
+            well as static{' '}
             <code style={{ fontWeight: 700 }}>Authorization: Bearer careto_sk_...</code> headers.
           </Alert>
         </div>

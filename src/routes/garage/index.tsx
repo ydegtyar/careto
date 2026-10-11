@@ -6,13 +6,13 @@ import { useAppStore } from '@/app/store';
 import { ActivityFeed } from '@/features/garage/components/ActivityFeed/ActivityFeed';
 import { QuickActions } from '@/features/garage/components/QuickActions/QuickActions';
 import { ReminderAlertStrip } from '@/features/garage/components/ReminderAlertStrip/ReminderAlertStrip';
+import { TelemetrySnapshotGrid } from '@/features/garage/components/TelemetrySnapshotGrid/TelemetrySnapshotGrid';
 import { VehicleHeroCard } from '@/features/garage/components/VehicleHeroCard/VehicleHeroCard';
 import {
   entriesQueryOptions,
   remindersQueryOptions,
   vehiclesQueryOptions,
 } from '@/features/garage/queries/vehicles';
-import { TelemetrySnapshotGrid } from '@/features/garage/components/TelemetrySnapshotGrid/TelemetrySnapshotGrid';
 
 const EmptyVehicleState = React.lazy(
   () => import('@/features/garage/components/EmptyVehicleState/EmptyVehicleState'),
@@ -102,16 +102,19 @@ function GaragePage() {
   }
 
   // Fallback nominal consumption if not enough refuels yet: ~6.5 L/100km or ~17 kWh/100km
-  const effectiveConsumptionLPerKm =
-    consumptionLPerKm ?? (isEv ? 0.17 : 0.065);
+  const effectiveConsumptionLPerKm = consumptionLPerKm ?? (isEv ? 0.17 : 0.065);
 
   // 3. Hero Card Approximations: Days since refuel, remaining fuel/energy %, and range
   const totalCapacityLOrKwh = isEv
-    ? (activeVehicle.battery_wh ? activeVehicle.battery_wh / 1000 : 75)
-    : (activeVehicle.tank_ml ? activeVehicle.tank_ml / 1000 : 55);
+    ? activeVehicle.battery_wh
+      ? activeVehicle.battery_wh / 1000
+      : 75
+    : activeVehicle.tank_ml
+      ? activeVehicle.tank_ml / 1000
+      : 55;
 
-  let approxFuelPercent: number | undefined = undefined;
-  let approxRange: number | undefined = undefined;
+  let approxFuelPercent: number | undefined;
+  let approxRange: number | undefined;
   let daysSinceRefuel: number | null = null;
   const tankPercentages: Record<string, number> = {};
 
@@ -128,21 +131,24 @@ function GaragePage() {
     const odoAtLastRefuelM = latestRefuelEntry.odometer_m ?? currentOdometerM;
     const distanceDrivenSinceRefuelKm = Math.max(0, (currentOdometerM - odoAtLastRefuelM) / 1000);
 
-    const initialFuelAtFill = latestRefuelEntry.is_full_tank !== false
-      ? totalCapacityLOrKwh
-      : Math.min(totalCapacityLOrKwh, (latestRefuelEntry.fuel_volume ?? totalCapacityLOrKwh));
+    const initialFuelAtFill =
+      latestRefuelEntry.is_full_tank !== false
+        ? totalCapacityLOrKwh
+        : Math.min(totalCapacityLOrKwh, latestRefuelEntry.fuel_volume ?? totalCapacityLOrKwh);
 
     const fuelConsumed = distanceDrivenSinceRefuelKm * effectiveConsumptionLPerKm;
-    const remainingFuel = Math.max(0, Math.min(totalCapacityLOrKwh, initialFuelAtFill - fuelConsumed));
+    const remainingFuel = Math.max(
+      0,
+      Math.min(totalCapacityLOrKwh, initialFuelAtFill - fuelConsumed),
+    );
 
     approxFuelPercent = Math.min(100, Math.max(0, (remainingFuel / totalCapacityLOrKwh) * 100));
 
     // Range in vehicle distance_unit
-    const remainingRangeKm = effectiveConsumptionLPerKm > 0 ? remainingFuel / effectiveConsumptionLPerKm : 0;
+    const remainingRangeKm =
+      effectiveConsumptionLPerKm > 0 ? remainingFuel / effectiveConsumptionLPerKm : 0;
     approxRange =
-      activeVehicle.distance_unit === 'mi'
-        ? remainingRangeKm / 1.609344
-        : remainingRangeKm;
+      activeVehicle.distance_unit === 'mi' ? remainingRangeKm / 1.609344 : remainingRangeKm;
 
     if (activeVehicle.tanks && activeVehicle.tanks.length > 0) {
       for (const tank of activeVehicle.tanks) {
@@ -151,16 +157,21 @@ function GaragePage() {
     }
   } else {
     // If no refuel entry recorded at all, approximate based on distance since vehicle initial odometer
-    const distFromInitialKm = Math.max(0, (currentOdometerM - (activeVehicle.initial_odometer_m || 0)) / 1000);
+    const distFromInitialKm = Math.max(
+      0,
+      (currentOdometerM - (activeVehicle.initial_odometer_m || 0)) / 1000,
+    );
     const fuelConsumed = distFromInitialKm * effectiveConsumptionLPerKm;
-    const remainingFuel = Math.max(0, Math.min(totalCapacityLOrKwh, totalCapacityLOrKwh - fuelConsumed));
+    const remainingFuel = Math.max(
+      0,
+      Math.min(totalCapacityLOrKwh, totalCapacityLOrKwh - fuelConsumed),
+    );
     approxFuelPercent = Math.min(100, Math.max(0, (remainingFuel / totalCapacityLOrKwh) * 100));
 
-    const remainingRangeKm = effectiveConsumptionLPerKm > 0 ? remainingFuel / effectiveConsumptionLPerKm : 0;
+    const remainingRangeKm =
+      effectiveConsumptionLPerKm > 0 ? remainingFuel / effectiveConsumptionLPerKm : 0;
     approxRange =
-      activeVehicle.distance_unit === 'mi'
-        ? remainingRangeKm / 1.609344
-        : remainingRangeKm;
+      activeVehicle.distance_unit === 'mi' ? remainingRangeKm / 1.609344 : remainingRangeKm;
 
     if (activeVehicle.tanks && activeVehicle.tanks.length > 0) {
       for (const tank of activeVehicle.tanks) {

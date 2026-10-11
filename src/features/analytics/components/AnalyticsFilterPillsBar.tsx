@@ -3,8 +3,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import type React from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
+import type React from 'react';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './AnalyticsFilterPillsBar.styles';
 
@@ -92,7 +92,7 @@ export const AnalyticsFilterPillsBar: React.FC<Props> = ({
           <MenuItem value="custom">Custom Range...</MenuItem>
         </Select>
       </div>
-{/*custom range selector*/}
+      {/*custom range selector*/}
       {timeRange === 'custom' && (
         <GlassCard style={styles.customRangeCard}>
           <TextField

@@ -13,7 +13,7 @@ import { computeCategoryDistribution } from '@/features/analytics/lib/analytics-
 import { vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import styles from './ActivityFeed.module.scss';
 import { ActivityItemRow } from './ActivityItemRow';
-import { MonthlySummaryCard, type MonthlyStats } from './MonthlySummaryCard';
+import { type MonthlyStats, MonthlySummaryCard } from './MonthlySummaryCard';
 
 type Props = {
   entries: Entry[];
@@ -173,7 +173,11 @@ export const ActivityFeed = ({ entries }: Props) => {
         const prevOdoEntry = [...odoEntries]
           .reverse()
           .find((e) => (e.occurred_on || '').slice(0, 7) < monthKey);
-        if (prevOdoEntry && typeof prevOdoEntry.odometer_m === 'number' && maxOdoInMonth > prevOdoEntry.odometer_m) {
+        if (
+          prevOdoEntry &&
+          typeof prevOdoEntry.odometer_m === 'number' &&
+          maxOdoInMonth > prevOdoEntry.odometer_m
+        ) {
           deltaM = maxOdoInMonth - prevOdoEntry.odometer_m;
         }
       }
@@ -361,4 +365,3 @@ export const ActivityFeed = ({ entries }: Props) => {
     </div>
   );
 };
-

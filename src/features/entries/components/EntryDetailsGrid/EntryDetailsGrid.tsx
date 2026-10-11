@@ -15,11 +15,11 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import type React from 'react';
 import type { Entry } from '@/data/client/types';
+import entryDetailStyles from '@/routes/entries/$entryId/EntryDetail.module.scss';
 import { formatAmount } from '@/shared/lib/currencies';
 import { useAccountFuelGrades } from '@/shared/lib/fuel-grades';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './EntryDetailsGrid.styles';
-import entryDetailStyles from '@/routes/entries/$entryId/EntryDetail.module.scss';
 
 export interface Props {
   entry: Entry;
@@ -47,21 +47,19 @@ export const EntryDetailsGrid: React.FC<Props> = ({
     (entry.kind === 'refuel' || entry.kind === 'charge') &&
     Boolean(
       entry.fuel_grade ||
-      entry.fuel_volume !== undefined ||
-      entry.unit_price !== undefined ||
-      entry.is_full_tank !== undefined,
+        entry.fuel_volume !== undefined ||
+        entry.unit_price !== undefined ||
+        entry.is_full_tank !== undefined,
     );
 
   const hasServiceItems =
-    entry.kind === 'service' &&
-    Boolean(entry.sub_items && entry.sub_items.length > 0);
+    entry.kind === 'service' && Boolean(entry.sub_items && entry.sub_items.length > 0);
 
-  const hasExpenseCategory =
-    entry.kind === 'expense' &&
-    Boolean(entry.category);
+  const hasExpenseCategory = entry.kind === 'expense' && Boolean(entry.category);
 
-  const hasVendorOrLocation =
-    Boolean(entry.vendor_name || (entry.lat !== undefined && entry.lon !== undefined));
+  const hasVendorOrLocation = Boolean(
+    entry.vendor_name || (entry.lat !== undefined && entry.lon !== undefined),
+  );
 
   const hasNotes = Boolean(entry.notes && entry.notes.trim().length > 0);
   const hasImage = Boolean(entry.image_data);
@@ -110,20 +108,14 @@ export const EntryDetailsGrid: React.FC<Props> = ({
           <div style={styles.fuelStatsGrid}>
             {entry.fuel_grade && (
               <div style={styles.statBox}>
-                <span style={styles.statLabel}>
-                  {isCharge ? 'Charge Type' : 'Fuel Grade'}
-                </span>
-                <p style={styles.statValue}>
-                  {prettyGrade}
-                </p>
+                <span style={styles.statLabel}>{isCharge ? 'Charge Type' : 'Fuel Grade'}</span>
+                <p style={styles.statValue}>{prettyGrade}</p>
               </div>
             )}
 
             {entry.fuel_volume !== undefined && (
               <div style={styles.statBox}>
-                <span style={styles.statLabel}>
-                  {isCharge ? 'Energy' : 'Volume'}
-                </span>
+                <span style={styles.statLabel}>{isCharge ? 'Energy' : 'Volume'}</span>
                 <p style={styles.statValue}>
                   {entry.fuel_volume} {volumeUnit}
                 </p>
@@ -178,17 +170,13 @@ export const EntryDetailsGrid: React.FC<Props> = ({
               return (
                 <div key={item.id || idx} style={styles.serviceItemRow}>
                   <div style={styles.serviceItemLeft}>
-                    <div style={styles.serviceItemIconWrapper}>
-                      {getIconForIndex(idx)}
-                    </div>
+                    <div style={styles.serviceItemIconWrapper}>{getIconForIndex(idx)}</div>
                     <div style={styles.serviceItemInfo}>
                       <span style={styles.serviceItemTitle}>
                         {item.name || 'Service line item'}
                       </span>
                       {item.partNumber && (
-                        <span style={styles.serviceItemPartNum}>
-                          Part #{item.partNumber}
-                        </span>
+                        <span style={styles.serviceItemPartNum}>Part #{item.partNumber}</span>
                       )}
                     </div>
                   </div>
@@ -234,7 +222,10 @@ export const EntryDetailsGrid: React.FC<Props> = ({
           >
             Expense Category
           </Typography>
-          <Typography variant="body2" sx={{ fontWeight: 600, textTransform: 'capitalize', color: 'primary.main' }}>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, textTransform: 'capitalize', color: 'primary.main' }}
+          >
             {entry.category}
           </Typography>
         </GlassCard>
@@ -259,11 +250,7 @@ export const EntryDetailsGrid: React.FC<Props> = ({
                 Vendor &amp; Location
               </Typography>
             </div>
-            {entry.business ? (
-              <span style={styles.businessBadge}>
-                Business Location
-              </span>
-            ) : null}
+            {entry.business ? <span style={styles.businessBadge}>Business Location</span> : null}
           </div>
 
           <div style={styles.vendorBeaconBox}>
@@ -272,12 +259,24 @@ export const EntryDetailsGrid: React.FC<Props> = ({
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
               {entry.vendor_name && (
-                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--mui-palette-text-primary)' }}>
+                <span
+                  style={{
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    color: 'var(--mui-palette-text-primary)',
+                  }}
+                >
                   {entry.vendor_name}
                 </span>
               )}
               {entry.lat !== undefined && entry.lon !== undefined && (
-                <span style={{ fontSize: '0.72rem', color: 'var(--mui-palette-text-secondary)', marginTop: 2 }}>
+                <span
+                  style={{
+                    fontSize: '0.72rem',
+                    color: 'var(--mui-palette-text-secondary)',
+                    marginTop: 2,
+                  }}
+                >
                   {entry.lat.toFixed(5)}, {entry.lon.toFixed(5)}
                 </span>
               )}
@@ -317,9 +316,7 @@ export const EntryDetailsGrid: React.FC<Props> = ({
             </Typography>
           </div>
           <div style={styles.memoContainer}>
-            <p style={styles.memoText}>
-              {entry.notes}
-            </p>
+            <p style={styles.memoText}>{entry.notes}</p>
           </div>
         </GlassCard>
       )}
@@ -364,10 +361,7 @@ export const EntryDetailsGrid: React.FC<Props> = ({
             </div>
           </div>
 
-          <div
-            onClick={onOpenImage}
-            style={styles.attachmentCardInteractive}
-          >
+          <div onClick={onOpenImage} style={styles.attachmentCardInteractive}>
             <div style={styles.attachmentThumbnailBox}>
               <img
                 src={entry.image_data}
@@ -392,7 +386,13 @@ export const EntryDetailsGrid: React.FC<Props> = ({
               >
                 Receipt Document
               </span>
-              <span style={{ fontSize: '0.68rem', color: 'var(--mui-palette-text-secondary)', marginTop: 2 }}>
+              <span
+                style={{
+                  fontSize: '0.68rem',
+                  color: 'var(--mui-palette-text-secondary)',
+                  marginTop: 2,
+                }}
+              >
                 WebP Image • Attached Media
               </span>
               <span
