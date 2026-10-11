@@ -2,12 +2,13 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSession } from '../_lib/auth.js';
 import { CARETO_MCP_TOOLS, executeMCPTool } from '../_lib/mcp/tools.js';
 import { handleOAuth } from '../_lib/mcp/oauth.js';
+import { handleKeys } from '../_lib/mcp/keys.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     // Handle CORS preflight
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
@@ -22,6 +23,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const session = await getSession(req.headers);
+
+    // Delegate API key management requests
+    if (action === 'keys' || ['list', 'create', 'revoke'].includes(action)) {
+      return await handleKeys(req, res, session);
+    }
 
     // SSE Transport initiation
     if (req.method === 'GET' && (action === 'sse' || !action)) {

@@ -45,7 +45,18 @@ export async function handleOAuth(req: VercelRequest, res: VercelResponse) {
     )
   `;
 
-  const subAction = (req.query.subAction as string) || (req.query.action as string) || (req.body?.action as string);
+  // Extract subAction from path or query or body
+  // e.g. /oauth/authorize, /oauth/token, /oauth/register OR ?subAction=... OR ?op=...
+  const urlPath = req.url?.split('?')[0] || '';
+  const pathParts = urlPath.split('/').filter(Boolean);
+  const lastPart = pathParts[pathParts.length - 1];
+  const isKnownAction = ['authorize', 'token', 'register'].includes(lastPart || '');
+
+  const subAction =
+    (isKnownAction ? lastPart : null) ||
+    (req.query.subAction as string) ||
+    (req.query.action as string !== 'oauth' ? (req.query.action as string) : null) ||
+    (req.body?.action as string);
 
   // 1. Dynamic Client Registration (RFC 7591)
   if (subAction === 'register' && req.method === 'POST') {
@@ -138,13 +149,33 @@ export async function handleOAuth(req: VercelRequest, res: VercelResponse) {
 
   // 3. Token Endpoint (POST)
   if (subAction === 'token' && req.method === 'POST') {
-    const {
-      grant_type = 'authorization_code',
-      code,
-      redirect_uri,
-      client_id,
-      code_verifier,
-    } = req.body || {};
+    let body = req.body || {};
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        const search = new URLSearchParams(body);
+        body = Object.fromEntries(search.entries());
+      }
+    }
+
+    // Also check Basic Auth for client_id/client_secret
+    let basicClientId: string | undefined;
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Basic ')) {
+      try {
+        const decoded = Buffer.from(authHeader.slice(6), 'base64').toString('utf-8');
+        const [u] = decoded.split(':');
+        basicClientId = u;
+      } catch {
+        // ignore
+      }
+    }
+
+    const grant_type = body.grant_type || req.query.grant_type || 'authorization_code';
+    const code = body.code || req.query.code;
+    const client_id = body.client_id || basicClientId || req.query.client_id;
+    const code_verifier = body.code_verifier || req.query.code_verifier;
 
     if (grant_type !== 'authorization_code') {
       return res.status(400).json({ error: 'unsupported_grant_type' });
@@ -191,6 +222,7 @@ export async function handleOAuth(req: VercelRequest, res: VercelResponse) {
       access_token: tokenSecret,
       token_type: 'Bearer',
       expires_in: 365 * 86400,
+      refresh_token: tokenSecret,
       scope: authCode.scope || 'careto.read careto.write',
     });
   }

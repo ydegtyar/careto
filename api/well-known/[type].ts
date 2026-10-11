@@ -30,9 +30,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // RFC 8414: OAuth 2.0 Authorization Server Metadata
     return res.status(200).json({
       issuer: baseUrl,
-      authorization_endpoint: `${baseUrl}/api/mcp/oauth?action=authorize`,
-      token_endpoint: `${baseUrl}/api/mcp/oauth?action=token`,
-      registration_endpoint: `${baseUrl}/api/mcp/oauth?action=register`,
+      authorization_endpoint: `${baseUrl}/oauth/authorize`,
+      token_endpoint: `${baseUrl}/oauth/token`,
+      registration_endpoint: `${baseUrl}/oauth/register`,
       response_types_supported: ['code'],
       grant_types_supported: ['authorization_code', 'refresh_token'],
       code_challenge_methods_supported: ['S256', 'plain'],
