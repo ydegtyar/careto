@@ -121,14 +121,12 @@ export const LocationMapDialog: React.FC<LocationMapDialogProps> = ({
         }
       } catch {
         // Keep existing address or fallback
-        if (!address) {
-          setAddress(`${lat.toFixed(4)}, ${lon.toFixed(4)}`);
-        }
+        setAddress((prev) => prev || `${lat.toFixed(4)}, ${lon.toFixed(4)}`);
       } finally {
         setIsGeocoding(false);
       }
     },
-    [address],
+    [NOMINATIM_BASE_URL],
   );
 
   // Update position helper

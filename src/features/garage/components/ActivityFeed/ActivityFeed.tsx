@@ -4,11 +4,11 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import SpeedIcon from '@mui/icons-material/Speed';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import Typography from '@mui/material/Typography';
-import { useMemo, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { useMemo } from 'react';
 import type { Entry } from '@/data/client/types';
 import styles from './ActivityFeed.module.scss';
 import { ActivityItemRow } from './ActivityItemRow';
-import { EntryDetailDialog } from './EntryDetailDialog';
 
 type Props = {
   entries: Entry[];
@@ -17,7 +17,7 @@ type Props = {
 export type EntryRecord = Entry;
 
 export const ActivityFeed = ({ entries }: Props) => {
-  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
+  const navigate = useNavigate();
 
   const sortedEntries = useMemo(() => {
     return [...entries].sort((a, b) => {
@@ -44,11 +44,7 @@ export const ActivityFeed = ({ entries }: Props) => {
   };
 
   const handleOpenDetail = (entry: Entry) => {
-    setSelectedEntry(entry);
-  };
-
-  const handleClose = () => {
-    setSelectedEntry(null);
+    navigate({ to: `/entries/${entry.id}` });
   };
 
   return (
@@ -75,13 +71,6 @@ export const ActivityFeed = ({ entries }: Props) => {
           ))
         )}
       </div>
-
-      {/* Entry Detail / Edit Dialog */}
-      <EntryDetailDialog
-        entry={selectedEntry}
-        open={Boolean(selectedEntry)}
-        onClose={handleClose}
-      />
     </div>
   );
-}
+};

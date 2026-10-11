@@ -311,7 +311,11 @@ function EntryDetailPage() {
       </GlassCard>
 
       {/* Type-Specific: Refuel Details */}
-      {(entry.kind === 'refuel' || entry.kind === 'charge') && (
+      {(entry.kind === 'refuel' || entry.kind === 'charge') &&
+        (entry.fuel_grade ||
+          entry.fuel_volume !== undefined ||
+          entry.unit_price !== undefined ||
+          entry.is_full_tank !== undefined) && (
         <GlassCard style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Typography variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: 1, color: 'text.secondary', fontWeight: 700 }}>
             Fueling Breakdown
