@@ -146,3 +146,28 @@ export const apiKeys = pgTable('api_keys', {
   revokedAt: timestamp('revoked_at', { withTimezone: true }),
 });
 
+export const oauthClients = pgTable('oauth_clients', {
+  clientId: text('client_id').primaryKey(),
+  clientSecret: text('client_secret'),
+  clientName: text('client_name'),
+  redirectUris: jsonb('redirect_uris').notNull(),
+  grantTypes: jsonb('grant_types'),
+  responseTypes: jsonb('response_types'),
+  tokenEndpointAuthMethod: text('token_endpoint_auth_method').default('none'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const oauthCodes = pgTable('oauth_codes', {
+  code: text('code').primaryKey(),
+  clientId: text('client_id').notNull(),
+  userId: uuid('user_id').notNull(),
+  redirectUri: text('redirect_uri').notNull(),
+  codeChallenge: text('code_challenge'),
+  codeChallengeMethod: text('code_challenge_method'),
+  scope: text('scope'),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  usedAt: timestamp('used_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+

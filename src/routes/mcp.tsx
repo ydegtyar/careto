@@ -263,15 +263,18 @@ function McpDocumentationPage() {
 
           <div>
             <Typography variant="caption" sx={{ fontWeight: 700, color: 'primary.main' }}>
-              JSON-RPC / Message Post Endpoint
+              OAuth 2.1 Discovery (Gemini & ChatGPT)
             </Typography>
             <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
-              POST /api/mcp/messages
+              GET /.well-known/oauth-protected-resource
+            </Typography>
+            <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
+              GET /.well-known/oauth-authorization-server
             </Typography>
           </div>
 
           <Alert severity="success" sx={{ borderRadius: 2, mt: 1 }}>
-            Supports standard{' '}
+            Fully compatible with <strong>Gemini & ChatGPT OAuth 2.1</strong> standard discovery as well as static{' '}
             <code style={{ fontWeight: 700 }}>Authorization: Bearer careto_sk_...</code> headers.
           </Alert>
         </div>

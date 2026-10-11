@@ -15,9 +15,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const session = await getSession(req.headers);
     if (!session) {
+      const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
+      const host = req.headers.host || 'careto.vercel.app';
+      const baseUrl = `${proto}://${host}`;
+
+      res.setHeader(
+        'WWW-Authenticate',
+        `Bearer error="invalid_token", error_description="Unauthorized", resource_metadata="${baseUrl}/.well-known/oauth-protected-resource"`,
+      );
+
       return res.status(401).json({
         jsonrpc: '2.0',
-        error: { code: -32001, message: 'Unauthorized. Bearer careto_sk_... API key or valid session required.' },
+        error: { code: -32001, message: 'Unauthorized. Bearer careto_sk_... API key, OAuth token, or valid session required.' },
         id: null,
       });
     }
