@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
-import { sql } from '../_lib/db.js';
-import { getSession } from '../_lib/auth.js';
+import { sql } from '../db.js';
+import { getSession } from '../auth.js';
 
 function base64UrlEncode(str: Buffer): string {
   return str.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
@@ -15,16 +15,7 @@ function verifyCodeChallenge(verifier: string, challenge: string, method = 'S256
   return base64UrlEncode(hash) === challenge;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
+export async function handleOAuth(req: VercelRequest, res: VercelResponse) {
   // Ensure tables exist safely
   await sql`
     CREATE TABLE IF NOT EXISTS oauth_clients (
@@ -54,10 +45,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     )
   `;
 
-  const action = (req.query.action as string) || (req.body?.action as string);
+  const subAction = (req.query.subAction as string) || (req.query.action as string) || (req.body?.action as string);
 
   // 1. Dynamic Client Registration (RFC 7591)
-  if (action === 'register' && req.method === 'POST') {
+  if (subAction === 'register' && req.method === 'POST') {
     const {
       client_name = 'Gemini / ChatGPT MCP Client',
       redirect_uris = [],
@@ -97,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // 2. Authorize Endpoint (GET or POST)
-  if (action === 'authorize') {
+  if (subAction === 'authorize') {
     const {
       client_id,
       redirect_uri,
@@ -115,7 +106,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Check user session
     const session = await getSession(req.headers);
 
-    // If user is not logged in, redirect them to sign-in with a return URL
+    // If user is not logged in, redirect them to sign-in with return URL
     if (!session) {
       const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
       const host = req.headers.host || 'careto.vercel.app';
@@ -123,7 +114,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.redirect(302, `/sign-in?redirect=${encodeURIComponent(currentFullUrl)}`);
     }
 
-    // If user is logged in, generate code and redirect back to client
+    // Generate code and redirect back to client
     const code = `careto_code_${crypto.randomBytes(24).toString('hex')}`;
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
 
@@ -146,7 +137,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // 3. Token Endpoint (POST)
-  if (action === 'token' && req.method === 'POST') {
+  if (subAction === 'token' && req.method === 'POST') {
     const {
       grant_type = 'authorization_code',
       code,
@@ -204,5 +195,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  return res.status(400).json({ error: 'invalid_request', error_description: `Unknown action: ${action}` });
+  return res.status(400).json({ error: 'invalid_request', error_description: `Unknown subAction: ${subAction}` });
 }

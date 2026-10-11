@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSession } from '../_lib/auth.js';
 import { CARETO_MCP_TOOLS, executeMCPTool } from '../_lib/mcp/tools.js';
+import { handleOAuth } from '../_lib/mcp/oauth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -11,6 +12,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'OPTIONS') {
       return res.status(200).end();
+    }
+
+    const action = req.query.action as string;
+
+    // Delegate OAuth requests
+    if (action === 'oauth') {
+      return await handleOAuth(req, res);
     }
 
     const session = await getSession(req.headers);
@@ -30,8 +38,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         id: null,
       });
     }
-
-    const action = req.query.action as string;
 
     // SSE Transport initiation
     if (req.method === 'GET' && action === 'sse') {
