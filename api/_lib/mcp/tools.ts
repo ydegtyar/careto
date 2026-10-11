@@ -1,5 +1,7 @@
 import { sql } from '../db.js';
 import { runWaterfallParse } from '../ai/waterfall.js';
+import { computeDue } from '../../../src/features/reminders/lib/compute-due.js';
+import { hasRole } from '../acl.js';
 
 export interface MCPToolDefinition {
   name: string;
@@ -29,50 +31,148 @@ export const CARETO_MCP_TOOLS: MCPToolDefinition[] = [
   },
   {
     name: 'careto_analyze_spendings',
-    description: 'Calculates and analyzes vehicle spendings, cost per kilometer, fuel expenses, maintenance, and category breakdown.',
+    description: 'Calculates and analyzes vehicle spendings, cost per kilometer, fuel expenses, maintenance, and category breakdown from logged entries.',
     inputSchema: {
       type: 'object',
       properties: {
         vehicleId: { type: 'string', description: 'UUID of the vehicle' },
         startDate: { type: 'string', description: 'ISO start date YYYY-MM-DD' },
         endDate: { type: 'string', description: 'ISO end date YYYY-MM-DD' },
-        category: { type: 'string', description: 'Filter by category (e.g. fuel, service, parking, wash, insurance, fine)' },
+        category: { type: 'string', description: 'Filter by category or kind (e.g. fuel, refuel, service, parking, wash, insurance, fine)' },
       },
       required: ['vehicleId'],
     },
   },
   {
     name: 'careto_get_reminders',
-    description: 'Fetch active, upcoming, or overdue service and maintenance reminders for a vehicle.',
+    description: 'Fetch active, upcoming, or overdue service and maintenance reminders for a vehicle, including complete recurrence schedules, next due mileage/date, and progress status.',
     inputSchema: {
       type: 'object',
       properties: {
         vehicleId: { type: 'string', description: 'UUID of the vehicle' },
-        statusFilter: { type: 'string', enum: ['all', 'due', 'overdue'], description: 'Filter reminders status' },
+        statusFilter: { 
+          type: 'string', 
+          enum: ['all', 'due', 'upcoming', 'overdue', 'ok', 'snoozed'], 
+          description: 'Filter reminders by status: "all", "due" (due soon or overdue), "upcoming", "overdue", "ok", or "snoozed". Defaults to "all".' 
+        },
       },
       required: ['vehicleId'],
     },
   },
   {
+    name: 'careto_create_reminder',
+    description: 'Create a maintenance reminder for a vehicle, supporting mileage-based, calendar date-based, or dual-interval service schedules.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        vehicleId: { type: 'string', description: 'UUID of the vehicle' },
+        title: { type: 'string', description: 'Reminder title / task description (e.g. "Engine Oil & Filter Change", "Brake Pad Inspection")' },
+        kind: { 
+          type: 'string', 
+          description: 'Maintenance category: "service", "fluids", "tires", "brakes", "filters", "transmission", "spark_plugs", "battery", "inspection", "timing_belt", or custom category name. Defaults to "service".' 
+        },
+        mode: { 
+          type: 'string', 
+          enum: ['km', 'time', 'earlier', 'later', 'seasonal'], 
+          description: 'Trigger mode: "km" (distance only), "time" (calendar only), "earlier" (whichever threshold comes first), "later" (both thresholds must elapse), or "seasonal" (calendar changeover cycle). Defaults to "earlier".' 
+        },
+        intervalKm: { type: 'number', description: 'Recurring mileage interval in kilometers (e.g. 10000 for every 10,000 km)' },
+        intervalDays: { type: 'number', description: 'Recurring calendar interval in days (e.g. 365 for 1 year, 180 for 6 months)' },
+        baseOdometerKm: { type: 'number', description: 'Odometer reading in kilometers at last completed service baseline' },
+        baseDate: { type: 'string', description: 'ISO date YYYY-MM-DD of last completed service baseline' },
+        leadKm: { type: 'number', description: 'Advance warning threshold in kilometers (default 500 km)' },
+        leadDays: { type: 'number', description: 'Advance warning threshold in days (default 14 days)' },
+        estimatedCost: { type: 'number', description: 'Estimated service cost in currency units (e.g. 120.00)' },
+        notes: { type: 'string', description: 'Additional service details, part numbers, or technician notes' },
+      },
+      required: ['vehicleId', 'title'],
+    },
+  },
+  {
+    name: 'careto_update_reminder',
+    description: 'Update an existing maintenance reminder by reminderId. Only explicitly provided fields are updated; omitted fields are preserved.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        vehicleId: { type: 'string', description: 'UUID of the vehicle' },
+        reminderId: { type: 'string', description: 'UUID of the reminder to update' },
+        title: { type: 'string', description: 'Updated title' },
+        kind: { type: 'string', description: 'Updated category ("service", "fluids", "brakes", "tires", etc.)' },
+        mode: { type: 'string', enum: ['km', 'time', 'earlier', 'later', 'seasonal'], description: 'Updated schedule mode' },
+        intervalKm: { type: 'number', description: 'Updated recurring interval in kilometers' },
+        intervalDays: { type: 'number', description: 'Updated recurring interval in days' },
+        baseOdometerKm: { type: 'number', description: 'Updated base odometer reading in kilometers' },
+        baseDate: { type: 'string', description: 'Updated base service date (YYYY-MM-DD)' },
+        leadKm: { type: 'number', description: 'Updated advance warning distance in kilometers' },
+        leadDays: { type: 'number', description: 'Updated advance warning time in days' },
+        estimatedCost: { type: 'number', description: 'Updated estimated cost' },
+        snoozedUntil: { type: 'string', description: 'Snooze reminder until ISO date YYYY-MM-DD' },
+        notes: { type: 'string', description: 'Updated notes' },
+      },
+      required: ['vehicleId', 'reminderId'],
+    },
+  },
+  {
+    name: 'careto_delete_reminder',
+    description: 'Delete or tombstone a maintenance reminder by reminderId with tenant and vehicle permission verification. Requires explicit user intent (confirmed=true).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        vehicleId: { type: 'string', description: 'UUID of the vehicle' },
+        reminderId: { type: 'string', description: 'UUID of the reminder to delete' },
+        confirmed: { type: 'boolean', description: 'Must be true to execute deletion with implicit user consent.' },
+        confirmationReason: { type: 'string', description: 'Reason or prompt confirming deletion intent' },
+      },
+      required: ['vehicleId', 'reminderId', 'confirmed'],
+    },
+  },
+  {
+    name: 'careto_complete_reminder',
+    description: 'Mark a maintenance reminder as completed. Resets/advances the baseline date and odometer, and optionally logs an expense/service entry to the vehicle timeline.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        vehicleId: { type: 'string', description: 'UUID of the vehicle' },
+        reminderId: { type: 'string', description: 'UUID of the reminder completed' },
+        completedDate: { type: 'string', description: 'ISO date of completion YYYY-MM-DD (defaults to today)' },
+        completedOdometerKm: { type: 'number', description: 'Odometer reading in kilometers at completion' },
+        cost: { type: 'number', description: 'Actual cost of the service' },
+        currency: { type: 'string', description: 'Currency code (default USD)' },
+        merchant: { type: 'string', description: 'Workshop, dealership, or merchant name' },
+        notes: { type: 'string', description: 'Completion notes or service details' },
+        createServiceEntry: { type: 'boolean', description: 'Whether to log a service entry in timeline "entries" (defaults to true if cost or merchant provided)' },
+      },
+      required: ['vehicleId', 'reminderId'],
+    },
+  },
+  {
     name: 'careto_add_entry',
-    description: 'Add a new rich record (expense, fueling, EV charge session, service log, note, or maintenance) to a vehicle.',
+    description: 'Add a new rich record to a vehicle timeline. All costs, fuelings, services, and general expenses are stored as timeline "entries" (kind: expense | refuel | charge | service), while notes and reminders use "notes" and "reminders".',
     inputSchema: {
       type: 'object',
       properties: {
         vehicleId: { type: 'string', description: 'UUID of the vehicle' },
         tbl: { 
           type: 'string', 
-          enum: ['expenses', 'notes', 'reminders'], 
-          description: 'Target table/type of record (defaults to expenses)' 
+          enum: ['entries', 'notes', 'reminders'], 
+          description: 'Target table of record: "entries" for all expenses, refuels, charges, and services; "notes" for vehicle notes; "reminders" for maintenance reminders. Defaults to "entries".' 
         },
-        amount: { type: 'number', description: 'Total cost / amount' },
+        kind: {
+          type: 'string',
+          enum: ['expense', 'refuel', 'charge', 'service'],
+          description: 'Entry kind when tbl="entries". Defaults to "refuel" if fuelVolumeL is present, "service" if subItems are present, or "expense".',
+        },
+        amount: { type: 'number', description: 'Total cost / amount in currency (e.g. 45.50)' },
+        currency: { type: 'string', description: 'Currency code (e.g. USD, EUR, UAH). Defaults to vehicle/local currency.' },
         date: { type: 'string', description: 'ISO date string YYYY-MM-DD' },
-        category: { type: 'string', description: 'Category: fuel, service, wash, parking, fine, insurance, or custom' },
-        notes: { type: 'string', description: 'Notes or description of expense / service' },
+        category: { type: 'string', description: 'Expense category: fuel, service, wash, parking, fine, insurance, or custom' },
+        notes: { type: 'string', description: 'Notes or description of entry / service' },
         odometerKm: { type: 'number', description: 'Odometer reading in kilometers' },
         merchant: { type: 'string', description: 'Vendor, workshop, or gas station name' },
         fuelVolumeL: { type: 'number', description: 'Liters / gallons of fuel or kWh charged' },
         pricePerUnit: { type: 'number', description: 'Price per unit/liter/kWh' },
+        fuelGrade: { type: 'string', description: 'Fuel grade name e.g. "Gasoline", "95 Octane", "Diesel"' },
+        isBusiness: { type: 'boolean', description: 'Whether this entry is for business mileage / business expense' },
         subItems: {
           type: 'array',
           items: {
@@ -93,7 +193,7 @@ export const CARETO_MCP_TOOLS: MCPToolDefinition[] = [
   },
   {
     name: 'careto_analyze_image_and_create_entry',
-    description: 'Use Careto Vision AI to analyze receipt images, fuel pumps, service invoices, dashboard odometers, or tire sidewalls and create a rich entry.',
+    description: 'Use Careto Vision AI to analyze receipt images, fuel pumps, service invoices, dashboard odometers, or tire sidewalls and create a rich entry on the vehicle timeline.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -123,7 +223,7 @@ export const CARETO_MCP_TOOLS: MCPToolDefinition[] = [
   },
   {
     name: 'careto_get_filling_helpers',
-    description: 'Get auto-completion suggestions for filling expenses (latest odometer, recent merchants, common fuel prices).',
+    description: 'Get auto-completion suggestions for entries and refuels (latest odometer reading, recent merchants, common fuel prices).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -134,7 +234,7 @@ export const CARETO_MCP_TOOLS: MCPToolDefinition[] = [
   },
   {
     name: 'careto_delete_entry',
-    description: 'Delete or tombstone an entry (expense, note, or reminder) from a vehicle timeline. Requires implicit user consent: the caller must specify confirmed=true with confirmationReason describing user approval.',
+    description: 'Delete or tombstone an entry (expense/refuel/service entry, note, or reminder) from a vehicle timeline. Requires implicit user consent: the caller must specify confirmed=true with confirmationReason describing user approval.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -142,8 +242,8 @@ export const CARETO_MCP_TOOLS: MCPToolDefinition[] = [
         entryId: { type: 'string', description: 'UUID of the entry / record to delete' },
         tbl: { 
           type: 'string', 
-          enum: ['expenses', 'notes', 'reminders'], 
-          description: 'Table / category of the record (defaults to expenses)' 
+          enum: ['entries', 'notes', 'reminders'], 
+          description: 'Table / category of the record: "entries" (for all expenses, refuels, services), "notes", or "reminders". Defaults to "entries".' 
         },
         confirmed: { 
           type: 'boolean', 
@@ -194,7 +294,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         SELECT id, data, updated_at
         FROM records
         WHERE vehicle_id = ${vehicleId}::uuid 
-          AND tbl = 'expenses' 
+          AND tbl = 'entries' 
           AND deleted = false
       `;
 
@@ -204,20 +304,34 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         updatedAt: r.updated_at,
       }));
 
-      if (startDate) items = items.filter((i) => i.date >= startDate);
-      if (endDate) items = items.filter((i) => i.date <= endDate);
-      if (category) items = items.filter((i) => (i.category || '').toLowerCase() === category.toLowerCase());
+      if (startDate) items = items.filter((i) => (i.occurred_on || i.date) >= startDate);
+      if (endDate) items = items.filter((i) => (i.occurred_on || i.date) <= endDate);
+      if (category) {
+        const catLower = category.toLowerCase();
+        items = items.filter((i) => 
+          (i.category || '').toLowerCase() === catLower ||
+          (i.category_id || '').toLowerCase() === catLower ||
+          (i.kind || '').toLowerCase() === catLower
+        );
+      }
 
-      const totalCost = items.reduce((sum, item) => sum + (Number(item.amount) || Number(item.cost) || 0), 0);
+      const totalCost = items.reduce((sum, item) => {
+        const amt = item.amount ?? (item.amount_minor ? item.amount_minor / 100 : item.cost) ?? 0;
+        return sum + (Number(amt) || 0);
+      }, 0);
+
       const totalFuelVolume = items
-        .filter((i) => i.category === 'fuel' || i.fuelVolume)
-        .reduce((sum, item) => sum + (Number(item.fuelVolume) || Number(item.volume) || 0), 0);
+        .filter((i) => i.kind === 'refuel' || i.category === 'fuel' || i.category_id === 'fuel' || i.fuel_volume || i.fuelVolume || i.volume_ml)
+        .reduce((sum, item) => {
+          const vol = item.fuel_volume ?? item.fuelVolume ?? (item.volume_ml ? item.volume_ml / 1000 : 0);
+          return sum + (Number(vol) || 0);
+        }, 0);
 
       const byCategory: Record<string, number> = {};
       for (const item of items) {
-        const cat = item.category || 'other';
-        const cost = Number(item.amount) || Number(item.cost) || 0;
-        byCategory[cat] = (byCategory[cat] || 0) + cost;
+        const cat = item.category || item.category_id || item.kind || 'other';
+        const cost = item.amount ?? (item.amount_minor ? item.amount_minor / 100 : item.cost) ?? 0;
+        byCategory[cat] = (byCategory[cat] || 0) + (Number(cost) || 0);
       }
 
       return {
@@ -233,57 +347,607 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
 
     case 'careto_get_reminders': {
       const { vehicleId, statusFilter = 'all' } = args;
+
+      // Verify access to vehicle
+      const canRead = await hasRole(userId, vehicleId, 'viewer');
+      if (!canRead) throw new Error('Vehicle not found or unauthorized');
+
+      // Fetch vehicle metadata for current odometer and units
+      const vehicleRows = await sql`
+        SELECT initial_odometer_m, distance_unit FROM vehicles WHERE id = ${vehicleId}::uuid LIMIT 1
+      `;
+      const initialOdoM = Number(vehicleRows[0]?.initial_odometer_m) || 0;
+
+      // Find highest odometer reading from vehicle entries
+      const entryRows = await sql`
+        SELECT data FROM records 
+        WHERE vehicle_id = ${vehicleId}::uuid AND tbl = 'entries' AND deleted = false
+      `;
+      let currentOdometerM = initialOdoM;
+      for (const row of entryRows) {
+        const d = (row.data as Record<string, any>) || {};
+        const odoM = d.odometer_m !== undefined && d.odometer_m !== null
+          ? Number(d.odometer_m)
+          : (d.odometerKm !== undefined && d.odometerKm !== null ? Number(d.odometerKm) * 1000 : null);
+        if (odoM && odoM > currentOdometerM) {
+          currentOdometerM = odoM;
+        }
+      }
+
       const records = await sql`
-        SELECT id, data
+        SELECT id, data, updated_at
         FROM records
         WHERE vehicle_id = ${vehicleId}::uuid 
           AND tbl = 'reminders' 
           AND deleted = false
+        ORDER BY updated_at DESC
       `;
 
-      const reminders: Array<Record<string, any>> = records.map((r) => ({ id: r.id, ...(r.data as Record<string, any>) }));
-      
-      const nowIso = new Date().toISOString().slice(0, 10);
-      const analyzed = reminders.map((rem) => {
-        let isOverdue = false;
-        let isDue = false;
+      const todayIso = new Date().toISOString().slice(0, 10);
 
-        if (rem.dueDate && rem.dueDate < nowIso) isOverdue = true;
-        else if (rem.dueDate && rem.dueDate <= new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10)) isDue = true;
+      const reminders = records.map((r) => {
+        const d = (r.data as Record<string, any>) || {};
+        const mode = d.mode || (d.interval_m ? 'km' : (d.interval_days ? 'time' : 'earlier'));
+        
+        const dueRes = computeDue(
+          {
+            id: r.id,
+            kind: d.kind,
+            title: d.title,
+            mode,
+            interval_m: d.interval_m,
+            interval_days: d.interval_days,
+            base_odometer_m: d.base_odometer_m,
+            base_date: d.base_date,
+            lead_m: d.lead_m ?? 500_000,
+            lead_days: d.lead_days ?? 14,
+            snoozed_until: d.snoozed_until,
+          },
+          {
+            currentOdometerM,
+            currentDate: todayIso,
+          },
+        );
 
         return {
-          ...rem,
-          status: isOverdue ? 'overdue' : isDue ? 'due' : 'active',
+          id: r.id,
+          title: d.title,
+          kind: d.kind || 'service',
+          mode,
+          status: dueRes.status,
+          reason: dueRes.reason,
+          percent: dueRes.percent,
+          // Recurrence configuration
+          intervalKm: d.interval_m !== undefined && d.interval_m !== null ? Math.round(d.interval_m / 1000) : null,
+          intervalDays: d.interval_days ?? null,
+          baseOdometerKm: d.base_odometer_m !== undefined && d.base_odometer_m !== null ? Math.round(d.base_odometer_m / 1000) : null,
+          baseDate: d.base_date ?? null,
+          leadKm: d.lead_m !== undefined && d.lead_m !== null ? Math.round(d.lead_m / 1000) : 500,
+          leadDays: d.lead_days ?? 14,
+          estimatedCost: d.est_cost_usd_minor !== undefined && d.est_cost_usd_minor !== null ? d.est_cost_usd_minor / 100 : null,
+          snoozedUntil: d.snoozed_until ?? null,
+          notes: d.notes ?? null,
+          // Calculated targets
+          targetOdometerKm: dueRes.targetOdometerM !== null ? Math.round(dueRes.targetOdometerM / 1000) : null,
+          remainingKm: dueRes.remainingM !== null ? Math.round(dueRes.remainingM / 1000) : null,
+          targetDate: dueRes.targetDate,
+          remainingDays: dueRes.remainingDays,
+          projectedDueDate: dueRes.projectedDueDate,
+          currentVehicleOdometerKm: Math.round(currentOdometerM / 1000),
+          updatedAt: r.updated_at,
         };
       });
 
-      let filtered = analyzed;
-      if (statusFilter === 'due') filtered = analyzed.filter((r) => r.status === 'due' || r.status === 'overdue');
-      if (statusFilter === 'overdue') filtered = analyzed.filter((r) => r.status === 'overdue');
+      let filtered = reminders;
+      if (statusFilter === 'due') {
+        filtered = reminders.filter((r) => r.status === 'due' || r.status === 'overdue');
+      } else if (statusFilter === 'overdue') {
+        filtered = reminders.filter((r) => r.status === 'overdue');
+      } else if (statusFilter === 'upcoming') {
+        filtered = reminders.filter((r) => r.status === 'upcoming');
+      } else if (statusFilter === 'ok') {
+        filtered = reminders.filter((r) => r.status === 'ok');
+      } else if (statusFilter === 'snoozed') {
+        filtered = reminders.filter((r) => r.status === 'snoozed');
+      }
 
-      return { reminders: filtered };
+      return {
+        vehicleId,
+        currentVehicleOdometerKm: Math.round(currentOdometerM / 1000),
+        totalCount: reminders.length,
+        filteredCount: filtered.length,
+        reminders: filtered,
+      };
     }
 
-    case 'careto_add_entry': {
-      const { vehicleId, tbl = 'expenses', amount, date = new Date().toISOString().slice(0, 10), category = 'other', notes, odometerKm, merchant, fuelVolumeL, pricePerUnit, subItems } = args;
+    case 'careto_create_reminder': {
+      const {
+        vehicleId,
+        title,
+        kind = 'service',
+        mode = 'earlier',
+        intervalKm,
+        intervalDays,
+        baseOdometerKm,
+        baseDate,
+        leadKm = 500,
+        leadDays = 14,
+        estimatedCost,
+        notes,
+      } = args;
 
-      const recordId = crypto.randomUUID();
+      if (!title || typeof title !== 'string' || !title.trim()) {
+        throw new Error('Reminder title is required');
+      }
+
+      const canEdit = await hasRole(userId, vehicleId, 'editor');
+      if (!canEdit) throw new Error('Forbidden: Editor permission required for vehicle');
+
+      const reminderId = crypto.randomUUID();
       const hlc = `${Date.now()}-0000-0000`;
 
-      const patch = {
-        id: recordId,
+      const intervalM = intervalKm !== undefined && intervalKm !== null ? Math.round(Number(intervalKm) * 1000) : undefined;
+      const intervalDaysNum = intervalDays !== undefined && intervalDays !== null ? Number(intervalDays) : undefined;
+      const baseOdoM = baseOdometerKm !== undefined && baseOdometerKm !== null ? Math.round(Number(baseOdometerKm) * 1000) : undefined;
+      const leadM = leadKm !== undefined && leadKm !== null ? Math.round(Number(leadKm) * 1000) : 500_000;
+      const leadDaysNum = leadDays !== undefined && leadDays !== null ? Number(leadDays) : 14;
+      const estCostMinor = estimatedCost !== undefined && estimatedCost !== null ? Math.round(Number(estimatedCost) * 100) : undefined;
+
+      const patch: Record<string, any> = {
+        id: reminderId,
+        title: title.trim(),
+        kind: kind || 'service',
+        mode,
+        interval_m: intervalM,
+        interval_days: intervalDaysNum,
+        base_odometer_m: baseOdoM,
+        base_date: baseDate || undefined,
+        lead_m: leadM,
+        lead_days: leadDaysNum,
+        est_cost_usd_minor: estCostMinor,
+        notes: notes || undefined,
+      };
+
+      const colHlc: Record<string, string> = {};
+      for (const k of Object.keys(patch)) colHlc[k] = hlc;
+
+      const v = await sql`SELECT seq FROM vehicles WHERE id = ${vehicleId}::uuid FOR UPDATE LIMIT 1`;
+      if (v.length === 0) throw new Error('Vehicle not found');
+      const nextSeq = (Number(v[0]?.seq) || 0) + 1;
+
+      await sql`
+        INSERT INTO records (
+          vehicle_id, tbl, id, data, col_hlc, deleted, seq, updated_by, updated_at
+        ) VALUES (
+          ${vehicleId}::uuid, 'reminders', ${reminderId}::uuid,
+          ${JSON.stringify(patch)}::jsonb, ${JSON.stringify(colHlc)}::jsonb,
+          false, ${nextSeq}, ${userId}::uuid, now()
+        )
+      `;
+
+      await sql`UPDATE vehicles SET seq = ${nextSeq} WHERE id = ${vehicleId}::uuid`;
+
+      return {
+        ok: true,
+        reminderId,
+        vehicleId,
+        seq: nextSeq,
+        reminder: {
+          id: reminderId,
+          title: patch.title,
+          kind: patch.kind,
+          mode: patch.mode,
+          intervalKm: intervalKm ?? null,
+          intervalDays: intervalDaysNum ?? null,
+          baseOdometerKm: baseOdometerKm ?? null,
+          baseDate: patch.base_date ?? null,
+          leadKm,
+          leadDays: leadDaysNum,
+          estimatedCost: estimatedCost ?? null,
+          notes: patch.notes ?? null,
+        },
+        message: `Maintenance reminder "${title}" created successfully.`,
+      };
+    }
+
+    case 'careto_update_reminder': {
+      const {
+        vehicleId,
+        reminderId,
+        title,
+        kind,
+        mode,
+        intervalKm,
+        intervalDays,
+        baseOdometerKm,
+        baseDate,
+        leadKm,
+        leadDays,
+        estimatedCost,
+        snoozedUntil,
+        notes,
+      } = args;
+
+      if (!reminderId) throw new Error('reminderId is required');
+
+      const canEdit = await hasRole(userId, vehicleId, 'editor');
+      if (!canEdit) throw new Error('Forbidden: Editor permission required for vehicle');
+
+      const existing = await sql`
+        SELECT data, col_hlc
+        FROM records
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${reminderId}::uuid
+          AND tbl = 'reminders'
+          AND deleted = false
+        LIMIT 1
+      `;
+
+      if (existing.length === 0) {
+        throw new Error(`Reminder ${reminderId} not found for vehicle ${vehicleId}`);
+      }
+
+      const currentData = (existing[0]!.data as Record<string, any>) || {};
+      const currentColHlc = (existing[0]!.col_hlc as Record<string, string>) || {};
+      const hlc = `${Date.now()}-0000-0000`;
+
+      const updatedData = { ...currentData };
+      const updatedColHlc = { ...currentColHlc };
+
+      const setField = (field: string, val: any) => {
+        if (val !== undefined) {
+          updatedData[field] = val;
+          updatedColHlc[field] = hlc;
+        }
+      };
+
+      if (title !== undefined) setField('title', title.trim());
+      if (kind !== undefined) setField('kind', kind);
+      if (mode !== undefined) setField('mode', mode);
+      if (intervalKm !== undefined) setField('interval_m', intervalKm !== null ? Math.round(Number(intervalKm) * 1000) : null);
+      if (intervalDays !== undefined) setField('interval_days', intervalDays !== null ? Number(intervalDays) : null);
+      if (baseOdometerKm !== undefined) setField('base_odometer_m', baseOdometerKm !== null ? Math.round(Number(baseOdometerKm) * 1000) : null);
+      if (baseDate !== undefined) setField('base_date', baseDate);
+      if (leadKm !== undefined) setField('lead_m', leadKm !== null ? Math.round(Number(leadKm) * 1000) : null);
+      if (leadDays !== undefined) setField('lead_days', leadDays !== null ? Number(leadDays) : null);
+      if (estimatedCost !== undefined) setField('est_cost_usd_minor', estimatedCost !== null ? Math.round(Number(estimatedCost) * 100) : null);
+      if (snoozedUntil !== undefined) setField('snoozed_until', snoozedUntil);
+      if (notes !== undefined) setField('notes', notes);
+
+      const v = await sql`SELECT seq FROM vehicles WHERE id = ${vehicleId}::uuid FOR UPDATE LIMIT 1`;
+      const nextSeq = (Number(v[0]?.seq) || 0) + 1;
+
+      await sql`
+        UPDATE records
+        SET 
+          data = ${JSON.stringify(updatedData)}::jsonb,
+          col_hlc = ${JSON.stringify(updatedColHlc)}::jsonb,
+          seq = ${nextSeq},
+          updated_by = ${userId}::uuid,
+          updated_at = now()
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${reminderId}::uuid
+          AND tbl = 'reminders'
+      `;
+
+      await sql`UPDATE vehicles SET seq = ${nextSeq} WHERE id = ${vehicleId}::uuid`;
+
+      return {
+        ok: true,
+        reminderId,
+        vehicleId,
+        seq: nextSeq,
+        reminder: {
+          id: reminderId,
+          title: updatedData.title,
+          kind: updatedData.kind,
+          mode: updatedData.mode,
+          intervalKm: updatedData.interval_m !== undefined && updatedData.interval_m !== null ? Math.round(updatedData.interval_m / 1000) : null,
+          intervalDays: updatedData.interval_days ?? null,
+          baseOdometerKm: updatedData.base_odometer_m !== undefined && updatedData.base_odometer_m !== null ? Math.round(updatedData.base_odometer_m / 1000) : null,
+          baseDate: updatedData.base_date ?? null,
+          leadKm: updatedData.lead_m !== undefined && updatedData.lead_m !== null ? Math.round(updatedData.lead_m / 1000) : null,
+          leadDays: updatedData.lead_days ?? null,
+          estimatedCost: updatedData.est_cost_usd_minor !== undefined && updatedData.est_cost_usd_minor !== null ? updatedData.est_cost_usd_minor / 100 : null,
+          snoozedUntil: updatedData.snoozed_until ?? null,
+          notes: updatedData.notes ?? null,
+        },
+        message: `Maintenance reminder "${updatedData.title}" updated successfully.`,
+      };
+    }
+
+    case 'careto_delete_reminder': {
+      const { vehicleId, reminderId, confirmed, confirmationReason } = args;
+
+      if (!reminderId) throw new Error('reminderId is required');
+
+      if (!confirmed) {
+        return {
+          ok: false,
+          requiresConsent: true,
+          message: 'Reminder deletion requires user confirmation. Specify confirmed=true with confirmationReason.',
+        };
+      }
+
+      const canEdit = await hasRole(userId, vehicleId, 'editor');
+      if (!canEdit) throw new Error('Forbidden: Editor permission required for vehicle');
+
+      const existing = await sql`
+        SELECT id, data, deleted
+        FROM records
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${reminderId}::uuid
+          AND tbl = 'reminders'
+        LIMIT 1
+      `;
+
+      if (existing.length === 0) {
+        return {
+          ok: false,
+          error: `Reminder ${reminderId} not found for vehicle ${vehicleId}.`,
+        };
+      }
+
+      if (existing[0]!.deleted) {
+        return {
+          ok: true,
+          message: `Reminder ${reminderId} was already deleted.`,
+        };
+      }
+
+      const hlc = `${Date.now()}-0000-0000`;
+      const v = await sql`SELECT seq FROM vehicles WHERE id = ${vehicleId}::uuid FOR UPDATE LIMIT 1`;
+      const nextSeq = (Number(v[0]?.seq) || 0) + 1;
+
+      await sql`
+        UPDATE records
+        SET 
+          deleted = true,
+          deleted_hlc = ${hlc},
+          seq = ${nextSeq},
+          updated_by = ${userId}::uuid,
+          updated_at = now()
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${reminderId}::uuid
+          AND tbl = 'reminders'
+      `;
+
+      await sql`UPDATE vehicles SET seq = ${nextSeq} WHERE id = ${vehicleId}::uuid`;
+
+      return {
+        ok: true,
+        deletedReminderId: reminderId,
+        vehicleId,
+        seq: nextSeq,
+        confirmationReason: confirmationReason || 'Implicit user consent verified',
+        message: `Reminder ${reminderId} successfully deleted. Associated service history was preserved.`,
+      };
+    }
+
+    case 'careto_complete_reminder': {
+      const {
+        vehicleId,
+        reminderId,
+        completedDate = new Date().toISOString().slice(0, 10),
+        completedOdometerKm,
+        cost,
+        currency = 'USD',
+        merchant,
+        notes,
+        createServiceEntry,
+      } = args;
+
+      if (!reminderId) throw new Error('reminderId is required');
+
+      const canEdit = await hasRole(userId, vehicleId, 'editor');
+      if (!canEdit) throw new Error('Forbidden: Editor permission required for vehicle');
+
+      const existing = await sql`
+        SELECT data, col_hlc
+        FROM records
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${reminderId}::uuid
+          AND tbl = 'reminders'
+          AND deleted = false
+        LIMIT 1
+      `;
+
+      if (existing.length === 0) {
+        throw new Error(`Reminder ${reminderId} not found for vehicle ${vehicleId}`);
+      }
+
+      const currentData = (existing[0]!.data as Record<string, any>) || {};
+      const currentColHlc = (existing[0]!.col_hlc as Record<string, string>) || {};
+      const hlc = `${Date.now()}-0000-0000`;
+
+      // 1. Advance the baseline date and odometer
+      const updatedReminderData = { ...currentData };
+      const updatedColHlc = { ...currentColHlc };
+
+      updatedReminderData.base_date = completedDate;
+      updatedColHlc.base_date = hlc;
+
+      if (completedOdometerKm !== undefined && completedOdometerKm !== null) {
+        const completedOdoM = Math.round(Number(completedOdometerKm) * 1000);
+        updatedReminderData.base_odometer_m = completedOdoM;
+        updatedColHlc.base_odometer_m = hlc;
+      }
+
+      // Clear any snooze on completion
+      if (updatedReminderData.snoozed_until) {
+        delete updatedReminderData.snoozed_until;
+        updatedColHlc.snoozed_until = hlc;
+      }
+
+      const v = await sql`SELECT seq FROM vehicles WHERE id = ${vehicleId}::uuid FOR UPDATE LIMIT 1`;
+      let currentSeq = (Number(v[0]?.seq) || 0) + 1;
+
+      // Update reminder record in database
+      await sql`
+        UPDATE records
+        SET 
+          data = ${JSON.stringify(updatedReminderData)}::jsonb,
+          col_hlc = ${JSON.stringify(updatedColHlc)}::jsonb,
+          seq = ${currentSeq},
+          updated_by = ${userId}::uuid,
+          updated_at = now()
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${reminderId}::uuid
+          AND tbl = 'reminders'
+      `;
+
+      // 2. Optionally create a linked service history entry in 'entries'
+      const shouldCreateEntry = createServiceEntry !== false && (createServiceEntry === true || cost !== undefined || merchant);
+      let createdEntryId: string | null = null;
+
+      if (shouldCreateEntry) {
+        currentSeq += 1;
+        createdEntryId = crypto.randomUUID();
+        const costNum = cost !== undefined && cost !== null ? Number(cost) : undefined;
+        const amountMinor = costNum !== undefined ? Math.round(costNum * 100) : undefined;
+        const odoM = completedOdometerKm !== undefined && completedOdometerKm !== null ? Math.round(Number(completedOdometerKm) * 1000) : undefined;
+
+        const entryPatch = {
+          id: createdEntryId,
+          kind: 'service',
+          occurred_on: completedDate,
+          amount_minor: amountMinor,
+          currency,
+          usd_minor: amountMinor,
+          driver_id: userId,
+          odometer_m: odoM,
+          vendor_name: merchant,
+          notes: notes || `Service completed: ${currentData.title || 'Maintenance'}`,
+          category: currentData.kind || 'service',
+          sub_items: [
+            {
+              id: crypto.randomUUID(),
+              name: currentData.title || 'Scheduled Maintenance',
+              cost: costNum !== undefined ? String(costNum) : '0',
+            },
+          ],
+          // Backwards compatibility keys
+          amount: costNum,
+          cost: costNum,
+          date: completedDate,
+          merchant,
+          odometerKm: completedOdometerKm,
+        };
+
+        const entryColHlc: Record<string, string> = {};
+        for (const k of Object.keys(entryPatch)) entryColHlc[k] = hlc;
+
+        await sql`
+          INSERT INTO records (
+            vehicle_id, tbl, id, data, col_hlc, deleted, seq, updated_by, updated_at
+          ) VALUES (
+            ${vehicleId}::uuid, 'entries', ${createdEntryId}::uuid,
+            ${JSON.stringify(entryPatch)}::jsonb, ${JSON.stringify(entryColHlc)}::jsonb,
+            false, ${currentSeq}, ${userId}::uuid, now()
+          )
+        `;
+      }
+
+      await sql`UPDATE vehicles SET seq = ${currentSeq} WHERE id = ${vehicleId}::uuid`;
+
+      return {
+        ok: true,
+        reminderId,
+        vehicleId,
+        serviceEntryCreated: !!createdEntryId,
+        serviceEntryId: createdEntryId,
+        newBaseDate: completedDate,
+        newBaseOdometerKm: completedOdometerKm ?? null,
+        seq: currentSeq,
+        message: `Maintenance task "${currentData.title || reminderId}" marked as completed. Schedule baseline advanced${createdEntryId ? ' and service expense logged to vehicle timeline' : ''}.`,
+      };
+    }
+
+
+    case 'careto_add_entry': {
+      const {
+        vehicleId,
+        tbl: rawTbl,
+        kind: rawKind,
         amount,
-        cost: amount,
-        date,
+        currency = 'USD',
+        date = new Date().toISOString().slice(0, 10),
         category,
         notes,
         odometerKm,
         merchant,
-        fuelVolume: fuelVolumeL,
+        fuelVolumeL,
         pricePerUnit,
+        fuelGrade,
+        isBusiness,
         subItems,
-        createdAt: new Date().toISOString(),
-      };
+      } = args;
+
+      // In Careto, all financial, refuel, and service entries live in tbl='entries'
+      const tbl = rawTbl === 'expenses' || !rawTbl ? 'entries' : rawTbl;
+      const recordId = crypto.randomUUID();
+      const hlc = `${Date.now()}-0000-0000`;
+
+      let patch: Record<string, any>;
+
+      if (tbl === 'entries') {
+        let inferredKind = rawKind;
+        if (!inferredKind) {
+          if (fuelVolumeL !== undefined && fuelVolumeL !== null) inferredKind = 'refuel';
+          else if (subItems && subItems.length > 0) inferredKind = 'service';
+          else inferredKind = 'expense';
+        }
+
+        const amountMinor = amount !== undefined && amount !== null ? Math.round(Number(amount) * 100) : undefined;
+        const odometerM = odometerKm !== undefined && odometerKm !== null ? Math.round(Number(odometerKm) * 1000) : undefined;
+
+        patch = {
+          id: recordId,
+          kind: inferredKind,
+          occurred_on: date,
+          amount_minor: amountMinor,
+          currency,
+          usd_minor: amountMinor, // fallback 1:1 if no FX converter present
+          driver_id: userId,
+          odometer_m: odometerM,
+          vendor_name: merchant,
+          notes,
+          business: isBusiness ? 1 : 0,
+          category: category || (inferredKind === 'expense' ? 'other' : inferredKind),
+          fuel_volume: fuelVolumeL,
+          unit_price: pricePerUnit,
+          fuel_grade: fuelGrade,
+          sub_items: subItems?.map((item: any, idx: number) => ({
+            id: crypto.randomUUID(),
+            name: item.name,
+            cost: String(item.cost),
+            partNumber: item.partNumber,
+          })),
+          // Backwards compatibility keys so callers reading flat amounts can also consume:
+          amount: amount !== undefined ? Number(amount) : undefined,
+          cost: amount !== undefined ? Number(amount) : undefined,
+          date,
+          merchant,
+          fuelVolume: fuelVolumeL,
+          pricePerUnit,
+          odometerKm,
+        };
+      } else {
+        patch = {
+          id: recordId,
+          amount,
+          cost: amount,
+          date,
+          category,
+          notes,
+          odometerKm,
+          merchant,
+          fuelVolume: fuelVolumeL,
+          pricePerUnit,
+          subItems,
+          createdAt: new Date().toISOString(),
+        };
+      }
 
       const colHlc: Record<string, string> = {};
       for (const k of Object.keys(patch)) colHlc[k] = hlc;
@@ -303,7 +967,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
 
       await sql`UPDATE vehicles SET seq = ${nextSeq} WHERE id = ${vehicleId}::uuid`;
 
-      return { ok: true, recordId, seq: nextSeq, entry: patch };
+      return { ok: true, recordId, tbl, seq: nextSeq, entry: patch };
     }
 
     case 'careto_analyze_image_and_create_entry': {
@@ -325,22 +989,50 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
       if (autoSave && extracted) {
         const recordId = crypto.randomUUID();
         const hlc = `${Date.now()}-0000-0000`;
-        const tbl = purpose === 'expense' ? 'expenses' : 'notes';
+        const tbl = purpose === 'expense' ? 'entries' : 'notes';
 
-        const patch = {
-          id: recordId,
-          amount: extracted.amount || extracted.cost,
-          cost: extracted.amount || extracted.cost,
-          date: extracted.date || new Date().toISOString().slice(0, 10),
-          category: extracted.category || (purpose === 'expense' ? 'service' : 'general'),
-          merchant: extracted.merchant || extracted.vendorName,
-          notes: extracted.notes || extracted.rawText,
-          fuelVolume: extracted.fuelVolume,
-          pricePerUnit: extracted.pricePerUnit,
-          subItems: extracted.subItems,
-          extractedAi: true,
-          createdAt: new Date().toISOString(),
-        };
+        let patch: Record<string, any>;
+        if (tbl === 'entries') {
+          const rawAmount = extracted.amount || extracted.cost;
+          const amountMinor = rawAmount ? Math.round(Number(rawAmount) * 100) : undefined;
+          const inferredKind = extracted.fuelVolume ? 'refuel' : (extracted.subItems && extracted.subItems.length > 0 ? 'service' : 'expense');
+
+          patch = {
+            id: recordId,
+            kind: inferredKind,
+            occurred_on: extracted.date || new Date().toISOString().slice(0, 10),
+            amount_minor: amountMinor,
+            currency: extracted.currency || 'USD',
+            usd_minor: amountMinor,
+            driver_id: userId,
+            vendor_name: extracted.merchant || extracted.vendorName,
+            notes: extracted.notes || extracted.rawText,
+            category: extracted.category || (inferredKind === 'expense' ? 'other' : inferredKind),
+            fuel_volume: extracted.fuelVolume,
+            unit_price: extracted.pricePerUnit,
+            sub_items: extracted.subItems?.map((item: any) => ({
+              id: crypto.randomUUID(),
+              name: item.name,
+              cost: String(item.cost),
+              partNumber: item.partNumber,
+            })),
+            extractedAi: true,
+            // Backwards compatibility keys:
+            amount: rawAmount ? Number(rawAmount) : undefined,
+            cost: rawAmount ? Number(rawAmount) : undefined,
+            date: extracted.date || new Date().toISOString().slice(0, 10),
+            merchant: extracted.merchant || extracted.vendorName,
+            fuelVolume: extracted.fuelVolume,
+            pricePerUnit: extracted.pricePerUnit,
+          };
+        } else {
+          patch = {
+            id: recordId,
+            notes: extracted.notes || extracted.rawText,
+            extractedAi: true,
+            createdAt: new Date().toISOString(),
+          };
+        }
 
         const colHlc: Record<string, string> = {};
         for (const k of Object.keys(patch)) colHlc[k] = hlc;
@@ -358,7 +1050,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         `;
         await sql`UPDATE vehicles SET seq = ${nextSeq} WHERE id = ${vehicleId}::uuid`;
 
-        createdRecord = { recordId, seq: nextSeq };
+        createdRecord = { recordId, tbl, seq: nextSeq };
       }
 
       return {
@@ -383,7 +1075,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         SELECT data
         FROM records
         WHERE vehicle_id = ${vehicleId}::uuid 
-          AND tbl = 'expenses' 
+          AND tbl = 'entries' 
           AND deleted = false
         ORDER BY updated_at DESC
         LIMIT 20
@@ -395,9 +1087,12 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
 
       for (const r of records) {
         const d = r.data as any;
-        if (d.odometerKm && d.odometerKm > maxOdometer) maxOdometer = d.odometerKm;
-        if (d.merchant) merchants.add(d.merchant);
-        if (!lastFuelPrice && d.pricePerUnit) lastFuelPrice = d.pricePerUnit;
+        const odoKm = d.odometerKm ?? (d.odometer_m ? d.odometer_m / 1000 : 0);
+        if (odoKm && odoKm > maxOdometer) maxOdometer = odoKm;
+        const merchantName = d.merchant || d.vendor_name;
+        if (merchantName) merchants.add(merchantName);
+        const price = d.pricePerUnit ?? d.unit_price ?? (d.price_per_unit_minor ? d.price_per_unit_minor / 100 : null);
+        if (!lastFuelPrice && price) lastFuelPrice = price;
       }
 
       return {
@@ -408,7 +1103,8 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
     }
 
     case 'careto_delete_entry': {
-      const { vehicleId, entryId, tbl = 'expenses', confirmed, confirmationReason } = args;
+      const { vehicleId, entryId, tbl: rawTbl = 'entries', confirmed, confirmationReason } = args;
+      const tbl = rawTbl === 'expenses' ? 'entries' : rawTbl;
 
       if (!confirmed) {
         return {
