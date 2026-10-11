@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import { createFileRoute, Link as RouterLink } from '@tanstack/react-router';
 import { useState } from 'react';
 import { CARETO_MCP_TOOLS } from '@/../api/_lib/mcp/tools';
+import { useSession } from '@/lib/auth-client';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 
 export const Route = createFileRoute('/mcp')({
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/mcp')({
 });
 
 function McpDocumentationPage() {
+  const { data: session } = useSession();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const handleCopy = (text: string, id: string) => {
@@ -57,14 +59,14 @@ function McpDocumentationPage() {
           marginBottom: 24,
         }}
       >
-        <RouterLink to="/settings" style={{ textDecoration: 'none' }}>
+        <RouterLink to={session ? '/settings' : '/sign-in'} style={{ textDecoration: 'none' }}>
           <Button startIcon={<ArrowBackIcon />} sx={{ textTransform: 'none' }}>
-            Back to Settings
+            {session ? 'Back to Settings' : 'Sign In'}
           </Button>
         </RouterLink>
         <Chip
           icon={<IntegrationInstructionsIcon />}
-          label="MCP v1.0.0 Spec Compliant"
+          label="Public MCP Spec Compliant"
           color="primary"
           variant="outlined"
           size="small"
@@ -90,26 +92,38 @@ function McpDocumentationPage() {
           <KeyIcon sx={{ color: 'primary.main', fontSize: 28 }} />
           <div>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              1. Get Your API Key
+              1. Get Your API Key or Connect with OAuth
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Generate a secret{' '}
               <code style={{ color: 'var(--mui-palette-primary-main)' }}>careto_sk_...</code> key in your
-              Careto settings.
+              settings, or connect directly using Gemini / ChatGPT OAuth 2.1.
             </Typography>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
-          <RouterLink to="/settings" style={{ textDecoration: 'none' }}>
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ textTransform: 'none', borderRadius: 2 }}
-            >
-              Manage API Keys in Settings
-            </Button>
-          </RouterLink>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          {session ? (
+            <RouterLink to="/settings" style={{ textDecoration: 'none' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ textTransform: 'none', borderRadius: 2 }}
+              >
+                Manage API Keys in Settings
+              </Button>
+            </RouterLink>
+          ) : (
+            <RouterLink to="/sign-in" search={{ redirect: '/mcp' }} style={{ textDecoration: 'none' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ textTransform: 'none', borderRadius: 2 }}
+              >
+                Sign In to Generate Keys
+              </Button>
+            </RouterLink>
+          )}
         </div>
 
         <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
