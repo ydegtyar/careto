@@ -20,9 +20,16 @@ interface Props {
   onChange: (items: EditableSubItem[]) => void;
   onAutoSum: (totalCost: number) => void;
   powertrain?: VehiclePowertrain | string;
+  totalAmount?: string;
 }
 
-export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum, powertrain }) => {
+export const SubItemsEditor: React.FC<Props> = ({
+  subItems,
+  onChange,
+  onAutoSum,
+  powertrain,
+  totalAmount,
+}) => {
   const predefinedOptions = useMemo(() => {
     return getPredefinedSubItems(powertrain).map((item) => item.name);
   }, [powertrain]);
@@ -50,9 +57,48 @@ export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum,
     return acc + (Number.isNaN(val) ? 0 : val);
   }, 0);
 
+  const parsedTotal = totalAmount ? parseFloat(totalAmount) : NaN;
+  const hasValidTotal = !Number.isNaN(parsedTotal) && parsedTotal > 0;
+
+  // Calculate remainder for the last item if total is entered
+  const lastItemRemainder = useMemo(() => {
+    if (!hasValidTotal || subItems.length === 0) return null;
+    const allExceptLastSum = subItems.slice(0, -1).reduce((acc, item) => {
+      const val = parseFloat(item.cost);
+      return acc + (Number.isNaN(val) ? 0 : val);
+    }, 0);
+    const diff = parsedTotal - allExceptLastSum;
+    return diff > 0 ? Number(diff.toFixed(2)) : 0;
+  }, [hasValidTotal, parsedTotal, subItems]);
+
+  const handleCalculateLastItem = () => {
+    if (lastItemRemainder === null || subItems.length === 0) return;
+    const lastIndex = subItems.length - 1;
+    const updated = subItems.map((item, index) =>
+      index === lastIndex ? { ...item, cost: lastItemRemainder.toFixed(2) } : item,
+    );
+    onChange(updated);
+  };
+
+  const lastItem = subItems.length > 0 ? subItems[subItems.length - 1] : undefined;
+  const lastItemCostNum = lastItem ? parseFloat(lastItem.cost) : NaN;
+  const canCalculateLastItem =
+    hasValidTotal &&
+    Boolean(lastItem) &&
+    lastItemRemainder !== null &&
+    (Number.isNaN(lastItemCostNum) || Math.abs(lastItemCostNum - lastItemRemainder) > 0.009);
+
   return (
     <GlassCard style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 8,
+        }}
+      >
         <Typography
           variant="caption"
           sx={{
@@ -64,24 +110,44 @@ export const SubItemsEditor: React.FC<Props> = ({ subItems, onChange, onAutoSum,
         >
           Itemized Service Breakdown
         </Typography>
-        {calculatedTotal > 0 && (
-          <Button
-            size="small"
-            onClick={() => onAutoSum(calculatedTotal)}
-            sx={{
-              fontSize: '0.75rem',
-              textTransform: 'none',
-              borderRadius: 2,
-              px: 1.5,
-              py: 0.25,
-              backgroundColor: 'rgba(125, 211, 252, 0.15)',
-              color: 'primary.main',
-              fontWeight: 600,
-            }}
-          >
-            Apply Sum ({calculatedTotal.toFixed(2)})
-          </Button>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {canCalculateLastItem && (
+            <Button
+              size="small"
+              onClick={handleCalculateLastItem}
+              sx={{
+                fontSize: '0.75rem',
+                textTransform: 'none',
+                borderRadius: 2,
+                px: 1.5,
+                py: 0.25,
+                backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                color: 'primary.main',
+                fontWeight: 600,
+              }}
+            >
+              Fill Last Item ({lastItemRemainder.toFixed(2)})
+            </Button>
+          )}
+          {calculatedTotal > 0 && (
+            <Button
+              size="small"
+              onClick={() => onAutoSum(calculatedTotal)}
+              sx={{
+                fontSize: '0.75rem',
+                textTransform: 'none',
+                borderRadius: 2,
+                px: 1.5,
+                py: 0.25,
+                backgroundColor: 'rgba(125, 211, 252, 0.15)',
+                color: 'primary.main',
+                fontWeight: 600,
+              }}
+            >
+              Apply Sum ({calculatedTotal.toFixed(2)})
+            </Button>
+          )}
+        </div>
       </div>
 
       {subItems.length === 0 ? (

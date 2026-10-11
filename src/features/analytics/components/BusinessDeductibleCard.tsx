@@ -14,6 +14,10 @@ interface Props {
 }
 
 export const BusinessDeductibleCard: React.FC<Props> = ({ entries, vehicle }) => {
+  if (!vehicle?.used_by_business) {
+    return null;
+  }
+
   const businessDeductible = computeBusinessDeductible(entries);
 
   return (

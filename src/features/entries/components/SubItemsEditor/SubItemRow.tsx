@@ -13,64 +13,62 @@ interface Props {
 
 const filter = createFilterOptions<string>();
 
-export function SubItemRow({ item, options, onUpdate, onRemove }: Props) {
-  return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      <Autocomplete
-        freeSolo
-        options={options}
-        value={item.name}
-        onChange={(_event, newValue) => {
-          onUpdate(item.id, 'name', newValue || '');
-        }}
-        onInputChange={(_event, newInputValue) => {
-          onUpdate(item.id, 'name', newInputValue);
-        }}
-        filterOptions={(options, params) => {
-          const filtered = filter(options, params);
-          const { inputValue } = params;
-          const isExisting = options.some(
-            (option) => inputValue.toLowerCase() === option.toLowerCase(),
-          );
-          if (inputValue !== '' && !isExisting) {
-            filtered.push(`Add "${inputValue}"`);
-          }
-          return filtered;
-        }}
-        renderOption={(props, option) => {
-          const isAddOption = option.startsWith('Add "') && option.endsWith('"');
-          return (
-            <li {...props} key={props.id || option}>
-              {isAddOption ? (
-                <span style={{ fontStyle: 'italic', fontWeight: 600 }}>{option}</span>
-              ) : (
-                option
-              )}
-            </li>
-          );
-        }}
-        fullWidth
-        size="small"
-        renderInput={(params) => (
-          <TextField {...params} placeholder="Item / Service Name (e.g. Oil Filter)" />
-        )}
-      />
-      <TextField
-        placeholder="Cost"
-        type="number"
-        value={item.cost}
-        onChange={(e) => onUpdate(item.id, 'cost', e.target.value)}
-        size="small"
-        sx={{ width: 110 }}
-      />
-      <IconButton
-        size="small"
-        onClick={() => onRemove(item.id)}
-        aria-label="remove sub-item"
-        sx={{ color: 'error.main' }}
-      >
-        <DeleteIcon fontSize="small" />
-      </IconButton>
-    </div>
-  );
-}
+export const SubItemRow = ({ item, options, onUpdate, onRemove }: Props) => (
+  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+    <Autocomplete
+      freeSolo
+      options={options}
+      value={item.name}
+      onChange={(_event, newValue) => {
+        onUpdate(item.id, 'name', newValue || '');
+      }}
+      onInputChange={(_event, newInputValue) => {
+        onUpdate(item.id, 'name', newInputValue);
+      }}
+      filterOptions={(options, params) => {
+        const filtered = filter(options, params);
+        const { inputValue } = params;
+        const isExisting = options.some(
+          (option) => inputValue.toLowerCase() === option.toLowerCase(),
+        );
+        if (inputValue !== '' && !isExisting) {
+          filtered.push(`Add "${inputValue}"`);
+        }
+        return filtered;
+      }}
+      renderOption={(props, option) => {
+        const isAddOption = option.startsWith('Add "') && option.endsWith('"');
+        return (
+          <li {...props} key={props.id || option}>
+            {isAddOption ? (
+              <span style={{ fontStyle: 'italic', fontWeight: 600 }}>{option}</span>
+            ) : (
+              option
+            )}
+          </li>
+        );
+      }}
+      fullWidth
+      size="small"
+      renderInput={(params) => (
+        <TextField {...params} placeholder="Item / Service Name (e.g. Oil Filter)" />
+      )}
+    />
+    <TextField
+      placeholder="Cost"
+      type="number"
+      value={item.cost}
+      onChange={(e) => onUpdate(item.id, 'cost', e.target.value)}
+      size="small"
+      sx={{ width: 110 }}
+    />
+    <IconButton
+      size="small"
+      onClick={() => onRemove(item.id)}
+      aria-label="remove sub-item"
+      sx={{ color: 'error.main' }}
+    >
+      <DeleteIcon fontSize="small" />
+    </IconButton>
+  </div>
+);

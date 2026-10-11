@@ -12,11 +12,6 @@ import { useState } from 'react';
 import { signOut, useSession } from '@/lib/auth-client';
 import { styles } from './UserMenu.styles';
 
-interface Props {
-  userName?: string;
-  userEmail?: string;
-}
-
 function getInitials(name?: string | null, email?: string | null): string {
   if (name && name.trim().length > 0) {
     const parts = name.trim().split(/\s+/);
@@ -32,17 +27,17 @@ function getInitials(name?: string | null, email?: string | null): string {
   if (email && email.trim().length > 0) {
     return email.trim().slice(0, 2).toUpperCase();
   }
-  return 'CU';
+  return '🚙';
 }
 
-export const UserMenu: React.FC<Props> = ({ userName, userEmail }) => {
+export const UserMenu: React.FC = () => {
   const router = useRouter();
   const { data: session } = useSession();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const displayName = userName ?? session?.user?.name;
-  const displayEmail = userEmail ?? session?.user?.email;
+  const displayName = session?.user?.name;
+  const displayEmail = session?.user?.email;
 
   const initials = getInitials(displayName, displayEmail);
 
@@ -114,5 +109,3 @@ export const UserMenu: React.FC<Props> = ({ userName, userEmail }) => {
     </>
   );
 };
-
-export default UserMenu;

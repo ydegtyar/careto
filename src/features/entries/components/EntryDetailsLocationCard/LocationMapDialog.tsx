@@ -25,7 +25,7 @@ interface PlaceSearchResult {
   lon: string;
 }
 
-export interface LocationMapDialogProps {
+export interface Props {
   open: boolean;
   onClose: () => void;
   initialAddress?: string;
@@ -67,7 +67,7 @@ const createCustomIcon = () =>
     iconAnchor: [16, 32],
   });
 
-export const LocationMapDialog: React.FC<LocationMapDialogProps> = ({
+export const LocationMapDialog: React.FC<Props> = ({
   open,
   onClose,
   initialAddress = '',
@@ -96,28 +96,83 @@ export const LocationMapDialog: React.FC<LocationMapDialogProps> = ({
     ? '/nominatim'
     : 'https://nominatim.openstreetmap.org';
 
-  // Reverse geocode lat/lon into address name using Nominatim API
+  // Reverse geocode lat/lon into address name using Nominatim API (with automotive place preference)
   const reverseGeocode = useCallback(
     async (lat: number, lon: number) => {
       setIsGeocoding(true);
       try {
-        const res = await fetch(
-          `${NOMINATIM_BASE_URL}/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
-          {
-            headers: {
-              'Accept-Language': 'en-US,en;q=0.9',
-            },
-          },
-        );
-        if (res.ok) {
-          const data = await res.json();
-          const formatted =
-            data.display_name ||
-            [data.address?.road, data.address?.suburb, data.address?.city || data.address?.town]
-              .filter(Boolean)
-              .join(', ') ||
-            `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        const deltaLat = 0.01;
+        const deltaLon = 0.013;
+        const minLat = lat - deltaLat;
+        const maxLat = lat + deltaLat;
+        const minLon = lon - deltaLon;
+        const maxLon = lon + deltaLon;
+        const viewbox = `${minLon},${maxLat},${maxLon},${minLat}`;
+
+        const carQueries = [
+          `${NOMINATIM_BASE_URL}/search?format=jsonv2&amenity=fuel&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
+          `${NOMINATIM_BASE_URL}/search?format=jsonv2&amenity=car_wash&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
+          `${NOMINATIM_BASE_URL}/search?format=jsonv2&q=%5Bshop%3Dcar_repair%5D&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
+          `${NOMINATIM_BASE_URL}/search?format=jsonv2&amenity=parking&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
+        ];
+
+        let closestPoi: { name: string; display_name: string; dist: number } | null = null;
+
+        for (const queryUrl of carQueries) {
+          try {
+            const poiRes = await fetch(queryUrl, {
+              headers: { 'Accept-Language': 'en-US,en;q=0.9' },
+            });
+            if (poiRes.ok) {
+              const pois = await poiRes.json();
+              if (Array.isArray(pois)) {
+                for (const poi of pois) {
+                  const poiLat = Number.parseFloat(poi.lat);
+                  const poiLon = Number.parseFloat(poi.lon);
+                  const dist = Math.hypot(poiLat - lat, poiLon - lon);
+                  const displayName = poi.name || poi.display_name;
+                  if (displayName && (!closestPoi || dist < closestPoi.dist)) {
+                    closestPoi = {
+                      name: poi.name || '',
+                      display_name: poi.display_name,
+                      dist,
+                    };
+                  }
+                }
+              }
+            }
+            if (closestPoi && closestPoi.name) {
+              break;
+            }
+          } catch {
+            // Continue to next query if one fails
+          }
+        }
+
+        if (closestPoi) {
+          const formatted = closestPoi.name
+            ? `${closestPoi.name}, ${closestPoi.display_name.split(',').slice(1, 4).join(',').trim()}`
+            : closestPoi.display_name;
           setAddress(formatted);
+        } else {
+          const res = await fetch(
+            `${NOMINATIM_BASE_URL}/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
+            {
+              headers: {
+                'Accept-Language': 'en-US,en;q=0.9',
+              },
+            },
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const formatted =
+              data.display_name ||
+              [data.address?.road, data.address?.suburb, data.address?.city || data.address?.town]
+                .filter(Boolean)
+                .join(', ') ||
+              `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+            setAddress(formatted);
+          }
         }
       } catch {
         // Keep existing address or fallback

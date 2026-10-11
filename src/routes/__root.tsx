@@ -6,11 +6,19 @@ export const Route = createRootRoute({
   component: RootComponent,
 });
 
+/** Routes that render with their own full-page layout (no app chrome). */
+const PUBLIC_ROUTE_PREFIXES = ['/sign-in', '/mcp', '/terms', '/privacy'];
+
+function isPublicRoute(pathname: string) {
+  return PUBLIC_ROUTE_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
+  );
+}
+
 function RootComponent() {
   const routerState = useRouterState();
-  const isSignIn = routerState.location.pathname.startsWith('/sign-in');
 
-  if (isSignIn) {
+  if (isPublicRoute(routerState.location.pathname)) {
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
         <main style={{ flex: 1 }}>

@@ -91,7 +91,9 @@ function AnalyticsPage() {
         <PriceVolatilityCard entries={filteredEntries} />
 
         {/* 8. Business Mileage & Tax Deductible Export Card */}
-        <BusinessDeductibleCard entries={filteredEntries} vehicle={activeVehicle} />
+        {activeVehicle?.used_by_business && (
+          <BusinessDeductibleCard entries={filteredEntries} vehicle={activeVehicle} />
+        )}
       </div>
     </div>
   );

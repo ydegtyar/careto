@@ -44,6 +44,9 @@ export const ReminderAlertStrip: React.FC<Props> = ({
         mode: reminder.mode ?? 'km',
         interval_m: reminder.interval_m,
         interval_days: reminder.interval_days,
+        base_odometer_m: reminder.base_odometer_m,
+        base_date: reminder.base_date,
+        snoozed_until: reminder.snoozed_until,
         lead_m: reminder.lead_m,
         lead_days: reminder.lead_days,
       },
@@ -55,22 +58,42 @@ export const ReminderAlertStrip: React.FC<Props> = ({
     return { reminder, dueResult };
   });
 
-  // Sort by priority (overdue > due > upcoming > ok) then by percent descending
-  evaluated.sort((a, b) => {
+  // Show only reminders that require attention (overdue, due, upcoming)
+  const priorityItems = evaluated.filter(
+    (item) =>
+      item.dueResult.status === 'overdue' ||
+      item.dueResult.status === 'due' ||
+      item.dueResult.status === 'upcoming',
+  );
+
+  if (priorityItems.length === 0) {
+    return null;
+  }
+
+  // Sort by priority status (overdue > due > upcoming)
+  // For tie-breaking within same status: closest maintenance first
+  priorityItems.sort((a, b) => {
     const priA = STATUS_PRIORITY[a.dueResult.status];
     const priB = STATUS_PRIORITY[b.dueResult.status];
     if (priA !== priB) {
       return priB - priA;
     }
+
+    // Within overdue: highest percent or most overdue first
+    if (a.dueResult.status === 'overdue') {
+      return b.dueResult.percent - a.dueResult.percent;
+    }
+
+    // Within due and upcoming: closest to maintenance threshold first (highest percent completion)
     return b.dueResult.percent - a.dueResult.percent;
   });
 
-  const mostImportant = evaluated[0];
+  const mostImportant = priorityItems[0];
   if (!mostImportant) {
     return null;
   }
 
-  const count = evaluated.length;
+  const count = priorityItems.length;
 
   const handleClick = () => {
     navigate({ to: '/reminders' });
@@ -79,7 +102,7 @@ export const ReminderAlertStrip: React.FC<Props> = ({
   const pillStatus: StatusLevel =
     mostImportant.dueResult.status === 'snoozed' ? 'ok' : mostImportant.dueResult.status;
 
-  const backgroundCards = evaluated.slice(1, 3);
+  const backgroundCards = priorityItems.slice(1, 3);
 
   return (
     <div

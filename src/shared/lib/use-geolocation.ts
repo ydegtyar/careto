@@ -37,30 +37,85 @@ export function useGeolocation(): UseGeolocationResult {
 
             let address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
             try {
-              const res = await fetch(
-                `${nominatimUrl}/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
-                {
-                  headers: {
-                    'Accept-Language': 'en-US,en;q=0.9',
-                  },
-                },
-              );
+              // Attempt to fetch closest car-related place (fuel, car_repair, car_wash, parking) within ~1km
+              const deltaLat = 0.01;
+              const deltaLon = 0.013;
+              const minLat = latitude - deltaLat;
+              const maxLat = latitude + deltaLat;
+              const minLon = longitude - deltaLon;
+              const maxLon = longitude + deltaLon;
+              const viewbox = `${minLon},${maxLat},${maxLon},${minLat}`;
 
-              if (res.ok) {
-                const data = await res.json();
-                address =
-                  data.display_name ||
-                  [
-                    data.address?.road,
-                    data.address?.suburb,
-                    data.address?.city || data.address?.town,
-                  ]
-                    .filter(Boolean)
-                    .join(', ') ||
-                  address;
+              const carQueries = [
+                `${nominatimUrl}/search?format=jsonv2&amenity=fuel&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
+                `${nominatimUrl}/search?format=jsonv2&amenity=car_wash&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
+                `${nominatimUrl}/search?format=jsonv2&q=%5Bshop%3Dcar_repair%5D&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
+                `${nominatimUrl}/search?format=jsonv2&amenity=parking&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
+              ];
+
+              let closestPoi: { name: string; display_name: string; dist: number } | null = null;
+
+              for (const queryUrl of carQueries) {
+                try {
+                  const poiRes = await fetch(queryUrl, {
+                    headers: { 'Accept-Language': 'en-US,en;q=0.9' },
+                  });
+                  if (poiRes.ok) {
+                    const pois = await poiRes.json();
+                    if (Array.isArray(pois)) {
+                      for (const poi of pois) {
+                        const poiLat = Number.parseFloat(poi.lat);
+                        const poiLon = Number.parseFloat(poi.lon);
+                        const dist = Math.hypot(poiLat - latitude, poiLon - longitude);
+                        const displayName = poi.name || poi.display_name;
+                        if (displayName && (!closestPoi || dist < closestPoi.dist)) {
+                          closestPoi = {
+                            name: poi.name || '',
+                            display_name: poi.display_name,
+                            dist,
+                          };
+                        }
+                      }
+                    }
+                  }
+                  if (closestPoi && closestPoi.name) {
+                    break;
+                  }
+                } catch {
+                  // Continue to next query if one fails
+                }
+              }
+
+              if (closestPoi) {
+                address = closestPoi.name
+                  ? `${closestPoi.name}, ${closestPoi.display_name.split(',').slice(1, 4).join(',').trim()}`
+                  : closestPoi.display_name;
+              } else {
+                const res = await fetch(
+                  `${nominatimUrl}/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
+                  {
+                    headers: {
+                      'Accept-Language': 'en-US,en;q=0.9',
+                    },
+                  },
+                );
+
+                if (res.ok) {
+                  const data = await res.json();
+                  address =
+                    data.display_name ||
+                    [
+                      data.address?.road,
+                      data.address?.suburb,
+                      data.address?.city || data.address?.town,
+                    ]
+                      .filter(Boolean)
+                      .join(', ') ||
+                    address;
+                }
               }
             } catch {
-              // Gracefully fallback to coordinates string if reverse geocoding fails or rate limited
+              // Gracefully fallback to coordinates string if lookups fail or rate limited
             }
 
             setLoading(false);

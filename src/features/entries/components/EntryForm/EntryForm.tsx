@@ -48,12 +48,7 @@ export interface Props {
   submitLabel?: string;
 }
 
-export const EntryForm: React.FC<Props> = ({
-  initialEntry,
-  onSave,
-  onCancel,
-  submitLabel,
-}) => {
+export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, submitLabel }) => {
   const isEditMode = Boolean(initialEntry);
   const { activeVehicleId } = useAppStore();
   const { data: vehicles = [] } = useQuery(vehiclesQueryOptions());
@@ -75,15 +70,11 @@ export const EntryForm: React.FC<Props> = ({
   const [category, setCategory] = useState<string>(
     initialEntry?.category || (initialEntry?.kind === 'service' ? 'service' : 'fuel'),
   );
-  const [fuelGrade, setFuelGrade] = useState<string>(
-    initialEntry?.fuel_grade || lastUsedFuelGrade,
-  );
+  const [fuelGrade, setFuelGrade] = useState<string>(initialEntry?.fuel_grade || lastUsedFuelGrade);
   const [amount, setAmount] = useState(
     initialEntry?.amount_minor !== undefined ? (initialEntry.amount_minor / 100).toFixed(2) : '',
   );
-  const [currency, setCurrency] = useState(
-    initialEntry?.currency || lastUsedCurrency || 'EUR',
-  );
+  const [currency, setCurrency] = useState(initialEntry?.currency || lastUsedCurrency || 'EUR');
 
   useEffect(() => {
     if (isEditMode) return;
@@ -373,8 +364,20 @@ export const EntryForm: React.FC<Props> = ({
           value={kind}
           onChange={(newKind) => {
             setKind(newKind);
-            if (newKind === 'refuel') setCategory('fuel');
-            else if (newKind === 'service') setCategory('service');
+            if (newKind === 'refuel') {
+              setCategory('fuel');
+              setSubItems([]);
+            } else if (newKind === 'service') {
+              setCategory('service');
+            } else if (newKind === 'expense') {
+              setSubItems([]);
+              if (category === 'fuel' || category === 'service') {
+                setCategory('other');
+              }
+            } else if (newKind === 'note') {
+              setAmount('');
+              setSubItems([]);
+            }
           }}
         />
 
@@ -420,6 +423,7 @@ export const EntryForm: React.FC<Props> = ({
         {(kind === 'service' || subItems.length > 0) && (
           <SubItemsEditor
             subItems={subItems}
+            totalAmount={amount}
             onChange={setSubItems}
             onAutoSum={(total) => setAmount(total.toFixed(2))}
             powertrain={activeVehicle?.powertrain}
