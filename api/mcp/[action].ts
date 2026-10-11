@@ -22,30 +22,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const session = await getSession(req.headers);
-    if (!session) {
-      const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
-      const host = req.headers.host || 'careto.vercel.app';
-      const baseUrl = `${proto}://${host}`;
-
-      res.setHeader(
-        'WWW-Authenticate',
-        `Bearer error="invalid_token", error_description="Unauthorized", resource_metadata="${baseUrl}/.well-known/oauth-protected-resource"`,
-      );
-
-      return res.status(401).json({
-        jsonrpc: '2.0',
-        error: { code: -32001, message: 'Unauthorized. Bearer careto_sk_... API key, OAuth token, or valid session required.' },
-        id: null,
-      });
-    }
 
     // SSE Transport initiation
-    if (req.method === 'GET' && action === 'sse') {
+    if (req.method === 'GET' && (action === 'sse' || !action)) {
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache, no-transform');
       res.setHeader('Connection', 'keep-alive');
 
-      const endpointUrl = `/api/mcp/messages?sessionId=${session.session.id}`;
+      const sessionId = session ? session.session.id : crypto.randomUUID();
+      const endpointUrl = `/api/mcp/messages?sessionId=${sessionId}`;
       res.write(`event: endpoint\ndata: ${endpointUrl}\n\n`);
 
       // Keep connection warm
@@ -64,6 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = req.body || {};
       const { jsonrpc = '2.0', method, params = {}, id = 1 } = body;
 
+      // Allow initialize method publicly
       if (method === 'initialize') {
         return res.status(200).json({
           jsonrpc: '2.0',
@@ -83,6 +69,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (method === 'notifications/initialized') {
         return res.status(200).end();
+      }
+
+      // Check auth for tools/list and tools/call
+      if (!session) {
+        const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
+        const host = req.headers.host || 'careto.vercel.app';
+        const baseUrl = `${proto}://${host}`;
+
+        res.setHeader(
+          'WWW-Authenticate',
+          `Bearer error="invalid_token", error_description="Unauthorized", resource_metadata="${baseUrl}/.well-known/oauth-protected-resource"`,
+        );
+
+        return res.status(401).json({
+          jsonrpc: '2.0',
+          error: { code: -32001, message: 'Unauthorized. Bearer careto_sk_... API key, OAuth token, or valid session required.' },
+          id,
+        });
       }
 
       if (method === 'tools/list') {

@@ -1,6 +1,7 @@
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -326,7 +327,10 @@ function NewEntryPage() {
     }
   };
 
-  const selectedTank = tanks.find((t) => t.id === selectedTankId);
+  const selectedTank = tanks.find((t) => t.id === effectiveTankId) || tanks[0];
+  const isEvTank = selectedTank ? selectedTank.type === 'ev' : activeVehicle?.powertrain === 'ev';
+  const volumeUnit = isEvTank ? 'kWh' : 'L';
+  const volumeLabel = `Volume (${volumeUnit})`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -472,17 +476,27 @@ function NewEntryPage() {
             {kind === 'refuel' && (
               <div style={{ display: 'flex', gap: 12 }}>
                 <TextField
-                  label="Volume (Liters / kWh)"
+                  label={volumeLabel}
                   type="number"
-                  slotProps={{ htmlInput: { step: '0.1' } }}
+                  slotProps={{
+                    htmlInput: { step: '0.1' },
+                    input: {
+                      endAdornment: <InputAdornment position="end">{volumeUnit}</InputAdornment>,
+                    },
+                  }}
                   value={volumeLiters}
                   onChange={(e) => handleVolumeChange(e.target.value)}
                   fullWidth
                 />
                 <TextField
-                  label="Price / Unit"
+                  label={`Price / ${volumeUnit}`}
                   type="number"
-                  slotProps={{ htmlInput: { step: '0.001' } }}
+                  slotProps={{
+                    htmlInput: { step: '0.001' },
+                    input: {
+                      endAdornment: <InputAdornment position="end">/{volumeUnit}</InputAdornment>,
+                    },
+                  }}
                   value={pricePerUnit}
                   onChange={(e) => handlePriceChange(e.target.value)}
                   fullWidth
