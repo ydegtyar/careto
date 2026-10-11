@@ -27,14 +27,15 @@ export const ApiKeysSettingsCard = () => {
   const [copied, setCopied] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthVerified, setIsAuthVerified] = useState(false);
 
   const handleUnauthorized = useCallback(() => {
     setKeys([]);
+    setIsAuthVerified(false);
     queryClient.removeQueries({ queryKey: ['api_keys'] });
   }, [queryClient]);
 
-  const fetchKeys = async () => {
-    if (!session?.user) return;
+  const fetchKeys = useCallback(async () => {
     try {
       const res = await fetch('/api/keys/list', { credentials: 'include' });
       if (res.status === 401) {
@@ -44,37 +45,16 @@ export const ApiKeysSettingsCard = () => {
       if (res.ok) {
         const data = await res.json();
         setKeys(data.keys || []);
+        setIsAuthVerified(true);
       }
     } catch (err) {
       console.error('Failed to fetch API keys:', err);
     }
-  };
+  }, [handleUnauthorized]);
 
   useEffect(() => {
-    let ignore = false;
-    if (session?.user) {
-      fetch('/api/keys/list', { credentials: 'include' })
-        .then((res) => {
-          if (res.status === 401) {
-            handleUnauthorized();
-            return null;
-          }
-          return res.ok ? res.json() : null;
-        })
-        .then((data) => {
-          if (!ignore && data?.keys) {
-            setKeys(data.keys);
-          }
-        })
-        .catch((err) => {
-          console.error('Failed to fetch API keys:', err);
-        });
-    }
-
-    return () => {
-      ignore = true;
-    };
-  }, [session?.user, handleUnauthorized]);
+    fetchKeys();
+  }, [fetchKeys, session?.user]);
 
   const handleCreate = async () => {
     if (!keyName.trim()) return;
@@ -180,7 +160,7 @@ export const ApiKeysSettingsCard = () => {
           <Button
             size="small"
             variant="contained"
-            disabled={!session?.user}
+            disabled={!session?.user && !isAuthVerified}
             onClick={() => {
               setCreateError(null);
               setCreateOpen(true);
@@ -192,7 +172,7 @@ export const ApiKeysSettingsCard = () => {
         </div>
       </div>
 
-      {!sessionLoading && !session?.user ? (
+      {!sessionLoading && !session?.user && !isAuthVerified ? (
         <Alert
           severity="warning"
           sx={{ borderRadius: 2 }}

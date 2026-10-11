@@ -7,12 +7,13 @@ const NEON_AUTH_BASE = process.env.NEON_AUTH_BASE_URL || 'https://ep-old-queen-b
 function sanitizeCookie(cookieStr: string): string {
   // Strip Domain=... attribute so the browser attributes cookie to app host
   let cleaned = cookieStr.replace(/;\s*Domain=[^;]*/gi, '');
+  cleaned = cleaned.replace(/;\s*SameSite=[^;]*/gi, '');
+  cleaned = cleaned.replace(/;\s*Partitioned/gi, '');
+  cleaned = cleaned.trim();
   if (!/;\s*Path=/i.test(cleaned)) {
     cleaned += '; Path=/';
   }
-  if (!/;\s*SameSite=/i.test(cleaned)) {
-    cleaned += '; SameSite=Lax';
-  }
+  cleaned += '; SameSite=Lax';
   return cleaned;
 }
 
@@ -93,6 +94,74 @@ async function handleGoogleOneTap(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+async function handleGetSession(req: VercelRequest, res: VercelResponse) {
+  try {
+    const reqOrigin =
+      (req.headers['origin'] as string) ||
+      (req.headers['referer']
+        ? new URL(req.headers['referer'] as string).origin
+        : 'https://careto.vercel.app');
+
+    const upHeaders: Record<string, string> = {
+      'content-type': 'application/json',
+      origin: reqOrigin,
+    };
+    if (req.headers['cookie']) upHeaders['cookie'] = req.headers['cookie'] as string;
+    if (req.headers['authorization']) upHeaders['authorization'] = req.headers['authorization'] as string;
+
+    const upRes = await fetch(`${NEON_AUTH_BASE}/get-session`, {
+      method: 'GET',
+      headers: upHeaders,
+      redirect: 'manual',
+    });
+
+    // No active session (4xx/5xx) — forward as-is
+    if (!upRes.ok) {
+      const body = await upRes.text();
+      res.status(upRes.status);
+      res.setHeader('content-type', 'application/json');
+      return res.send(body || 'null');
+    }
+
+    const text = await upRes.text();
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // Not JSON — forward raw (e.g. redirect or empty body)
+      res.status(upRes.status);
+      res.setHeader('content-type', upRes.headers.get('content-type') || 'application/json');
+      return res.send(text);
+    }
+
+    // Enrich with name/email from DB if we have a user id
+    const userId = data?.user?.id;
+    if (userId) {
+      try {
+        const userRows = await sql`
+          SELECT name, email FROM neon_auth."user" WHERE id = ${userId} LIMIT 1
+        `;
+        if (userRows.length > 0) {
+          data.user = {
+            ...data.user,
+            name: userRows[0]!.name ?? data.user.name ?? null,
+            email: userRows[0]!.email ?? data.user.email,
+          };
+        }
+      } catch (dbErr) {
+        // Non-fatal: DB enrichment failed, return base session unchanged
+        console.warn('get-session DB enrichment failed:', dbErr);
+      }
+    }
+
+    res.setHeader('content-type', 'application/json');
+    return res.status(200).json(data);
+  } catch (err: any) {
+    console.error('get-session enrichment error:', err);
+    return res.status(500).json({ error: 'Session fetch failed' });
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     let subpath = '';
@@ -110,6 +179,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!subpath.startsWith('/')) {
       subpath = '/' + subpath;
+    }
+
+    // Intercept GET /get-session — enrich response with name/email from DB
+    if (subpath === '/get-session' && req.method === 'GET') {
+      return await handleGetSession(req, res);
     }
 
     // Intercept one-tap callback endpoints
