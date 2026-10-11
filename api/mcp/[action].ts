@@ -15,6 +15,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).end();
     }
 
+    // Handle HEAD probe
+    if (req.method === 'HEAD') {
+      return res.status(200).end();
+    }
+
     const action = req.query.action as string;
 
     // Delegate OAuth requests
@@ -55,6 +60,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const body = req.body || {};
       const { jsonrpc = '2.0', method, params = {}, id = 1 } = body;
 
+      console.log(`[MCP JSON-RPC] method=${method} hasSession=${!!session} id=${id}`);
+
       // Allow initialize method publicly
       if (method === 'initialize') {
         return res.status(200).json({
@@ -77,7 +84,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(200).end();
       }
 
-      // Check auth for tools/list and tools/call
+      // Public tools discovery for Gemini & other MCP clients
+      if (method === 'tools/list') {
+        return res.status(200).json({
+          jsonrpc: '2.0',
+          result: {
+            tools: CARETO_MCP_TOOLS,
+          },
+          id,
+        });
+      }
+
+      // Secure tool execution: requires valid session/API key
       if (!session) {
         const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
         const host = req.headers.host || 'careto.vercel.app';
@@ -91,16 +109,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(401).json({
           jsonrpc: '2.0',
           error: { code: -32001, message: 'Unauthorized. Bearer careto_sk_... API key, OAuth token, or valid session required.' },
-          id,
-        });
-      }
-
-      if (method === 'tools/list') {
-        return res.status(200).json({
-          jsonrpc: '2.0',
-          result: {
-            tools: CARETO_MCP_TOOLS,
-          },
           id,
         });
       }
