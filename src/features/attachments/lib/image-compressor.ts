@@ -1,5 +1,6 @@
 export interface CompressedImage {
   blob: Blob;
+  dataUrl: string;
   sha256: string;
   byteSize: number;
   width: number;
@@ -64,8 +65,11 @@ export async function compressAndPrepareImage(
             const arrayBuffer = await blob.arrayBuffer();
             const sha256 = await computeSha256(arrayBuffer);
 
+            const dataUrl = canvas.toDataURL('image/webp', quality);
+
             resolve({
               blob,
+              dataUrl,
               sha256,
               byteSize: blob.size,
               width,

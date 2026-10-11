@@ -10,13 +10,14 @@ import { useRef, useState } from 'react';
 import { type CompressedImage, compressAndPrepareImage } from '../../lib/image-compressor';
 
 interface Props {
+  initialImage?: string | null;
   onImageReady: (img: CompressedImage | null) => void;
 }
 
-export function ReceiptCapture({ onImageReady }: Props) {
+export function ReceiptCapture({ initialImage, onImageReady }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [compressing, setCompressing] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(initialImage || null);
   const [stats, setStats] = useState<{ origKb: number; compKb: number } | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -22,6 +22,8 @@ import { Route as RemindersIndexRouteImport } from './routes/reminders/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as SettingsConflictsRouteImport } from './routes/settings/conflicts'
 import { Route as SignInIndexRouteImport } from './routes/sign-in/index'
+import { Route as EntriesEntryIdIndexRouteImport } from './routes/entries/$entryId/index'
+import { Route as EntriesEntryIdEditRouteImport } from './routes/entries/$entryId/edit'
 import { Route as GarageVehiclesNewRouteImport } from './routes/garage/vehicles/new'
 import { Route as GarageVehiclesVehicleIdIndexRouteImport } from './routes/garage/vehicles/$vehicleId/index'
 import { Route as GarageVehiclesVehicleIdEditRouteImport } from './routes/garage/vehicles/$vehicleId/edit'
@@ -91,6 +93,16 @@ const SignInIndexRoute = SignInIndexRouteImport.update({
   path: '/sign-in/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EntriesEntryIdIndexRoute = EntriesEntryIdIndexRouteImport.update({
+  id: '/entries/$entryId/',
+  path: '/entries/$entryId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntriesEntryIdEditRoute = EntriesEntryIdEditRouteImport.update({
+  id: '/entries/$entryId/edit',
+  path: '/entries/$entryId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GarageVehiclesNewRoute = GarageVehiclesNewRouteImport.update({
   id: '/garage/vehicles/new',
   path: '/garage/vehicles/new',
@@ -123,7 +135,9 @@ export interface FileRoutesByFullPath {
   '/reminders/': typeof RemindersIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/sign-in/': typeof SignInIndexRoute
+  '/entries/$entryId/edit': typeof EntriesEntryIdEditRoute
   '/garage/vehicles/new': typeof GarageVehiclesNewRoute
+  '/entries/$entryId/': typeof EntriesEntryIdIndexRoute
   '/garage/vehicles/$vehicleId/edit': typeof GarageVehiclesVehicleIdEditRoute
   '/garage/vehicles/$vehicleId/': typeof GarageVehiclesVehicleIdIndexRoute
 }
@@ -141,7 +155,9 @@ export interface FileRoutesByTo {
   '/reminders': typeof RemindersIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/sign-in': typeof SignInIndexRoute
+  '/entries/$entryId/edit': typeof EntriesEntryIdEditRoute
   '/garage/vehicles/new': typeof GarageVehiclesNewRoute
+  '/entries/$entryId': typeof EntriesEntryIdIndexRoute
   '/garage/vehicles/$vehicleId/edit': typeof GarageVehiclesVehicleIdEditRoute
   '/garage/vehicles/$vehicleId': typeof GarageVehiclesVehicleIdIndexRoute
 }
@@ -160,7 +176,9 @@ export interface FileRoutesById {
   '/reminders/': typeof RemindersIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/sign-in/': typeof SignInIndexRoute
+  '/entries/$entryId/edit': typeof EntriesEntryIdEditRoute
   '/garage/vehicles/new': typeof GarageVehiclesNewRoute
+  '/entries/$entryId/': typeof EntriesEntryIdIndexRoute
   '/garage/vehicles/$vehicleId/edit': typeof GarageVehiclesVehicleIdEditRoute
   '/garage/vehicles/$vehicleId/': typeof GarageVehiclesVehicleIdIndexRoute
 }
@@ -180,7 +198,9 @@ export interface FileRouteTypes {
     | '/reminders/'
     | '/settings/'
     | '/sign-in/'
+    | '/entries/$entryId/edit'
     | '/garage/vehicles/new'
+    | '/entries/$entryId/'
     | '/garage/vehicles/$vehicleId/edit'
     | '/garage/vehicles/$vehicleId/'
   fileRoutesByTo: FileRoutesByTo
@@ -198,7 +218,9 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/settings'
     | '/sign-in'
+    | '/entries/$entryId/edit'
     | '/garage/vehicles/new'
+    | '/entries/$entryId'
     | '/garage/vehicles/$vehicleId/edit'
     | '/garage/vehicles/$vehicleId'
   id:
@@ -216,7 +238,9 @@ export interface FileRouteTypes {
     | '/reminders/'
     | '/settings/'
     | '/sign-in/'
+    | '/entries/$entryId/edit'
     | '/garage/vehicles/new'
+    | '/entries/$entryId/'
     | '/garage/vehicles/$vehicleId/edit'
     | '/garage/vehicles/$vehicleId/'
   fileRoutesById: FileRoutesById
@@ -235,7 +259,9 @@ export interface RootRouteChildren {
   RemindersIndexRoute: typeof RemindersIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
   SignInIndexRoute: typeof SignInIndexRoute
+  EntriesEntryIdEditRoute: typeof EntriesEntryIdEditRoute
   GarageVehiclesNewRoute: typeof GarageVehiclesNewRoute
+  EntriesEntryIdIndexRoute: typeof EntriesEntryIdIndexRoute
   GarageVehiclesVehicleIdEditRoute: typeof GarageVehiclesVehicleIdEditRoute
   GarageVehiclesVehicleIdIndexRoute: typeof GarageVehiclesVehicleIdIndexRoute
 }
@@ -333,6 +359,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/entries/$entryId/': {
+      id: '/entries/$entryId/'
+      path: '/entries/$entryId'
+      fullPath: '/entries/$entryId/'
+      preLoaderRoute: typeof EntriesEntryIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entries/$entryId/edit': {
+      id: '/entries/$entryId/edit'
+      path: '/entries/$entryId/edit'
+      fullPath: '/entries/$entryId/edit'
+      preLoaderRoute: typeof EntriesEntryIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/garage/vehicles/new': {
       id: '/garage/vehicles/new'
       path: '/garage/vehicles/new'
@@ -371,7 +411,9 @@ const rootRouteChildren: RootRouteChildren = {
   RemindersIndexRoute: RemindersIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
   SignInIndexRoute: SignInIndexRoute,
+  EntriesEntryIdEditRoute: EntriesEntryIdEditRoute,
   GarageVehiclesNewRoute: GarageVehiclesNewRoute,
+  EntriesEntryIdIndexRoute: EntriesEntryIdIndexRoute,
   GarageVehiclesVehicleIdEditRoute: GarageVehiclesVehicleIdEditRoute,
   GarageVehiclesVehicleIdIndexRoute: GarageVehiclesVehicleIdIndexRoute,
 }

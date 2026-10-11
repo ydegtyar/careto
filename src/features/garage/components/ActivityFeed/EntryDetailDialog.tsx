@@ -1,5 +1,6 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -13,6 +14,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { data } from '@/data/client';
 import type { Entry } from '@/data/client/types';
@@ -35,6 +37,7 @@ export interface ActivityEntryFormValues {
 }
 
 export function EntryDetailDialog({ entry, open, onClose }: Props) {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [dateFormat] = useDateFormatPreference();
   const [isEditing, setIsEditing] = useState(false);
@@ -121,6 +124,17 @@ export function EntryDetailDialog({ entry, open, onClose }: Props) {
           <span>{isEditing ? 'Edit Activity Entry' : 'Activity Details'}</span>
           {!isEditing && (
             <div style={styles.headerActions}>
+              <Button
+                size="small"
+                startIcon={<OpenInNewIcon />}
+                onClick={() => {
+                  handleCloseDialog();
+                  navigate({ to: `/entries/${entry.id}` });
+                }}
+                sx={styles.editButton}
+              >
+                Page
+              </Button>
               <Button
                 size="small"
                 startIcon={<EditIcon />}

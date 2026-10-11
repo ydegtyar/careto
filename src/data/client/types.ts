@@ -64,6 +64,13 @@ export enum EntryKind {
 
 export type EntryKindType = `${EntryKind}`;
 
+export interface EntrySubItem {
+  id: string;
+  name: string;
+  cost: string;
+  partNumber?: string;
+}
+
 export interface Entry {
   id: string;
   kind: EntryKindType | EntryKind;
@@ -79,6 +86,17 @@ export interface Entry {
   vendor_name?: string;
   lat?: number;
   lon?: number;
+  // Type-specific & attachment fields
+  image_data?: string;
+  fuel_volume?: number;
+  unit_price?: number;
+  fuel_grade?: string;
+  tank_id?: string;
+  is_full_tank?: boolean;
+  sub_items?: EntrySubItem[];
+  notes?: string;
+  payment_method?: string;
+  category?: string;
 }
 
 export interface ServiceItem {
