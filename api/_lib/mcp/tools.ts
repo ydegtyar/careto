@@ -132,6 +132,31 @@ export const CARETO_MCP_TOOLS: MCPToolDefinition[] = [
       required: ['vehicleId'],
     },
   },
+  {
+    name: 'careto_delete_entry',
+    description: 'Delete or tombstone an entry (expense, note, or reminder) from a vehicle timeline. Requires implicit user consent: the caller must specify confirmed=true with confirmationReason describing user approval.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        vehicleId: { type: 'string', description: 'UUID of the vehicle' },
+        entryId: { type: 'string', description: 'UUID of the entry / record to delete' },
+        tbl: { 
+          type: 'string', 
+          enum: ['expenses', 'notes', 'reminders'], 
+          description: 'Table / category of the record (defaults to expenses)' 
+        },
+        confirmed: { 
+          type: 'boolean', 
+          description: 'Implicit user consent flag. Must be set to true to execute deletion.' 
+        },
+        confirmationReason: { 
+          type: 'string', 
+          description: 'Context or user prompt indicating explicit intent to delete (e.g. "User requested deleting the duplicate Shell fuel expense on Oct 10")' 
+        },
+      },
+      required: ['vehicleId', 'entryId', 'confirmed'],
+    },
+  },
 ];
 
 export async function executeMCPTool(userId: string, name: string, args: Record<string, any>) {
@@ -379,6 +404,74 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         latestOdometerKm: maxOdometer,
         recentMerchants: Array.from(merchants),
         lastFuelPrice,
+      };
+    }
+
+    case 'careto_delete_entry': {
+      const { vehicleId, entryId, tbl = 'expenses', confirmed, confirmationReason } = args;
+
+      if (!confirmed) {
+        return {
+          ok: false,
+          requiresConsent: true,
+          message: 'Deletion requires user consent. Please confirm deletion by setting confirmed=true and specifying confirmationReason.',
+        };
+      }
+
+      // Verify entry exists in vehicle
+      const existing = await sql`
+        SELECT id, tbl, data, deleted
+        FROM records
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${entryId}::uuid
+          AND tbl = ${tbl}
+        LIMIT 1
+      `;
+
+      if (existing.length === 0) {
+        return {
+          ok: false,
+          error: `Entry ${entryId} not found in ${tbl} for vehicle ${vehicleId}.`,
+        };
+      }
+
+      const entry = existing[0]!;
+      if (entry.deleted) {
+        return {
+          ok: true,
+          message: `Entry ${entryId} was already deleted.`,
+        };
+      }
+
+      const hlc = `${Date.now()}-0000-0000`;
+
+      // Update vehicle seq
+      const v = await sql`SELECT seq FROM vehicles WHERE id = ${vehicleId}::uuid FOR UPDATE LIMIT 1`;
+      const nextSeq = (Number(v[0]?.seq) || 0) + 1;
+
+      // Soft delete / tombstone record for CRDT sync propagation
+      await sql`
+        UPDATE records
+        SET 
+          deleted = true,
+          deleted_hlc = ${hlc},
+          seq = ${nextSeq},
+          updated_by = ${userId}::uuid,
+          updated_at = now()
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${entryId}::uuid
+          AND tbl = ${tbl}
+      `;
+
+      await sql`UPDATE vehicles SET seq = ${nextSeq} WHERE id = ${vehicleId}::uuid`;
+
+      return {
+        ok: true,
+        deletedEntryId: entryId,
+        tbl,
+        seq: nextSeq,
+        confirmationReason: confirmationReason || 'Implicit user consent verified',
+        message: `Successfully deleted entry ${entryId} from ${tbl}.`,
       };
     }
 

@@ -458,12 +458,13 @@ Stitch: `b6135099397e4e70808808f61cdead74` + `1b1126734d304cd8aae6b69015675d52` 
 - [x] `/api/keys/create`, `/api/keys/list`, `/api/keys/revoke` endpoints (`api/keys/[action].ts`)
 - [x] `ApiKeysSettingsCard` UI component on Settings Page with one-click copy & pre-formatted MCP client config snippets
 - [x] MCP HTTP SSE (`/api/mcp/sse`) and JSON-RPC (`/api/mcp/messages`) server implementation (`api/mcp/[action].ts`)
-- [x] 8 MCP Tools implemented in `api/_lib/mcp/tools.ts`:
+- [x] 9 MCP Tools implemented in `api/_lib/mcp/tools.ts`:
   - `careto_list_vehicles`
   - `careto_get_vehicle_details`
   - `careto_analyze_spendings`
   - `careto_get_reminders`
   - `careto_add_entry`
+  - `careto_delete_entry` (Tombstone deletion with implicit user consent confirmation)
   - `careto_analyze_image_and_create_entry` (Vision AI OCR integration)
   - `careto_manage_grades`
   - `careto_get_filling_helpers`

@@ -4,20 +4,28 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import SpeedIcon from '@mui/icons-material/Speed';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Entry } from '@/data/client/types';
 import styles from './ActivityFeed.module.scss';
 import { ActivityItemRow } from './ActivityItemRow';
 import { EntryDetailDialog } from './EntryDetailDialog';
 
-interface Props {
+type Props = {
   entries: Entry[];
-}
+};
 
 export type EntryRecord = Entry;
 
-export function ActivityFeed({ entries }: Props) {
+export const ActivityFeed = ({ entries }: Props) => {
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
+
+  const sortedEntries = useMemo(() => {
+    return [...entries].sort((a, b) => {
+      const dateA = a.occurred_on + (a.occurred_time ? `T${a.occurred_time}` : '');
+      const dateB = b.occurred_on + (b.occurred_time ? `T${b.occurred_time}` : '');
+      return dateB.localeCompare(dateA);
+    });
+  }, [entries]);
 
   const getIcon = (kind: string) => {
     switch (kind) {
@@ -52,12 +60,12 @@ export function ActivityFeed({ entries }: Props) {
       </div>
 
       <div className={styles.list}>
-        {entries.length === 0 ? (
+        {sortedEntries.length === 0 ? (
           <Typography variant="body2" sx={{ color: 'text.secondary', py: 2, textAlign: 'center' }}>
             No recent activity recorded yet.
           </Typography>
         ) : (
-          entries.map((entry) => (
+          sortedEntries.map((entry) => (
             <ActivityItemRow
               key={entry.id}
               entry={entry}
