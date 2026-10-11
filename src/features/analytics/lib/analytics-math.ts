@@ -43,6 +43,17 @@ export interface BusinessDeductible {
   potentialWriteOffUsd: number;
 }
 
+export interface ConsumptionAnomaly {
+  id: string;
+  recentRate: number;
+  baselineRate: number;
+  spikePercentage: number;
+  unit: string;
+  isMpg: boolean;
+  recentRefuelCount: number;
+  recommendations: string[];
+}
+
 export interface AnomalyAlert {
   id: string;
   type: 'spike' | 'savings';
@@ -346,5 +357,145 @@ export function computeBusinessDeductible(entries: Entry[]): BusinessDeductible 
   return {
     distanceKm,
     potentialWriteOffUsd: Number(potentialWriteOffUsd.toFixed(2)),
+  };
+}
+
+export function computeConsumptionAnomaly(
+  entries: Entry[],
+  vehicle?: Vehicle,
+): ConsumptionAnomaly | null {
+  const isEv = vehicle?.powertrain === 'ev';
+  const effUnit = vehicle?.efficiency_unit || (isEv ? 'kwh100km' : 'l100km');
+  const isMpg = effUnit === 'mpg';
+  const unit =
+    effUnit === 'kwh100km' || effUnit === 'kwh_100km'
+      ? 'kWh/100km'
+      : effUnit === 'mpg'
+        ? 'MPG'
+        : 'L/100km';
+
+  // 1. Filter and sort refuel/charge entries with odometer and fuel volume in chronological order
+  const refuels = entries
+    .filter(
+      (e) =>
+        (e.kind === 'refuel' || e.kind === 'charge') &&
+        typeof e.odometer_m === 'number' &&
+        e.odometer_m > 0 &&
+        typeof e.fuel_volume === 'number' &&
+        e.fuel_volume > 0,
+    )
+    .sort((a, b) => {
+      const dateA = a.occurred_on + (a.occurred_time ? `T${a.occurred_time}` : '');
+      const dateB = b.occurred_on + (b.occurred_time ? `T${b.occurred_time}` : '');
+      if (dateA !== dateB) return dateA.localeCompare(dateB);
+      return (a.odometer_m ?? 0) - (b.odometer_m ?? 0);
+    });
+
+  if (refuels.length < 3) {
+    return null;
+  }
+
+  // 2. Compute consumption for each interval between refuels
+  interface IntervalStat {
+    id: string;
+    rate: number;
+    occurredOn: string;
+  }
+
+  const intervals: IntervalStat[] = [];
+  for (let i = 1; i < refuels.length; i++) {
+    const prev = refuels[i - 1];
+    const curr = refuels[i];
+    if (!prev?.odometer_m || !curr?.odometer_m || !curr?.fuel_volume) continue;
+
+    const deltaM = curr.odometer_m - prev.odometer_m;
+    if (deltaM <= 0) continue;
+
+    const distanceKm = deltaM / 1000;
+    const volume = curr.fuel_volume;
+
+    let rate: number;
+    if (isMpg) {
+      const miles = distanceKm / 1.609344;
+      const gallons = volume / 3.785411784;
+      rate = miles / gallons;
+    } else if (vehicle?.distance_unit === 'mi') {
+      const distanceMi = distanceKm / 1.609344;
+      rate = (volume / distanceMi) * 100;
+    } else {
+      rate = (volume / distanceKm) * 100;
+    }
+
+    if (rate > 0 && Number.isFinite(rate)) {
+      intervals.push({
+        id: curr.id,
+        rate,
+        occurredOn: curr.occurred_on,
+      });
+    }
+  }
+
+  // Need at least 2 intervals (3 refuels) to compare recent vs baseline
+  if (intervals.length < 2) {
+    return null;
+  }
+
+  // Baseline requires prior history. If we have at least 4 intervals, compare the last 2 intervals against prior baseline.
+  // If we have 2 or 3 intervals, compare the latest 1 interval against the prior intervals.
+  const recentCount = intervals.length >= 4 ? 2 : 1;
+  const recentIntervals = intervals.slice(-recentCount);
+  const baselineIntervals = intervals.slice(0, -recentCount);
+
+  if (baselineIntervals.length === 0) {
+    return null;
+  }
+
+  const recentAvg =
+    recentIntervals.reduce((sum, item) => sum + item.rate, 0) / recentIntervals.length;
+  const baselineAvg =
+    baselineIntervals.reduce((sum, item) => sum + item.rate, 0) / baselineIntervals.length;
+
+  if (baselineAvg <= 0 || recentAvg <= 0) {
+    return null;
+  }
+
+  // Calculate spike percentage
+  let spikePercentage: number;
+  if (isMpg) {
+    // For MPG: lower MPG means higher consumption (spike in consumption)
+    spikePercentage = Math.round(((baselineAvg - recentAvg) / baselineAvg) * 100);
+  } else {
+    // For L/100km or kWh/100km: higher value means higher consumption
+    spikePercentage = Math.round(((recentAvg - baselineAvg) / baselineAvg) * 100);
+  }
+
+  // Threshold: at least 15% spike
+  if (spikePercentage < 15) {
+    return null;
+  }
+
+  const recommendations: string[] = isEv
+    ? [
+        'Check tire pressures and wheel alignment.',
+        'Review recent high climate/HVAC usage or battery cabin overheat protection.',
+        'High highway cruising speeds significantly increase aerodynamic consumption.',
+      ]
+    : [
+        'Check cold tire inflation pressures (low PSI increases rolling resistance).',
+        'Inspect the engine air filter for dust or debris blockage.',
+        'Check for dragging brake calipers or aged spark plugs / ignition coils.',
+      ];
+
+  const latestInterval = recentIntervals[recentIntervals.length - 1];
+
+  return {
+    id: latestInterval?.id ?? 'anomaly',
+    recentRate: Number(recentAvg.toFixed(1)),
+    baselineRate: Number(baselineAvg.toFixed(1)),
+    spikePercentage,
+    unit,
+    isMpg,
+    recentRefuelCount: recentCount,
+    recommendations,
   };
 }

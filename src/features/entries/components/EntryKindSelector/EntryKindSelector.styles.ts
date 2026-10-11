@@ -61,6 +61,11 @@ export const styles: Record<string, SxProps<Theme>> = {
       '&:active': {
         transform: 'scale(0.97)',
       },
+      '&.Mui-disabled': {
+        opacity: 0.5,
+        cursor: 'not-allowed',
+        pointerEvents: 'auto',
+      },
     },
   },
 };

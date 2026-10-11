@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import EvStationIcon from '@mui/icons-material/EvStation';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
@@ -916,7 +917,11 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <LocalGasStationIcon sx={{ color: 'primary.main', fontSize: 18 }} />
+                      {powertrain === 'ev' ? (
+                        <EvStationIcon sx={{ color: 'primary.main', fontSize: 18 }} />
+                      ) : (
+                        <LocalGasStationIcon sx={{ color: 'primary.main', fontSize: 18 }} />
+                      )}
                       <Typography
                         variant="caption"
                         sx={{
@@ -926,7 +931,11 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
                           letterSpacing: '0.5px',
                         }}
                       >
-                        Enabled Fuel / Charge Grades for Vehicle
+                        {powertrain === 'ev'
+                          ? 'Enabled Charge Types for Vehicle'
+                          : powertrain === 'phev'
+                            ? 'Enabled Fuel & Charge Grades for Vehicle'
+                            : 'Enabled Fuel Grades for Vehicle'}
                       </Typography>
                     </div>
                     <Button

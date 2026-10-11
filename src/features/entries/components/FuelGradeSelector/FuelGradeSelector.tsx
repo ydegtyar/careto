@@ -36,8 +36,23 @@ export const FuelGradeSelector: React.FC<Props> = ({
     availableGrades = getGradesForPowertrain(powertrain, allGrades);
   }
 
-  const title =
-    powertrain === 'ev' ? 'Energy Grade' : powertrain ? 'Fuel Grade' : 'Fuel / Energy Grade';
+  const title = (() => {
+    if (filterCategory === 'ev' || (!activeVehicle && filterCategory !== 'all')) {
+      return filterCategory === 'ev' ? 'Energy Grade' : 'Fuel Grade';
+    }
+    switch (powertrain) {
+      case 'ev':
+        return 'Energy Grade';
+      case 'hybrid':
+        return 'Fuel';
+      case 'ice':
+      case 'phev':
+      case 'hydrogen':
+        return 'Fuel Grade';
+      default:
+        return 'Fuel / Energy Grade';
+    }
+  })();
 
   let displayedGrades = availableGrades;
   if (filterCategory !== 'all') {

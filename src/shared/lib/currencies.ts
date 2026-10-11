@@ -70,6 +70,27 @@ export function convertToUsdMinor(
   return Math.round(amountMinor / rate);
 }
 
+/**
+ * Converts a numeric amount from one currency to another using fallback FX rates.
+ */
+export function convertCurrency(
+  amount: number,
+  fromCurrency: string,
+  toCurrency: string,
+): number {
+  if (!amount || Number.isNaN(amount)) return 0;
+  const fromCode = fromCurrency.toUpperCase();
+  const toCode = toCurrency.toUpperCase();
+  if (fromCode === toCode) return amount;
+
+  const fromRate = USD_FALLBACK_RATES[fromCode] ?? 1.0;
+  const toRate = USD_FALLBACK_RATES[toCode] ?? 1.0;
+
+  // Amount in USD = amount / fromRate
+  // Amount in toCurrency = (amount / fromRate) * toRate
+  return (amount / fromRate) * toRate;
+}
+
 export interface FormattableAmount {
   amount_minor?: number | null;
   currency?: string | null;

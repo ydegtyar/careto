@@ -12,6 +12,7 @@ When creating or refactoring React components in TypeScript/JavaScript, follow t
 1. **Arrow Component Functions**: Declare functional components using arrow functions (`const Component = (...) => { ... }`).
 2. **Named Exports**: Use named exports (`export const Component = ...`) rather than default exports.
 3. **Props Type Naming**: Name component prop types/interfaces simply `Props` (or `Props` scoped locally to the component file), avoiding verbose suffixes like `ComponentProps`.
+4. **Avoid `render...` Helper Functions**: Do not use inner render functions like `const renderHeader = () => { ... }` or `renderItem(...)` inside components. Extract them into distinct, standalone React components instead.
 
 ## Example Pattern
 
@@ -39,3 +40,5 @@ export const Header = ({ title, subtitle, onClick }: Props) => {
 - **Prop Types**: Keep the interface/type name as `Props` when defined in the component file.
 - **Exports**: Prefer exporting component functions directly at declaration time: `export const MyComponent = ...`.
 - **Children Prop**: Explicitly define `children?: React.ReactNode` in `Props` when the component accepts children.
+- **No Inline `renderSomething` Helpers**: Avoid declaring helper functions like `const renderCard = () => { ... }` within component bodies. Inline JSX directly or extract a separate component (e.g. `Card`, `HeaderItem`) with its own `Props`.
+

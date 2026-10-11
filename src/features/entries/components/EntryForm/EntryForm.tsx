@@ -35,6 +35,8 @@ import {
 } from '@/features/entries/lib/fuel-grade-storage';
 import { entriesQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import {
+  ALL_CURRENCIES,
+  convertCurrency,
   convertToUsdMinor,
   useLastUsedCurrency,
   useLastUsedPaymentMethod,
@@ -46,9 +48,16 @@ export interface Props {
   onSave: (entryData: Partial<Entry>) => Promise<void>;
   onCancel: () => void;
   submitLabel?: string;
+  disableKindChange?: boolean;
 }
 
-export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, submitLabel }) => {
+export const EntryForm: React.FC<Props> = ({
+  initialEntry,
+  onSave,
+  onCancel,
+  submitLabel,
+  disableKindChange = false,
+}) => {
   const isEditMode = Boolean(initialEntry);
   const { activeVehicleId } = useAppStore();
   const { data: vehicles = [] } = useQuery(vehiclesQueryOptions());
@@ -70,22 +79,56 @@ export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, sub
   const [category, setCategory] = useState<string>(
     initialEntry?.category || (initialEntry?.kind === 'service' ? 'service' : 'fuel'),
   );
+  const initialCurrency = initialEntry?.currency || lastUsedCurrency || 'EUR';
+  const [currency, setCurrency] = useState(initialCurrency);
+
   const [fuelGrade, setFuelGrade] = useState<string>(initialEntry?.fuel_grade || lastUsedFuelGrade);
   const [amount, setAmount] = useState(
     initialEntry?.amount_minor !== undefined ? (initialEntry.amount_minor / 100).toFixed(2) : '',
   );
-  const [currency, setCurrency] = useState(initialEntry?.currency || lastUsedCurrency || 'EUR');
 
-  useEffect(() => {
-    if (isEditMode) return;
-    const latestEntryWithCurrency = entries.find((e) => Boolean(e.currency));
-    if (latestEntryWithCurrency?.currency) {
-      setCurrency(latestEntryWithCurrency.currency);
-    } else if (lastUsedCurrency) {
-      setCurrency(lastUsedCurrency);
+  const [volumeLiters, setVolumeLiters] = useState(
+    initialEntry?.fuel_volume !== undefined ? initialEntry.fuel_volume.toString() : '45.2',
+  );
+
+  const getHistoricalPriceForGrade = (targetGrade: string, targetCurrency: string): string => {
+    const historicalEntry = entries.find(
+      (e) =>
+        e.fuel_grade === targetGrade &&
+        e.unit_price !== undefined &&
+        Number(e.unit_price) > 0,
+    );
+
+    if (historicalEntry && historicalEntry.unit_price !== undefined) {
+      const historicalCurrency = historicalEntry.currency || 'EUR';
+      const converted = convertCurrency(
+        historicalEntry.unit_price,
+        historicalCurrency,
+        targetCurrency,
+      );
+      return converted.toFixed(3);
     }
-  }, [entries, lastUsedCurrency, isEditMode]);
 
+    const fallbackStored = lastPricesPerGrade[targetGrade] || '1.44';
+    const fallbackNum = parseFloat(fallbackStored);
+    if (!Number.isNaN(fallbackNum) && fallbackNum > 0) {
+      const converted = convertCurrency(fallbackNum, 'EUR', targetCurrency);
+      return converted.toFixed(3);
+    }
+    return fallbackStored;
+  };
+
+  const [pricePerUnit, setPricePerUnit] = useState<string>(() => {
+    if (initialEntry?.unit_price !== undefined) {
+      return initialEntry.unit_price.toString();
+    }
+    const currentGrade = initialEntry?.fuel_grade || lastUsedFuelGrade;
+    return getHistoricalPriceForGrade(currentGrade, initialCurrency);
+  });
+  const [isFullTank, setIsFullTank] = useState(initialEntry?.is_full_tank ?? true);
+  const [date, setDate] = useState(
+    initialEntry?.occurred_on || new Date().toISOString().slice(0, 10),
+  );
   const [odometerKm, setOdometerKm] = useState(
     initialEntry?.odometer_m !== undefined ? (initialEntry.odometer_m / 1000).toString() : '',
   );
@@ -102,18 +145,6 @@ export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, sub
     }
   }, [entries, activeVehicle?.initial_odometer_m, kind, isEditMode]);
 
-  const [volumeLiters, setVolumeLiters] = useState(
-    initialEntry?.fuel_volume !== undefined ? initialEntry.fuel_volume.toString() : '45.2',
-  );
-  const [pricePerUnit, setPricePerUnit] = useState<string>(
-    initialEntry?.unit_price !== undefined
-      ? initialEntry.unit_price.toString()
-      : lastPricesPerGrade[lastUsedFuelGrade] || '1.44',
-  );
-  const [isFullTank, setIsFullTank] = useState(initialEntry?.is_full_tank ?? true);
-  const [date, setDate] = useState(
-    initialEntry?.occurred_on || new Date().toISOString().slice(0, 10),
-  );
   const [paymentMethod, setPaymentMethod] = useState(
     initialEntry?.payment_method || lastUsedPaymentMethod || 'credit_card',
   );
@@ -219,8 +250,26 @@ export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, sub
     tanks.length > 0 && !tanks.some((t) => t.id === selectedTankId) ? tanks[0]?.id : selectedTankId;
 
   const handleCurrencyChange = (newCurrency: string) => {
+    const prevCurrency = currency;
     setCurrency(newCurrency);
     setLastUsedCurrency(newCurrency);
+
+    if (prevCurrency !== newCurrency && pricePerUnit) {
+      const priceNum = parseFloat(pricePerUnit);
+      if (!Number.isNaN(priceNum) && priceNum > 0) {
+        const convertedPrice = convertCurrency(priceNum, prevCurrency, newCurrency);
+        const formattedConvertedPrice = convertedPrice.toFixed(3);
+        setPricePerUnit(formattedConvertedPrice);
+
+        const volNum = parseFloat(volumeLiters);
+        const amtNum = parseFloat(amount);
+        if (!Number.isNaN(volNum) && volNum > 0) {
+          setAmount((volNum * convertedPrice).toFixed(2));
+        } else if (!Number.isNaN(amtNum) && amtNum > 0) {
+          setVolumeLiters((amtNum / convertedPrice).toFixed(1));
+        }
+      }
+    }
   };
 
   const handleAmountChange = (val: string) => {
@@ -256,17 +305,19 @@ export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, sub
   const handleFuelGradeChange = (newGrade: string) => {
     setFuelGrade(newGrade);
     setLastUsedFuelGrade(newGrade);
-    const storedPrice = lastPricesPerGrade[newGrade];
-    if (storedPrice) {
-      setPricePerUnit(storedPrice);
-      const priceNum = parseFloat(storedPrice);
-      const volNum = parseFloat(volumeLiters);
+    const historicalOrStoredPrice = getHistoricalPriceForGrade(newGrade, currency);
+    if (historicalOrStoredPrice) {
+      setPricePerUnit(historicalOrStoredPrice);
+      const priceNum = parseFloat(historicalOrStoredPrice);
       const amtNum = parseFloat(amount);
+      const volNum = parseFloat(volumeLiters);
       if (!Number.isNaN(priceNum) && priceNum > 0) {
-        if (!Number.isNaN(volNum) && volNum > 0) {
-          setAmount((volNum * priceNum).toFixed(2));
-        } else if (!Number.isNaN(amtNum) && amtNum > 0) {
+        if (!Number.isNaN(amtNum) && amtNum > 0) {
+          // Keep total amount unchanged and recalculate volume
           setVolumeLiters((amtNum / priceNum).toFixed(1));
+        } else if (!Number.isNaN(volNum) && volNum > 0) {
+          // If amount is not set but volume is, calculate amount
+          setAmount((volNum * priceNum).toFixed(2));
         }
       }
     }
@@ -305,6 +356,7 @@ export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, sub
   const isEvTank = selectedTank ? selectedTank.type === 'ev' : activeVehicle?.powertrain === 'ev';
   const volumeUnit = isEvTank ? 'kWh' : 'L';
   const volumeLabel = `Volume (${volumeUnit})`;
+  const currencySymbol = ALL_CURRENCIES.find((c) => c.code === currency)?.symbol ?? '';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -362,6 +414,7 @@ export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, sub
         {/* Entry Kind Selector */}
         <EntryKindSelector
           value={kind}
+          disabled={disableKindChange}
           onChange={(newKind) => {
             setKind(newKind);
             if (newKind === 'refuel') {
@@ -483,12 +536,17 @@ export const EntryForm: React.FC<Props> = ({ initialEntry, onSave, onCancel, sub
                   fullWidth
                 />
                 <TextField
-                  label={`Price / ${volumeUnit}`}
+                  label={`Price (${currencySymbol || currency}) / ${volumeUnit}`}
                   type="number"
                   slotProps={{
                     htmlInput: { step: '0.001' },
                     input: {
-                      endAdornment: <InputAdornment position="end">/{volumeUnit}</InputAdornment>,
+                      startAdornment: currencySymbol ? (
+                        <InputAdornment position="start">{currencySymbol}</InputAdornment>
+                      ) : undefined,
+                      endAdornment: (
+                        <InputAdornment position="end">/{volumeUnit}</InputAdornment>
+                      ),
                     },
                   }}
                   value={pricePerUnit}

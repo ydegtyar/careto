@@ -108,6 +108,7 @@ function EditEntryPage() {
         onSave={handleSave}
         onCancel={handleCancel}
         submitLabel="Update Entry"
+        disableKindChange
       />
     </div>
   );

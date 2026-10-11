@@ -77,6 +77,7 @@ async function main() {
         amount_minor: 6500,
         currency: 'EUR',
         usd_minor: 7020,
+        fuel_grade: 'ron95',
         driver_id: userId,
         business: 0,
       },

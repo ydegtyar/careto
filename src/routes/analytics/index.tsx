@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useAppStore } from '@/app/store';
 import {
   AnalyticsFilterPillsBar,
@@ -16,7 +16,27 @@ import { TcoSummaryCard } from '@/features/analytics/components/TcoSummaryCard';
 import { entriesQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import { styles } from './-index.styles';
 
+export interface AnalyticsSearchParams {
+  timeRange?: TimeRangeMode;
+  startDate?: string;
+  endDate?: string;
+}
+
+const VALID_TIME_RANGES: TimeRangeMode[] = ['all', 'may2025', 'ytd', '6months', 'custom'];
+
 export const Route = createFileRoute('/analytics/')({
+  validateSearch: (search: Record<string, unknown>): AnalyticsSearchParams => {
+    const rawTimeRange = typeof search.timeRange === 'string' ? search.timeRange : undefined;
+    const timeRange = VALID_TIME_RANGES.includes(rawTimeRange as TimeRangeMode)
+      ? (rawTimeRange as TimeRangeMode)
+      : undefined;
+
+    return {
+      timeRange,
+      startDate: typeof search.startDate === 'string' ? search.startDate : undefined,
+      endDate: typeof search.endDate === 'string' ? search.endDate : undefined,
+    };
+  },
   component: AnalyticsPage,
 });
 
@@ -24,12 +44,13 @@ function AnalyticsPage() {
   const { activeVehicleId } = useAppStore();
   const { data: vehicles = [] } = useQuery(vehiclesQueryOptions());
   const { data: rawEntries = [] } = useQuery(entriesQueryOptions(activeVehicleId ?? undefined));
+  const searchParams = Route.useSearch();
 
   const activeVehicle = vehicles.find((v) => v.id === activeVehicleId) || vehicles[0];
 
-  const [timeRange, setTimeRange] = useState<TimeRangeMode>('may2025');
-  const [startDate, setStartDate] = useState<string>('2026-01-01');
-  const [endDate, setEndDate] = useState<string>('2026-12-31');
+  const timeRange = searchParams.timeRange ?? 'all';
+  const startDate = searchParams.startDate ?? '2026-01-01';
+  const endDate = searchParams.endDate ?? '2026-12-31';
 
   // Filter entries based on timeRange
   const filteredEntries = useMemo(() => {
@@ -61,20 +82,13 @@ function AnalyticsPage() {
   return (
     <div style={styles.container}>
       {/* 1. Top Filter Pills Bar */}
-      <AnalyticsFilterPillsBar
-        timeRange={timeRange}
-        onTimeRangeChange={setTimeRange}
-        startDate={startDate}
-        onStartDateChange={setStartDate}
-        endDate={endDate}
-        onEndDateChange={setEndDate}
-      />
+      <AnalyticsFilterPillsBar />
 
       {/* 2. True Total Cost of Ownership Card */}
       <TcoSummaryCard entries={filteredEntries} vehicle={activeVehicle} />
 
       {/* 3. Consumption Anomaly Detected Banner */}
-      <ConsumptionAnomalyBanner />
+      <ConsumptionAnomalyBanner entries={rawEntries} vehicle={activeVehicle} />
 
       {/* Grid of Analytics Cards for Desktop */}
       <div style={styles.grid}>

@@ -2,9 +2,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckIcon from '@mui/icons-material/Check';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import EditIcon from '@mui/icons-material/Edit';
-import ElectricCarIcon from '@mui/icons-material/ElectricCar';
 import GroupIcon from '@mui/icons-material/Group';
 import ShareIcon from '@mui/icons-material/Share';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -30,6 +28,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppStore } from '@/app/store';
 import { data } from '@/data/client';
 import { MemberRow } from '@/features/garage/components/MemberRow/MemberRow';
+import { VehicleSpecsOverview } from '@/features/garage/components/VehicleSpecsOverview/VehicleSpecsOverview';
 import { vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 
@@ -214,14 +213,6 @@ function VehicleDetailPage() {
     );
   }
 
-  const isEv = vehicle.powertrain === 'ev';
-  const VehicleIcon = isEv ? ElectricCarIcon : DirectionsCarIcon;
-  const capacityDisplay = vehicle.tank_ml
-    ? `${vehicle.tank_ml / 1000} L`
-    : vehicle.battery_wh
-      ? `${vehicle.battery_wh / 1000} kWh`
-      : 'N/A';
-
   return (
     <div
       style={{
@@ -276,100 +267,7 @@ function VehicleDetailPage() {
       </div>
 
       {/* Readonly Specs Overview */}
-      <GlassCard style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              backgroundColor: 'rgba(125, 211, 252, 0.1)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <VehicleIcon style={{ color: vehicle.color || '#7dd3fc', fontSize: 26 }} />
-          </div>
-          <div>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'text.primary' }}>
-              {vehicle.make} {vehicle.model} ({vehicle.year})
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              {vehicle.trim ? `${vehicle.trim} • ` : ''}Powertrain:{' '}
-              {vehicle.powertrain.toUpperCase()}
-            </Typography>
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-            gap: 12,
-            paddingTop: 8,
-            borderTop: '1px solid rgba(125, 211, 252, 0.1)',
-          }}
-        >
-          <div>
-            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-              VIN
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
-              {vehicle.vin || 'Not provided'}
-            </Typography>
-          </div>
-
-          <div>
-            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-              License Plate
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {vehicle.plate || 'Not provided'}
-            </Typography>
-          </div>
-
-          <div>
-            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-              Capacity
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {capacityDisplay}
-            </Typography>
-          </div>
-
-          <div>
-            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-              Starting Odometer
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {vehicle.initial_odometer_m
-                ? `${vehicle.initial_odometer_m / 1000} ${vehicle.distance_unit}`
-                : '0'}
-            </Typography>
-          </div>
-
-          <div>
-            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-              Units
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {vehicle.distance_unit} / {vehicle.efficiency_unit}
-            </Typography>
-          </div>
-
-          <div>
-            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-              Fuel Grades
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {vehicle.fuel_grades && vehicle.fuel_grades.length > 0
-                ? vehicle.fuel_grades.join(', ')
-                : 'Default'}
-            </Typography>
-          </div>
-        </div>
-      </GlassCard>
+      <VehicleSpecsOverview vehicle={vehicle} />
 
       {/* Vehicle Sharing Section */}
       <GlassCard style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>

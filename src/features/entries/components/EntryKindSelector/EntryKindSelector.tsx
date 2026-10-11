@@ -16,22 +16,24 @@ export type EntryKind = 'refuel' | 'expense' | 'service' | 'note';
 interface Props {
   value: EntryKind;
   onChange: (kind: EntryKind) => void;
+  disabled?: boolean;
 }
 
-export const EntryKindSelector: React.FC<Props> = ({ value, onChange }) => {
+export const EntryKindSelector: React.FC<Props> = ({ value, onChange, disabled }) => {
   const { activeVehicleId } = useAppStore();
   const { data: vehicles = [] } = useQuery(vehiclesQueryOptions());
 
   const activeVehicle = vehicles.find((v) => v.id === activeVehicleId);
   const isEv = activeVehicle?.powertrain === 'ev';
 
-  const refuelLabel = isEv ? 'Charge' : activeVehicle?.powertrain ? 'Refuel' : 'Refuel / Charge';
+  const refuelLabel = isEv && 'Charge' || ['ice', 'hybrid'].includes(activeVehicle?.powertrain!) && 'Refuel' || 'Refuel / Charge';
   const RefuelIcon = isEv ? EvStationIcon : LocalGasStationIcon;
 
   return (
     <ToggleButtonGroup
       value={value}
       exclusive
+      disabled={disabled}
       onChange={(_, val: EntryKind | null) => {
         if (val) {
           onChange(val);

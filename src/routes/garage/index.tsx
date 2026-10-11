@@ -12,7 +12,7 @@ import {
   remindersQueryOptions,
   vehiclesQueryOptions,
 } from '@/features/garage/queries/vehicles';
-import { StatCard } from '@/shared/ui/StatCard/StatCard';
+import { TelemetrySnapshotGrid } from '@/features/garage/components/TelemetrySnapshotGrid/TelemetrySnapshotGrid';
 
 const EmptyVehicleState = React.lazy(
   () => import('@/features/garage/components/EmptyVehicleState/EmptyVehicleState'),
@@ -69,28 +69,8 @@ function GaragePage() {
     0,
   );
   const currentOdometerM = maxEntryOdo || activeVehicle.initial_odometer_m || 0;
-  const odometerDisplay = currentOdometerM > 0 ? (currentOdometerM / 1000).toLocaleString() : '0';
 
-  // 2. This Month's Spending
-  const currentYearMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-  const thisMonthEntries = entries.filter((e) => e.occurred_on?.startsWith(currentYearMonth));
-  const thisMonthSpentMinor = thisMonthEntries.reduce(
-    (sum, e) => sum + (e.usd_minor ?? e.amount_minor ?? 0),
-    0,
-  );
-  const thisMonthSpentDisplay =
-    thisMonthSpentMinor > 0 ? `$${(thisMonthSpentMinor / 100).toFixed(0)}` : '$0';
-
-  // 3. Avg Cost per Distance Unit
-  const totalSpentMinor = entries.reduce((sum, e) => sum + (e.usd_minor ?? e.amount_minor ?? 0), 0);
-  const distanceCoveredM = currentOdometerM - (activeVehicle.initial_odometer_m || 0);
-  const distanceCoveredKm = distanceCoveredM > 0 ? distanceCoveredM / 1000 : 0;
-  const avgCostPerKmDisplay =
-    distanceCoveredKm > 0 && totalSpentMinor > 0
-      ? `$${(totalSpentMinor / 100 / distanceCoveredKm).toFixed(2)}`
-      : '$0.00';
-
-  // 4. Efficiency & Consumption Calculation
+  // 2. Efficiency & Consumption Calculation for Hero Card
   // Sort entries descending by odometer (or occurred_on if odometer matches)
   const refuelEntries = entries
     .filter(
@@ -101,22 +81,9 @@ function GaragePage() {
     )
     .sort((a, b) => (b.odometer_m ?? 0) - (a.odometer_m ?? 0));
 
-  let calculatedEfficiency: string = '-';
   let consumptionLPerKm: number | null = null; // Standardized L/km or kWh/km
   const isEv = activeVehicle.powertrain === 'ev';
   const efficiencyUnitSetting = activeVehicle.efficiency_unit || (isEv ? 'kwh100km' : 'l100km');
-
-  // Friendly unit label mapping
-  let efficiencyUnitLabel = 'L/100km';
-  if (efficiencyUnitSetting === 'kwh100km' || efficiencyUnitSetting === 'kwh_100km') {
-    efficiencyUnitLabel = 'kWh/100km';
-  } else if (efficiencyUnitSetting === 'mpg') {
-    efficiencyUnitLabel = 'MPG';
-  } else if (efficiencyUnitSetting === 'l100km' || efficiencyUnitSetting === 'l_100km') {
-    efficiencyUnitLabel = 'L/100km';
-  } else {
-    efficiencyUnitLabel = efficiencyUnitSetting;
-  }
 
   if (refuelEntries.length >= 2 && refuelEntries[0] && refuelEntries[1]) {
     const latestRefuel = refuelEntries[0];
@@ -130,22 +97,6 @@ function GaragePage() {
 
       if (volumeLOrKwh > 0) {
         consumptionLPerKm = volumeLOrKwh / distanceKm;
-        if (efficiencyUnitSetting === 'mpg') {
-          // 1 mile = 1.609344 km; 1 US gallon = 3.785411784 liters
-          const miles = distanceKm / 1.609344;
-          const gallons = volumeLOrKwh / 3.785411784;
-          calculatedEfficiency = (miles / gallons).toFixed(1);
-        } else {
-          // Standard Metric consumption: volume per 100 km (or per 100 mi if distance_unit === 'mi')
-          if (activeVehicle.distance_unit === 'mi') {
-            const distanceMi = distanceKm / 1.609344;
-            const per100Mi = (volumeLOrKwh / distanceMi) * 100;
-            calculatedEfficiency = per100Mi.toFixed(1);
-          } else {
-            const per100Km = (volumeLOrKwh / distanceKm) * 100;
-            calculatedEfficiency = per100Km.toFixed(1);
-          }
-        }
       }
     }
   }
@@ -154,7 +105,7 @@ function GaragePage() {
   const effectiveConsumptionLPerKm =
     consumptionLPerKm ?? (isEv ? 0.17 : 0.065);
 
-  // 5. Hero Card Approximations: Days since refuel, remaining fuel/energy %, and range
+  // 3. Hero Card Approximations: Days since refuel, remaining fuel/energy %, and range
   const totalCapacityLOrKwh = isEv
     ? (activeVehicle.battery_wh ? activeVehicle.battery_wh / 1000 : 75)
     : (activeVehicle.tank_ml ? activeVehicle.tank_ml / 1000 : 55);
@@ -245,30 +196,7 @@ function GaragePage() {
       <QuickActions vehicle={activeVehicle} />
 
       {/* 5. Telemetry Snapshot Grid (2 cols on mobile, 4 cols on desktop) */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 12,
-        }}
-      >
-        <StatCard label="Odometer" value={odometerDisplay} unit={activeVehicle.distance_unit} />
-        <StatCard
-          label="This Month"
-          value={thisMonthSpentDisplay}
-          trend={thisMonthEntries.length > 0 ? `${thisMonthEntries.length} entries` : 'No entries'}
-        />
-        <StatCard
-          label="Avg Cost"
-          value={avgCostPerKmDisplay}
-          unit={`/${activeVehicle.distance_unit}`}
-        />
-        <StatCard
-          label="Efficiency"
-          value={calculatedEfficiency}
-          unit={efficiencyUnitLabel}
-        />
-      </div>
+      <TelemetrySnapshotGrid vehicle={activeVehicle} entries={entries} />
 
       {/* 6. Recent Activity Feed — Hidden when empty */}
       {entries.length > 0 && <ActivityFeed entries={entries} />}

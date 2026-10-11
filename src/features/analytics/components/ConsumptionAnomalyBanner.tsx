@@ -2,17 +2,46 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
+import { useNavigate } from '@tanstack/react-router';
 import type React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import type { Entry, Vehicle } from '@/data/client/types';
+import { computeConsumptionAnomaly } from '@/features/analytics/lib/analytics-math';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { styles } from './ConsumptionAnomalyBanner.styles';
 
-export const ConsumptionAnomalyBanner: React.FC = () => {
-  const [anomalyDismissed, setAnomalyDismissed] = useState(false);
+export interface ConsumptionAnomalyBannerProps {
+  entries: Entry[];
+  vehicle?: Vehicle;
+}
 
-  if (anomalyDismissed) {
+export const ConsumptionAnomalyBanner: React.FC<ConsumptionAnomalyBannerProps> = ({
+  entries,
+  vehicle,
+}) => {
+  const navigate = useNavigate();
+  const [dismissedAnomalyId, setDismissedAnomalyId] = useState<string | null>(null);
+
+  const anomaly = useMemo(() => {
+    return computeConsumptionAnomaly(entries, vehicle);
+  }, [entries, vehicle]);
+
+  if (!anomaly || dismissedAnomalyId === anomaly.id) {
     return null;
   }
+
+  const fillUpsLabel =
+    anomaly.recentRefuelCount === 1
+      ? 'Last fill-up showed'
+      : `Last ${anomaly.recentRefuelCount} fill-ups showed`;
+
+  const comparisonText = `${fillUpsLabel} ${anomaly.recentRate} ${anomaly.unit} over baseline of ${anomaly.baselineRate} ${anomaly.unit}.`;
+
+  const recommendationText = `💡 Recommended checks: ${anomaly.recommendations.join(' ')}`;
+
+  const handleCheckTireSpecs = () => {
+    navigate({ to: '/reminders' });
+  };
 
   return (
     <GlassCard style={styles.card}>
@@ -27,17 +56,16 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
               variant="caption"
               sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}
             >
-              Last 2 fill-ups showed 6.8 L/100km over 3-month baseline of 5.7 L/100km.
+              {comparisonText}
             </Typography>
           </div>
         </div>
-        <Chip label="+19% SPIKE" size="small" color={'error'} />
+        <Chip label={`+${anomaly.spikePercentage}% SPIKE`} size="small" color="error" />
       </div>
 
       <div style={styles.recBox}>
         <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-          💡 Recommended checks: Tire pressures (fronts measuring ~29 PSI vs 33 PSI factory spec) or
-          engine air filter restriction.
+          {recommendationText}
         </Typography>
       </div>
 
@@ -45,6 +73,7 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
         <Button
           variant="contained"
           size="small"
+          onClick={handleCheckTireSpecs}
           sx={{
             flex: 1,
             borderRadius: 2,
@@ -53,12 +82,12 @@ export const ConsumptionAnomalyBanner: React.FC = () => {
             fontSize: '0.78rem',
           }}
         >
-          Check Tire Specs
+          Check Maintenance & Tires
         </Button>
         <Button
           variant="outlined"
           size="small"
-          onClick={() => setAnomalyDismissed(true)}
+          onClick={() => setDismissedAnomalyId(anomaly.id)}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
