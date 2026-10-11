@@ -23,7 +23,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
@@ -50,6 +50,7 @@ function VehicleDetailPage() {
   const navigate = useNavigate();
   const { activeVehicleId, setActiveVehicleId } = useAppStore();
 
+  const queryClient = useQueryClient();
   const { data: vehicles = [], isLoading: loadingVehicles } = useQuery(vehiclesQueryOptions());
   const vehicle = vehicles.find((v) => v.id === vehicleId);
 
@@ -86,10 +87,21 @@ function VehicleDetailPage() {
     }
   };
 
+  const handleUnauthorized = useCallback(() => {
+    setMembers([]);
+    queryClient.removeQueries({ queryKey: ['vehicles'] });
+  }, [queryClient]);
+
   const fetchMembers = useCallback(async () => {
     if (!vehicleId) return;
     try {
-      const res = await fetch(`/api/vehicles/members?vehicle_id=${vehicleId}`);
+      const res = await fetch(`/api/vehicles/members?vehicle_id=${vehicleId}`, {
+        credentials: 'include',
+      });
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
       if (res.ok) {
         const data = (await res.json()) as { members?: Member[] };
         setMembers(data.members || []);
@@ -97,7 +109,7 @@ function VehicleDetailPage() {
     } finally {
       setLoadingMembers(false);
     }
-  }, [vehicleId]);
+  }, [vehicleId, handleUnauthorized]);
 
   useEffect(() => {
     fetchMembers();
@@ -115,8 +127,14 @@ function VehicleDetailPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ vehicleId, email, role }),
       });
+
+      if (res.status === 401) {
+        handleUnauthorized();
+        throw new Error('Unauthorized. Please sign in again.');
+      }
 
       const data = (await res.json()) as { error?: string; inviteUrl?: string };
       if (!res.ok) {
@@ -149,8 +167,13 @@ function VehicleDetailPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ vehicleId, targetUserId }),
       });
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
       if (res.ok) {
         fetchMembers();
       }

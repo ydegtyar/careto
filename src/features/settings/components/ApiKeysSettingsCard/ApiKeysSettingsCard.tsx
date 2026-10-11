@@ -10,13 +10,15 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useQueryClient } from '@tanstack/react-query';
 import { Link as RouterLink } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSession } from '@/lib/auth-client';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { type ApiKeyItem, ApiKeyRow } from './ApiKeyRow';
 
 export const ApiKeysSettingsCard = () => {
+  const queryClient = useQueryClient();
   const { data: session, isPending: sessionLoading } = useSession();
   const [keys, setKeys] = useState<ApiKeyItem[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
@@ -26,10 +28,19 @@ export const ApiKeysSettingsCard = () => {
   const [createError, setCreateError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleUnauthorized = useCallback(() => {
+    setKeys([]);
+    queryClient.removeQueries({ queryKey: ['api_keys'] });
+  }, [queryClient]);
+
   const fetchKeys = async () => {
     if (!session?.user) return;
     try {
       const res = await fetch('/api/keys/list', { credentials: 'include' });
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setKeys(data.keys || []);
@@ -43,7 +54,13 @@ export const ApiKeysSettingsCard = () => {
     let ignore = false;
     if (session?.user) {
       fetch('/api/keys/list', { credentials: 'include' })
-        .then((res) => (res.ok ? res.json() : null))
+        .then((res) => {
+          if (res.status === 401) {
+            handleUnauthorized();
+            return null;
+          }
+          return res.ok ? res.json() : null;
+        })
         .then((data) => {
           if (!ignore && data?.keys) {
             setKeys(data.keys);
@@ -57,7 +74,7 @@ export const ApiKeysSettingsCard = () => {
     return () => {
       ignore = true;
     };
-  }, [session?.user]);
+  }, [session?.user, handleUnauthorized]);
 
   const handleCreate = async () => {
     if (!keyName.trim()) return;
@@ -70,6 +87,11 @@ export const ApiKeysSettingsCard = () => {
         credentials: 'include',
         body: JSON.stringify({ name: keyName.trim() }),
       });
+      if (res.status === 401) {
+        handleUnauthorized();
+        setCreateError('Unauthorized. Please sign in again.');
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setNewKey(data.key);
@@ -95,6 +117,10 @@ export const ApiKeysSettingsCard = () => {
         credentials: 'include',
         body: JSON.stringify({ id }),
       });
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
       if (res.ok) {
         fetchKeys();
       }

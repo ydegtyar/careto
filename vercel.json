@@ -15,8 +15,6 @@
     { "source": "/api/mcp/oauth", "destination": "/api/mcp/[action]?action=oauth" },
     { "source": "/api/mcp/:action", "destination": "/api/mcp/[action]" },
     { "source": "/api/mcp", "destination": "/api/mcp/[action]?action=sse" },
-    { "source": "/mcp", "destination": "/api/mcp/[action]?action=sse" },
-    { "source": "/mcp/:action", "destination": "/api/mcp/[action]" },
     { "source": "/api/keys/:action", "destination": "/api/mcp/[action]" },
     { "source": "/api/auth/(.*)", "destination": "/api/auth/[...all]?__path=$1" },
     { "source": "/((?!api/|\\.well-known/|oauth/).*)", "destination": "/index.html" }
