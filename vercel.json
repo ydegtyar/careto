@@ -8,6 +8,7 @@
     { "source": "/api/push/:action", "destination": "/api/push/[action]" },
     { "source": "/api/export/:action", "destination": "/api/export/[action]" },
     { "source": "/api/ai/:action", "destination": "/api/ai/[action]" },
+    { "source": "/api/analytics/:action", "destination": "/api/analytics/[action]" },
     { "source": "/.well-known/oauth-protected-resource", "destination": "/api/well-known/[type]?type=protected-resource" },
     { "source": "/.well-known/oauth-authorization-server", "destination": "/api/well-known/[type]?type=authorization-server" },
     { "source": "/.well-known/openid-configuration", "destination": "/api/well-known/[type]?type=openid-configuration" },
