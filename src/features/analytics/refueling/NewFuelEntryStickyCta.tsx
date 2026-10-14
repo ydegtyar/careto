@@ -1,8 +1,8 @@
-import Button from '@mui/material/Button';
 import AddCircle from '@mui/icons-material/AddCircle';
+import Button from '@mui/material/Button';
 import { useNavigate } from '@tanstack/react-router';
 
-export function NewFuelEntryStickyCta() {
+export const NewFuelEntryStickyCta = () => {
   const navigate = useNavigate();
 
   return (

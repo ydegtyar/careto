@@ -1,14 +1,14 @@
-import Button from '@mui/material/Button';
+import Build from '@mui/icons-material/Build';
 import GridView from '@mui/icons-material/GridView';
 import LocalGasStation from '@mui/icons-material/LocalGasStation';
-import Build from '@mui/icons-material/Build';
 import ReceiptLong from '@mui/icons-material/ReceiptLong';
+import Button from '@mui/material/Button';
 import type React from 'react';
 import type { CSSProperties } from 'react';
 
-export type AnalyticsTab = 'general' | 'refueling' | 'services' ;
+export type AnalyticsTab = 'general' | 'refueling' | 'services';
 
-export interface AnalyticsTabsProps {
+export interface Props {
   currentTab: AnalyticsTab;
   onChange: (tab: AnalyticsTab) => void;
 }
@@ -35,10 +35,9 @@ const TABS: TabDefinition[] = [
     label: 'Services',
     icon: <Build sx={{ fontSize: 18 }} />,
   },
-
 ];
 
-export function AnalyticsTabs({ currentTab, onChange }: AnalyticsTabsProps) {
+export const AnalyticsTabs = ({ currentTab, onChange }: Props) => {
   const containerStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
@@ -78,17 +77,29 @@ export function AnalyticsTabs({ currentTab, onChange }: AnalyticsTabsProps) {
               px: { xs: '14px', sm: '18px' },
               whiteSpace: 'nowrap',
               backgroundColor: isActive ? 'var(--mui-palette-primary-main)' : 'transparent',
-              color: isActive ? 'var(--mui-palette-primary-contrastText)' : 'var(--mui-palette-text-secondary)',
-              boxShadow: isActive ? '0 0 16px color-mix(in srgb, var(--mui-palette-primary-main) 35%, transparent)' : 'none',
+              color: isActive
+                ? 'var(--mui-palette-primary-contrastText)'
+                : 'var(--mui-palette-text-secondary)',
+              boxShadow: isActive
+                ? '0 0 16px color-mix(in srgb, var(--mui-palette-primary-main) 35%, transparent)'
+                : 'none',
               '& .MuiButton-startIcon': {
                 mr: '6px',
-                color: isActive ? 'var(--mui-palette-primary-contrastText)' : 'var(--mui-palette-text-secondary)',
+                color: isActive
+                  ? 'var(--mui-palette-primary-contrastText)'
+                  : 'var(--mui-palette-text-secondary)',
               },
               '&:hover': {
-                backgroundColor: isActive ? 'color-mix(in srgb, var(--mui-palette-primary-main) 85%, transparent)' : 'color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent)',
-                color: isActive ? 'var(--mui-palette-primary-contrastText)' : 'var(--mui-palette-text-primary)',
+                backgroundColor: isActive
+                  ? 'color-mix(in srgb, var(--mui-palette-primary-main) 85%, transparent)'
+                  : 'color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent)',
+                color: isActive
+                  ? 'var(--mui-palette-primary-contrastText)'
+                  : 'var(--mui-palette-text-primary)',
                 '& .MuiButton-startIcon': {
-                  color: isActive ? 'var(--mui-palette-primary-contrastText)' : 'var(--mui-palette-text-primary)',
+                  color: isActive
+                    ? 'var(--mui-palette-primary-contrastText)'
+                    : 'var(--mui-palette-text-primary)',
                 },
               },
             }}
@@ -100,4 +111,3 @@ export function AnalyticsTabs({ currentTab, onChange }: AnalyticsTabsProps) {
     </div>
   );
 }
-

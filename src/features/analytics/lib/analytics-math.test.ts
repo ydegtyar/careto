@@ -3,15 +3,15 @@ import type { Entry, Vehicle } from '@/data/client/types';
 import {
   computeBusinessDeductible,
   computeCategoryDistribution,
+  computeClientRefuelingAnalytics,
+  computeClientServicesAnalytics,
   computeConsumptionAnomaly,
   computeEfficiencyTelemetry,
   computeMonthlyTrends,
+  computeOdometerProgression,
   computePriceVolatility,
   computeTCO,
   computeTravelDistance,
-  computeOdometerProgression,
-  computeClientRefuelingAnalytics,
-  computeClientServicesAnalytics,
 } from './analytics-math';
 
 const mockVehicle: Vehicle = {
@@ -519,5 +519,3 @@ describe('analytics-math', () => {
     });
   });
 });
-
-

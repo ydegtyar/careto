@@ -1,14 +1,14 @@
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { FuelPriceTrajectoryDto } from '../../../../api/_lib/analytics/types';
 import { styles } from '../shared/glacier.styles';
 
-export interface FuelPriceTrajectoryCardProps {
+interface Props {
   data: FuelPriceTrajectoryDto;
   volumeUnit?: string;
 }
 
-export function FuelPriceTrajectoryCard({ data, volumeUnit = 'L' }: FuelPriceTrajectoryCardProps) {
+export const FuelPriceTrajectoryCard = ({ data, volumeUnit = 'L' }: Props) => {
   const chartData = data.points.map((p) => {
     const [year, month] = p.month.split('-');
     const label = `${month}/${year?.slice(2)}`;
@@ -42,7 +42,12 @@ export function FuelPriceTrajectoryCard({ data, volumeUnit = 'L' }: FuelPriceTra
                 <stop offset="95%" stopColor="var(--mui-palette-primary-main)" stopOpacity={0.0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="monthLabel" stroke="var(--mui-palette-text-secondary)" fontSize={11} tickLine={false} />
+            <XAxis
+              dataKey="monthLabel"
+              stroke="var(--mui-palette-text-secondary)"
+              fontSize={11}
+              tickLine={false}
+            />
             <YAxis
               stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
@@ -87,7 +92,10 @@ export function FuelPriceTrajectoryCard({ data, volumeUnit = 'L' }: FuelPriceTra
         }}
       >
         <span style={{ color: 'var(--mui-palette-text-secondary)' }}>
-          Weighted Avg: <strong style={{ color: 'var(--mui-palette-text-primary)' }}>${data.overallWeightedAvgPrice?.toFixed(2) ?? '—'}</strong>
+          Weighted Avg:{' '}
+          <strong style={{ color: 'var(--mui-palette-text-primary)' }}>
+            ${data.overallWeightedAvgPrice?.toFixed(2) ?? '—'}
+          </strong>
         </span>
 
         {change !== null && (

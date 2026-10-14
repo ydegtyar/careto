@@ -14,7 +14,7 @@ interface Props {
   onImageReady: (img: CompressedImage | null) => void;
 }
 
-export function ReceiptCapture({ initialImage, onImageReady }: Props) {
+export const ReceiptCapture = ({ initialImage, onImageReady }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [compressing, setCompressing] = useState(false);
   const [preview, setPreview] = useState<string | null>(initialImage || null);

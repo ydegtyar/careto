@@ -1,11 +1,11 @@
-import Button from '@mui/material/Button';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import Button from '@mui/material/Button';
 import type { CSSProperties } from 'react';
 import { formatDatePreference, useDateFormatPreference } from '@/shared/lib/date-format-preference';
 
 export type PeriodPreset = '1M' | '3M' | '6M' | '1Y' | 'all' | 'custom';
 
-export interface PeriodFilterProps {
+export interface Props {
   currentPreset: PeriodPreset;
   from?: string;
   to?: string;
@@ -38,7 +38,7 @@ const pillsStyle: CSSProperties = {
   border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 14%, transparent)',
   gap: '2px',
 };
-export function PeriodFilter({ currentPreset, from, to, onChange }: PeriodFilterProps) {
+export const PeriodFilter = ({ currentPreset, from, to, onChange }: Props) => {
   const [dateFormat] = useDateFormatPreference();
 
   const handleSelectPreset = (preset: PeriodPreset) => {
@@ -81,11 +81,18 @@ export function PeriodFilter({ currentPreset, from, to, onChange }: PeriodFilter
                 fontSize: '0.75rem',
                 fontWeight: isActive ? 600 : 500,
                 textTransform: 'none',
-                backgroundColor: isActive ? 'color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent)' : 'transparent',
-                color: isActive ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-text-secondary)',
-                border: isActive ? '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 35%, transparent)' : '1px solid transparent',
+                backgroundColor: isActive
+                  ? 'color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent)'
+                  : 'transparent',
+                color: isActive
+                  ? 'var(--mui-palette-primary-main)'
+                  : 'var(--mui-palette-text-secondary)',
+                border: isActive
+                  ? '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 35%, transparent)'
+                  : '1px solid transparent',
                 '&:hover': {
-                  backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent)',
+                  backgroundColor:
+                    'color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent)',
                   color: 'var(--mui-palette-text-primary)',
                 },
               }}
@@ -105,13 +112,16 @@ export function PeriodFilter({ currentPreset, from, to, onChange }: PeriodFilter
             background: 'color-mix(in srgb, var(--mui-palette-background-paper) 60%, transparent)',
             padding: '4px 10px',
             borderRadius: '12px',
-            border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 14%, transparent)',
+            border:
+              '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 14%, transparent)',
             fontSize: '0.75rem',
             color: 'var(--mui-palette-text-secondary)',
           }}
         >
           <CalendarTodayIcon sx={{ fontSize: 13, color: 'var(--mui-palette-primary-main)' }} />
-          <span>{formattedFrom} — {formattedTo}</span>
+          <span>
+            {formattedFrom} — {formattedTo}
+          </span>
         </div>
       )}
     </div>

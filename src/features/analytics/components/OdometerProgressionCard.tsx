@@ -1,14 +1,7 @@
-import ShowChartIcon from '@mui/icons-material/ShowChart';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 import type React from 'react';
-import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { Entry, Vehicle } from '@/data/client/types';
 import { computeOdometerProgression } from '@/features/analytics/lib/analytics-math';
 import { styles } from './OdometerProgressionCard.styles';
@@ -57,8 +50,8 @@ export const OdometerProgressionCard: React.FC<Props> = ({ entries, vehicle }) =
           <div style={styles.titleTextGroup}>
             <h3 style={styles.title}>Odometer Progression</h3>
             <span style={styles.subTitle}>
-              {startOdometer.toLocaleString()} {distanceUnit} →{' '}
-              {currentOdometer.toLocaleString()} {distanceUnit} logged
+              {startOdometer.toLocaleString()} {distanceUnit} → {currentOdometer.toLocaleString()}{' '}
+              {distanceUnit} logged
             </span>
           </div>
         </div>
@@ -105,7 +98,10 @@ export const OdometerProgressionCard: React.FC<Props> = ({ entries, vehicle }) =
                 fontSize: '12px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               }}
-              formatter={(value: any) => [`${Number(value).toLocaleString()} ${distanceUnit}`, 'Odometer']}
+              formatter={(value: any) => [
+                `${Number(value).toLocaleString()} ${distanceUnit}`,
+                'Odometer',
+              ]}
             />
             <Area
               type="monotone"

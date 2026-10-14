@@ -10,8 +10,8 @@ interface Props {
   onMove: (idx: number, dir: 'up' | 'down') => void;
 }
 
-export function AdapterRow({ id, idx, totalLength, labels, onMove }: Props) {
-  return (
+export const AdapterRow = ({ id, idx, totalLength, labels, onMove }: Props) =>
+  (
     <div
       style={{
         display: 'flex',
@@ -66,4 +66,3 @@ export function AdapterRow({ id, idx, totalLength, labels, onMove }: Props) {
       </div>
     </div>
   );
-}

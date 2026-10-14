@@ -17,7 +17,7 @@ interface Props {
   variant?: 'button' | 'icon-button';
 }
 
-export function WheelsScanner({ onParsed, variant = 'button' }: Props) {
+export const WheelsScanner = ({ onParsed, variant = 'button' }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{
@@ -145,4 +145,4 @@ export function WheelsScanner({ onParsed, variant = 'button' }: Props) {
       )}
     </div>
   );
-}
+};

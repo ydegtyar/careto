@@ -3,12 +3,12 @@ import SavingsIcon from '@mui/icons-material/Savings';
 import type { GasStationsRankingDto } from '../../../../api/_lib/analytics/types';
 import { styles } from '../shared/glacier.styles';
 
-export interface GasStationsRankingCardProps {
+interface Props {
   data: GasStationsRankingDto;
   volumeUnit?: string;
 }
 
-export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRankingCardProps) {
+export const GasStationsRankingCard = ({ data, volumeUnit = 'L' }: Props) => {
   const { stations, optimizationInsight } = data;
 
   return (
@@ -38,7 +38,8 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
                 justifyContent: 'space-between',
                 padding: '10px 12px',
                 borderRadius: '14px',
-                background: 'color-mix(in srgb, var(--mui-palette-background-default) 50%, transparent)',
+                background:
+                  'color-mix(in srgb, var(--mui-palette-background-default) 50%, transparent)',
                 border: '1px solid var(--mui-palette-divider)',
               }}
             >
@@ -56,7 +57,13 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
 
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--mui-palette-text-primary)' }}>
+                    <span
+                      style={{
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                        color: 'var(--mui-palette-text-primary)',
+                      }}
+                    >
                       {s.brand}
                     </span>
                     <span
@@ -65,7 +72,9 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
                         fontWeight: 600,
                         padding: '1px 5px',
                         borderRadius: '6px',
-                        background: isCheaper ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        background: isCheaper
+                          ? 'rgba(16, 185, 129, 0.15)'
+                          : 'rgba(239, 68, 68, 0.15)',
                         color: isCheaper ? '#10b981' : '#ef4444',
                       }}
                     >
@@ -73,17 +82,35 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
                     </span>
                   </div>
 
-                  <div style={{ fontSize: '0.7rem', color: 'var(--mui-palette-text-secondary)', marginTop: '2px' }}>
+                  <div
+                    style={{
+                      fontSize: '0.7rem',
+                      color: 'var(--mui-palette-text-secondary)',
+                      marginTop: '2px',
+                    }}
+                  >
                     {s.refuelCount} refuels • {s.totalLiters} {volumeUnit}
                   </div>
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
+                <div
+                  style={{
+                    fontSize: '0.95rem',
+                    fontWeight: 700,
+                    color: 'var(--mui-palette-text-primary)',
+                  }}
+                >
                   ${s.totalSpend.toFixed(2)}
                 </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--mui-palette-primary-main)', fontWeight: 500 }}>
+                <div
+                  style={{
+                    fontSize: '0.7rem',
+                    color: 'var(--mui-palette-primary-main)',
+                    fontWeight: 500,
+                  }}
+                >
                   ${s.avgPricePerLiter.toFixed(2)}/{volumeUnit}
                 </div>
               </div>
@@ -99,7 +126,8 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
             marginTop: '14px',
             padding: '12px 14px',
             borderRadius: '14px',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent))',
+            background:
+              'linear-gradient(135deg, rgba(16, 185, 129, 0.1), color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent))',
             border: '1px solid rgba(16, 185, 129, 0.25)',
             display: 'flex',
             alignItems: 'flex-start',
@@ -107,7 +135,13 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
           }}
         >
           <SavingsIcon sx={{ fontSize: 20, color: '#10b981', mt: '2px' }} />
-          <div style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-primary)', lineHeight: 1.4 }}>
+          <div
+            style={{
+              fontSize: '0.75rem',
+              color: 'var(--mui-palette-text-primary)',
+              lineHeight: 1.4,
+            }}
+          >
             <span style={{ fontWeight: 700, color: '#10b981' }}>Optimization Insight: </span>
             {optimizationInsight.message}
           </div>

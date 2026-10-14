@@ -39,7 +39,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-export function Providers() {
+export const Providers = () => {
   useAutoUpdatePWA();
 
   React.useEffect(() => {
@@ -77,4 +77,4 @@ export function Providers() {
       </ThemeProvider>
     </PersistQueryClientProvider>
   );
-}
+};

@@ -1,26 +1,26 @@
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SpeedIcon from '@mui/icons-material/Speed';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import type { Vehicle } from '@/data/client/types';
 import type { RefuelingAnalyticsResponseDto } from '../../../../api/_lib/analytics/types';
-import { KpiCard } from '../shared/KpiCard';
 import { DonutCard } from '../shared/DonutCard';
-import { RefuelingRoutineCard } from './RefuelingRoutineCard';
-import { MonthlyExpensesCard } from './MonthlyExpensesCard';
-import { LastRefuelBenchmarkCard } from './LastRefuelBenchmarkCard';
-import { GasStationsRankingCard } from './GasStationsRankingCard';
-import { FuelPriceTrajectoryCard } from './FuelPriceTrajectoryCard';
-import { NewFuelEntryStickyCta } from './NewFuelEntryStickyCta';
 import { styles } from '../shared/glacier.styles';
+import { KpiCard } from '../shared/KpiCard';
+import { FuelPriceTrajectoryCard } from './FuelPriceTrajectoryCard';
+import { GasStationsRankingCard } from './GasStationsRankingCard';
+import { LastRefuelBenchmarkCard } from './LastRefuelBenchmarkCard';
+import { MonthlyExpensesCard } from './MonthlyExpensesCard';
+import { NewFuelEntryStickyCta } from './NewFuelEntryStickyCta';
+import { RefuelingRoutineCard } from './RefuelingRoutineCard';
 
-export interface RefuelingTabContentProps {
+interface Props {
   data: RefuelingAnalyticsResponseDto;
   vehicle?: Vehicle;
   isLoading?: boolean;
 }
 
-export function RefuelingTabContent({ data, vehicle, isLoading }: RefuelingTabContentProps) {
+export const RefuelingTabContent = ({ data, vehicle, isLoading }: Props) => {
   const { summary, routine, monthlyExpenses, benchmark, stations, fuelTypes, priceTrend } = data;
 
   const distanceUnit = vehicle?.distance_unit || 'km';
@@ -37,44 +37,99 @@ export function RefuelingTabContent({ data, vehicle, isLoading }: RefuelingTabCo
           value={summary.totalCost !== null ? `$${summary.totalCost.toLocaleString()}` : null}
           isLoading={isLoading}
           subMetrics={[
-            { label: 'Per day', value: summary.costPerDay !== null ? `$${summary.costPerDay}` : null, highlightColor: 'cyan' },
-            { label: `Per ${distanceUnit}`, value: summary.costPerKm !== null ? `$${summary.costPerKm}` : null, highlightColor: 'cyan' },
+            {
+              label: 'Per day',
+              value: summary.costPerDay !== null ? `$${summary.costPerDay}` : null,
+              highlightColor: 'cyan',
+            },
+            {
+              label: `Per ${distanceUnit}`,
+              value: summary.costPerKm !== null ? `$${summary.costPerKm}` : null,
+              highlightColor: 'cyan',
+            },
           ]}
         />
 
         <KpiCard
           title="Fuel Volume"
           icon={<LocalGasStationIcon sx={{ fontSize: 18 }} />}
-          value={summary.totalVolumeLiters !== null ? `${summary.totalVolumeLiters.toLocaleString()}` : null}
+          value={
+            summary.totalVolumeLiters !== null
+              ? `${summary.totalVolumeLiters.toLocaleString()}`
+              : null
+          }
           unit={volumeUnit}
           isLoading={isLoading}
           subMetrics={[
-            { label: 'Per refuel', value: summary.volumePerRefuel !== null ? `${summary.volumePerRefuel} ${volumeUnit}` : null },
-            { label: 'Per day', value: summary.volumePerDay !== null ? `${summary.volumePerDay} ${volumeUnit}` : null },
+            {
+              label: 'Per refuel',
+              value:
+                summary.volumePerRefuel !== null
+                  ? `${summary.volumePerRefuel} ${volumeUnit}`
+                  : null,
+            },
+            {
+              label: 'Per day',
+              value: summary.volumePerDay !== null ? `${summary.volumePerDay} ${volumeUnit}` : null,
+            },
           ]}
         />
 
         <KpiCard
           title={`Avg Price / ${volumeUnit}`}
           icon={<TrendingUpIcon sx={{ fontSize: 18 }} />}
-          value={summary.avgPricePerLiter !== null ? `$${summary.avgPricePerLiter.toFixed(2)}` : null}
+          value={
+            summary.avgPricePerLiter !== null ? `$${summary.avgPricePerLiter.toFixed(2)}` : null
+          }
           isLoading={isLoading}
           subMetrics={[
-            { label: 'Min', value: summary.minPricePerLiter !== null ? `$${summary.minPricePerLiter.toFixed(2)}` : null, highlightColor: 'green' },
-            { label: 'Max', value: summary.maxPricePerLiter !== null ? `$${summary.maxPricePerLiter.toFixed(2)}` : null, highlightColor: 'red' },
+            {
+              label: 'Min',
+              value:
+                summary.minPricePerLiter !== null
+                  ? `$${summary.minPricePerLiter.toFixed(2)}`
+                  : null,
+              highlightColor: 'green',
+            },
+            {
+              label: 'Max',
+              value:
+                summary.maxPricePerLiter !== null
+                  ? `$${summary.maxPricePerLiter.toFixed(2)}`
+                  : null,
+              highlightColor: 'red',
+            },
           ]}
         />
 
         <KpiCard
           title="Avg Efficiency"
           icon={<SpeedIcon sx={{ fontSize: 18 }} />}
-          value={summary.avgEfficiencyL100km !== null ? `${summary.avgEfficiencyL100km.toFixed(2)}` : null}
+          value={
+            summary.avgEfficiencyL100km !== null
+              ? `${summary.avgEfficiencyL100km.toFixed(2)}`
+              : null
+          }
           unit={effUnit}
           isLoading={isLoading}
           valueColor="var(--mui-palette-primary-main)"
           subMetrics={[
-            { label: 'Best', value: summary.bestEfficiencyL100km !== null ? `${summary.bestEfficiencyL100km.toFixed(2)}` : null, highlightColor: 'green' },
-            { label: 'Worst', value: summary.worstEfficiencyL100km !== null ? `${summary.worstEfficiencyL100km.toFixed(2)}` : null, highlightColor: 'red' },
+            {
+              label: 'Best',
+              value:
+                summary.bestEfficiencyL100km !== null
+                  ? `${summary.bestEfficiencyL100km.toFixed(2)}`
+                  : null,
+              highlightColor: 'green',
+            },
+            {
+              label: 'Worst',
+              value:
+                summary.worstEfficiencyL100km !== null
+                  ? `${summary.worstEfficiencyL100km.toFixed(2)}`
+                  : null,
+              highlightColor: 'red',
+            },
           ]}
         />
       </div>
@@ -86,7 +141,11 @@ export function RefuelingTabContent({ data, vehicle, isLoading }: RefuelingTabCo
       <MonthlyExpensesCard data={monthlyExpenses} />
 
       {/* 4. Last Refuel Benchmark */}
-      <LastRefuelBenchmarkCard benchmark={benchmark} efficiencyUnit={effUnit} distanceUnit={distanceUnit} />
+      <LastRefuelBenchmarkCard
+        benchmark={benchmark}
+        efficiencyUnit={effUnit}
+        distanceUnit={distanceUnit}
+      />
 
       {/* 5. Gas Stations Ranking & Savings Insight */}
       <GasStationsRankingCard data={stations} volumeUnit={volumeUnit} />
@@ -107,7 +166,6 @@ export function RefuelingTabContent({ data, vehicle, isLoading }: RefuelingTabCo
 
       {/* 7. Fuel Price Trajectory Area Chart */}
       <FuelPriceTrajectoryCard data={priceTrend} volumeUnit={volumeUnit} />
-
     </div>
   );
 }

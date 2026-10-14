@@ -1,13 +1,13 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import BuildIcon from '@mui/icons-material/Build';
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { MonthlyServiceTrajectoryDto } from '../../../../api/_lib/analytics/types';
 import { styles } from '../shared/glacier.styles';
 
-export interface MonthlyServiceTrajectoryCardProps {
+interface Props {
   data: MonthlyServiceTrajectoryDto;
 }
 
-export function MonthlyServiceTrajectoryCard({ data }: MonthlyServiceTrajectoryCardProps) {
+export const MonthlyServiceTrajectoryCard = ({ data }: Props) => {
   const chartData = data.points.map((p) => {
     const [year, month] = p.month.split('-');
     const label = `${month}/${year?.slice(2)}`;
@@ -27,7 +27,13 @@ export function MonthlyServiceTrajectoryCard({ data }: MonthlyServiceTrajectoryC
         </div>
 
         {data.peakMonth && (
-          <span style={{ fontSize: '0.75rem', color: 'var(--mui-palette-tertiary-main)', fontWeight: 600 }}>
+          <span
+            style={{
+              fontSize: '0.75rem',
+              color: 'var(--mui-palette-tertiary-main)',
+              fontWeight: 600,
+            }}
+          >
             Peak: ${data.peakCost} ({data.peakMonth})
           </span>
         )}
@@ -36,7 +42,12 @@ export function MonthlyServiceTrajectoryCard({ data }: MonthlyServiceTrajectoryC
       <div style={{ width: '100%', height: 160, marginTop: '8px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-            <XAxis dataKey="monthLabel" stroke="var(--mui-palette-text-secondary)" fontSize={11} tickLine={false} />
+            <XAxis
+              dataKey="monthLabel"
+              stroke="var(--mui-palette-text-secondary)"
+              fontSize={11}
+              tickLine={false}
+            />
             <YAxis
               stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
@@ -55,11 +66,7 @@ export function MonthlyServiceTrajectoryCard({ data }: MonthlyServiceTrajectoryC
               }}
               formatter={(value: any) => [`$${value}`, 'Service Spend']}
             />
-            <Bar
-              dataKey="cost"
-              fill="var(--mui-palette-tertiary-main)"
-              radius={[4, 4, 0, 0]}
-            />
+            <Bar dataKey="cost" fill="var(--mui-palette-tertiary-main)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

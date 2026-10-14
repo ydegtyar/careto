@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { styles } from './glacier.styles';
 
 export interface DonutItem {
@@ -9,7 +9,7 @@ export interface DonutItem {
   subLabel?: string;
 }
 
-export interface DonutCardProps {
+export interface Props {
   title: string;
   centerText: string;
   centerSubText?: string;
@@ -17,7 +17,7 @@ export interface DonutCardProps {
   footer?: React.ReactNode;
 }
 
-export function DonutCard({ title, centerText, centerSubText, items, footer }: DonutCardProps) {
+export const DonutCard = ({ title, centerText, centerSubText, items, footer }: Props) => {
   const chartData = items.map((item) => ({
     name: item.name,
     value: item.value,
@@ -29,7 +29,16 @@ export function DonutCard({ title, centerText, centerSubText, items, footer }: D
         <h4 style={styles.title}>{title}</h4>
       </div>
 
-      <div style={{ position: 'relative', width: '100%', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '160px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -57,11 +66,23 @@ export function DonutCard({ title, centerText, centerSubText, items, footer }: D
             pointerEvents: 'none',
           }}
         >
-          <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
+          <span
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              color: 'var(--mui-palette-text-primary)',
+            }}
+          >
             {centerText}
           </span>
           {centerSubText && (
-            <span style={{ fontSize: '0.7rem', color: 'var(--mui-palette-text-secondary)', textTransform: 'uppercase' }}>
+            <span
+              style={{
+                fontSize: '0.7rem',
+                color: 'var(--mui-palette-text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
               {centerSubText}
             </span>
           )}
@@ -70,15 +91,36 @@ export function DonutCard({ title, centerText, centerSubText, items, footer }: D
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
         {items.map((item, idx) => (
-          <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+          <div
+            key={idx}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '0.8rem',
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: item.color }} />
-              <span style={{ color: 'var(--mui-palette-text-primary)', fontWeight: 500 }}>{item.name}</span>
+              <div
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: item.color,
+                }}
+              />
+              <span style={{ color: 'var(--mui-palette-text-primary)', fontWeight: 500 }}>
+                {item.name}
+              </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {item.subLabel && <span style={{ color: 'var(--mui-palette-text-secondary)' }}>{item.subLabel}</span>}
+              {item.subLabel && (
+                <span style={{ color: 'var(--mui-palette-text-secondary)' }}>{item.subLabel}</span>
+              )}
               {item.sharePercent !== undefined && (
-                <span style={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}>{item.sharePercent}%</span>
+                <span style={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}>
+                  {item.sharePercent}%
+                </span>
               )}
             </div>
           </div>
@@ -86,7 +128,13 @@ export function DonutCard({ title, centerText, centerSubText, items, footer }: D
       </div>
 
       {footer && (
-        <div style={{ borderTop: '1px solid var(--mui-palette-divider)', marginTop: '14px', paddingTop: '10px' }}>
+        <div
+          style={{
+            borderTop: '1px solid var(--mui-palette-divider)',
+            marginTop: '14px',
+            paddingTop: '10px',
+          }}
+        >
           {footer}
         </div>
       )}

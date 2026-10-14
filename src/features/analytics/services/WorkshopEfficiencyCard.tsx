@@ -1,14 +1,14 @@
 import StarIcon from '@mui/icons-material/Star';
-import VerifiedIcon from '@mui/icons-material/Verified';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import type { WorkshopEfficiencyDto } from '../../../../api/_lib/analytics/types';
 import { styles } from '../shared/glacier.styles';
 
-export interface WorkshopEfficiencyCardProps {
+interface Props {
   data: WorkshopEfficiencyDto;
 }
 
-export function WorkshopEfficiencyCard({ data }: WorkshopEfficiencyCardProps) {
+export const WorkshopEfficiencyCard = ({ data }: Props) => {
   if (!data.hasData || !data.workshopName) {
     return (
       <div style={styles.glassCard}>
@@ -18,15 +18,18 @@ export function WorkshopEfficiencyCard({ data }: WorkshopEfficiencyCardProps) {
             <h4 style={styles.title}>Workshop Efficiency</h4>
           </div>
         </div>
-        <div style={{ color: 'var(--mui-palette-text-secondary)', fontSize: '0.85rem' }}>No workshop data for this period.</div>
+        <div style={{ color: 'var(--mui-palette-text-secondary)', fontSize: '0.85rem' }}>
+          No workshop data for this period.
+        </div>
       </div>
     );
   }
 
   const isUnder = data.diffVsBenchmarkPercent !== null && data.diffVsBenchmarkPercent < 0;
-  const diffLabel = data.diffVsBenchmarkPercent !== null
-    ? `${Math.abs(data.diffVsBenchmarkPercent)}% ${isUnder ? 'Under' : 'Over'} Benchmark`
-    : 'Benchmark rate';
+  const diffLabel =
+    data.diffVsBenchmarkPercent !== null
+      ? `${Math.abs(data.diffVsBenchmarkPercent)}% ${isUnder ? 'Under' : 'Over'} Benchmark`
+      : 'Benchmark rate';
 
   return (
     <div style={styles.glassCard}>
@@ -64,21 +67,52 @@ export function WorkshopEfficiencyCard({ data }: WorkshopEfficiencyCardProps) {
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
+            <span
+              style={{
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                color: 'var(--mui-palette-text-primary)',
+              }}
+            >
               {data.workshopName}
             </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#f59e0b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '2px',
+                color: '#f59e0b',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+              }}
+            >
               <StarIcon sx={{ fontSize: 14 }} />
               <span>{data.rating?.toFixed(1) ?? '5.0'}</span>
             </div>
           </div>
 
-          <div style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)', marginTop: '2px' }}>
+          <div
+            style={{
+              fontSize: '0.75rem',
+              color: 'var(--mui-palette-text-secondary)',
+              marginTop: '2px',
+            }}
+          >
             {data.specialization}
           </div>
 
-          <div style={{ fontSize: '0.75rem', color: 'var(--mui-palette-primary-main)', marginTop: '6px' }}>
-            Rate: <strong style={{ color: 'var(--mui-palette-text-primary)' }}>${data.hourlyRate}/hr</strong> • Avg Reg: ${data.benchmarkHourlyRate}/hr
+          <div
+            style={{
+              fontSize: '0.75rem',
+              color: 'var(--mui-palette-primary-main)',
+              marginTop: '6px',
+            }}
+          >
+            Rate:{' '}
+            <strong style={{ color: 'var(--mui-palette-text-primary)' }}>
+              ${data.hourlyRate}/hr
+            </strong>{' '}
+            • Avg Reg: ${data.benchmarkHourlyRate}/hr
           </div>
         </div>
       </div>

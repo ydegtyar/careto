@@ -6,7 +6,11 @@ export interface CostSlice {
   color: string;
 }
 
-export function CostDonut({ data = [] }: { data?: CostSlice[] }) {
+type Props = {
+  data?: CostSlice[];
+};
+
+export const CostDonut = ({ data = [] }: Props) => {
   const chartData = data;
 
   return (

@@ -1,8 +1,8 @@
-import Button from '@mui/material/Button';
 import BuildCircle from '@mui/icons-material/BuildCircle';
+import Button from '@mui/material/Button';
 import { useNavigate } from '@tanstack/react-router';
 
-export function LogServiceStickyCta() {
+export const LogServiceStickyCta = () => {
   const navigate = useNavigate();
 
   return (

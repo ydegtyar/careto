@@ -30,7 +30,7 @@ const ADAPTER_LABELS: Record<AdapterId, { title: string; desc: string }> = {
   },
 };
 
-export function AiSettingsCard() {
+export const AiSettingsCard = () => {
   const { adapterOrder, customApiKey, setAdapterOrder, setCustomApiKey, resetDefaults } =
     useAiSettingsStore();
 
@@ -159,4 +159,4 @@ export function AiSettingsCard() {
       </div>
     </GlassCard>
   );
-}
+};

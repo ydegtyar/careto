@@ -1,13 +1,12 @@
 import type React from 'react';
 
-export function LegendItemRow({
-  cat,
-  styles,
-}: {
+type Props = {
   cat: { name: string; color: string; value: number; percentage: number };
   styles: Record<string, React.CSSProperties>;
-}) {
-  return (
+};
+
+export const LegendItemRow = ({ cat, styles }: Props) =>
+  (
     <div style={styles.legendItem}>
       <span style={{ color: cat.color, fontSize: '0.78rem', fontWeight: 600 }}>● {cat.name}</span>
       <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>
@@ -16,4 +15,3 @@ export function LegendItemRow({
       </span>
     </div>
   );
-}

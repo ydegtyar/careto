@@ -1,17 +1,17 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { OdometerCostProgressionDto } from '../../../../api/_lib/analytics/types';
 import { styles } from '../shared/glacier.styles';
 
-export interface OdometerCostProgressionCardProps {
+interface Props {
   data: OdometerCostProgressionDto;
   distanceUnit?: string;
 }
 
-export function OdometerCostProgressionCard({
+export const OdometerCostProgressionCard = ({
   data,
   distanceUnit = 'km',
-}: OdometerCostProgressionCardProps) {
+}: Props) => {
   const chartData = data.points.map((p) => ({
     odometerLabel: `${(p.odometerKm / 1000).toFixed(0)}k`,
     costPerKm: p.costPerKm,
@@ -27,7 +27,13 @@ export function OdometerCostProgressionCard({
         </div>
 
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--mui-palette-primary-main)' }}>
+          <div
+            style={{
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              color: 'var(--mui-palette-primary-main)',
+            }}
+          >
             ${data.currentCostPerKm?.toFixed(2) ?? '—'}/{distanceUnit}
           </div>
           <div style={{ fontSize: '0.65rem', color: 'var(--mui-palette-text-secondary)' }}>
@@ -39,7 +45,12 @@ export function OdometerCostProgressionCard({
       <div style={{ width: '100%', height: 160, marginTop: '8px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-            <XAxis dataKey="odometerLabel" stroke="var(--mui-palette-text-secondary)" fontSize={11} tickLine={false} />
+            <XAxis
+              dataKey="odometerLabel"
+              stroke="var(--mui-palette-text-secondary)"
+              fontSize={11}
+              tickLine={false}
+            />
             <YAxis
               stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
@@ -82,8 +93,17 @@ export function OdometerCostProgressionCard({
           fontSize: '0.75rem',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--mui-palette-text-secondary)' }}>
-          <span>• {data.currentOdometerKm?.toLocaleString()} {distanceUnit} Current</span>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: 'var(--mui-palette-text-secondary)',
+          }}
+        >
+          <span>
+            • {data.currentOdometerKm?.toLocaleString()} {distanceUnit} Current
+          </span>
           <span>• Service Point</span>
         </div>
 

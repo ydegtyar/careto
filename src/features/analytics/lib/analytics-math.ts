@@ -508,10 +508,7 @@ export interface TravelDistanceSummary {
   distanceUnit: string;
 }
 
-export function computeTravelDistance(
-  entries: Entry[],
-  vehicle?: Vehicle,
-): TravelDistanceSummary {
+export function computeTravelDistance(entries: Entry[], vehicle?: Vehicle): TravelDistanceSummary {
   const distanceUnit = vehicle?.distance_unit || 'km';
   const initialOdoM = vehicle?.initial_odometer_m ?? 0;
 
@@ -595,9 +592,7 @@ export function computeOdometerProgression(
   const odoEntries = entries
     .filter(
       (e) =>
-        typeof e.odometer_m === 'number' &&
-        e.odometer_m > 0 &&
-        typeof e.occurred_on === 'string',
+        typeof e.odometer_m === 'number' && e.odometer_m > 0 && typeof e.occurred_on === 'string',
     )
     .sort((a, b) => {
       const cmp = a.occurred_on.localeCompare(b.occurred_on);
@@ -652,13 +647,11 @@ export function computeOdometerProgression(
     if (diff > 0) days = diff;
   }
 
-  const rollingPacePerDay =
-    days > 0 ? Number((distanceLogged / days).toFixed(1)) : 26.1;
+  const rollingPacePerDay = days > 0 ? Number((distanceLogged / days).toFixed(1)) : 26.1;
 
   // Next milestone (next round 10,000 threshold)
   const milestoneStep = 10000;
-  const nextMilestoneKm =
-    Math.ceil((currentOdometer + 1) / milestoneStep) * milestoneStep;
+  const nextMilestoneKm = Math.ceil((currentOdometer + 1) / milestoneStep) * milestoneStep;
   const kmRemaining = Math.max(0, nextMilestoneKm - currentOdometer);
   const daysToNextMilestone =
     rollingPacePerDay > 0 ? Math.round(kmRemaining / rollingPacePerDay) : 60;
@@ -678,10 +671,10 @@ export function computeOdometerProgression(
 export function computeClientRefuelingAnalytics(
   entries: Entry[],
   vehicle?: Vehicle,
-  allEntries?: Entry[]
+  allEntries?: Entry[],
 ): import('../../../../api/_lib/analytics/types').RefuelingAnalyticsResponseDto {
   // Use all available entries for overall vehicle telemetry if provided
-  const contextEntries = (allEntries && allEntries.length > 0) ? allEntries : entries;
+  const contextEntries = allEntries && allEntries.length > 0 ? allEntries : entries;
 
   // Filter refuel entries
   const refuels = entries
@@ -689,8 +682,14 @@ export function computeClientRefuelingAnalytics(
     .map((e) => {
       const odometerKm = e.odometer_m ? Math.round(e.odometer_m / 1000) : 0;
       const totalCost = (e.usd_minor ?? e.amount_minor ?? 0) / 100;
-      const liters = e.fuel_volume && e.fuel_volume > 0 ? e.fuel_volume : totalCost > 0 ? totalCost / 3.5 : 0;
-      const pricePerLiter = liters > 0 ? Number((totalCost / liters).toFixed(2)) : (e.unit_price ? e.unit_price / 100 : 3.5);
+      const liters =
+        e.fuel_volume && e.fuel_volume > 0 ? e.fuel_volume : totalCost > 0 ? totalCost / 3.5 : 0;
+      const pricePerLiter =
+        liters > 0
+          ? Number((totalCost / liters).toFixed(2))
+          : e.unit_price
+            ? e.unit_price / 100
+            : 3.5;
 
       return {
         id: e.id,
@@ -700,8 +699,10 @@ export function computeClientRefuelingAnalytics(
         liters: Number(liters.toFixed(2)),
         price_per_liter: Number(pricePerLiter.toFixed(2)),
         total_cost: Number(totalCost.toFixed(2)),
-        fuel_type_id: e.fuel_grade || (vehicle?.powertrain === 'ev' ? 'Electricity' : 'Gasoline 95'),
-        fuel_type_name: e.fuel_grade || (vehicle?.powertrain === 'ev' ? 'Electricity' : 'Gasoline 95'),
+        fuel_type_id:
+          e.fuel_grade || (vehicle?.powertrain === 'ev' ? 'Electricity' : 'Gasoline 95'),
+        fuel_type_name:
+          e.fuel_grade || (vehicle?.powertrain === 'ev' ? 'Electricity' : 'Gasoline 95'),
         station_id: e.vendor_name || 'Shell',
         station_brand: e.vendor_name || 'Shell',
         station_name: e.vendor_name || 'Shell',
@@ -743,18 +744,33 @@ export function computeClientRefuelingAnalytics(
   }
 
   // 1. KPI Summary
-  const totalCost = refuels.length > 0 ? Number(refuels.reduce((sum, r) => sum + r.total_cost, 0).toFixed(2)) : null;
-  const totalVolumeLiters = refuels.length > 0 ? Number(refuels.reduce((sum, r) => sum + r.liters, 0).toFixed(2)) : null;
-  const costPerDay = totalCost !== null && periodDays > 0 ? Number((totalCost / periodDays).toFixed(2)) : null;
-  const costPerKm = totalCost !== null && kmDriven > 0 ? Number((totalCost / kmDriven).toFixed(2)) : null;
-  const volumePerRefuel = totalVolumeLiters !== null && refuels.length > 0 ? Number((totalVolumeLiters / refuels.length).toFixed(2)) : null;
-  const volumePerDay = totalVolumeLiters !== null && periodDays > 0 ? Number((totalVolumeLiters / periodDays).toFixed(2)) : null;
+  const totalCost =
+    refuels.length > 0
+      ? Number(refuels.reduce((sum, r) => sum + r.total_cost, 0).toFixed(2))
+      : null;
+  const totalVolumeLiters =
+    refuels.length > 0 ? Number(refuels.reduce((sum, r) => sum + r.liters, 0).toFixed(2)) : null;
+  const costPerDay =
+    totalCost !== null && periodDays > 0 ? Number((totalCost / periodDays).toFixed(2)) : null;
+  const costPerKm =
+    totalCost !== null && kmDriven > 0 ? Number((totalCost / kmDriven).toFixed(2)) : null;
+  const volumePerRefuel =
+    totalVolumeLiters !== null && refuels.length > 0
+      ? Number((totalVolumeLiters / refuels.length).toFixed(2))
+      : null;
+  const volumePerDay =
+    totalVolumeLiters !== null && periodDays > 0
+      ? Number((totalVolumeLiters / periodDays).toFixed(2))
+      : null;
 
   const totalCostSum = refuels.reduce((s, r) => s + r.total_cost, 0);
   const totalLitersSum = refuels.reduce((s, r) => s + r.liters, 0);
-  const avgPricePerLiter = totalLitersSum > 0 ? Number((totalCostSum / totalLitersSum).toFixed(2)) : null;
-  const minPricePerLiter = refuels.length > 0 ? Math.min(...refuels.map((r) => r.price_per_liter)) : null;
-  const maxPricePerLiter = refuels.length > 0 ? Math.max(...refuels.map((r) => r.price_per_liter)) : null;
+  const avgPricePerLiter =
+    totalLitersSum > 0 ? Number((totalCostSum / totalLitersSum).toFixed(2)) : null;
+  const minPricePerLiter =
+    refuels.length > 0 ? Math.min(...refuels.map((r) => r.price_per_liter)) : null;
+  const maxPricePerLiter =
+    refuels.length > 0 ? Math.max(...refuels.map((r) => r.price_per_liter)) : null;
 
   // Chained efficiency
   const efficiencies: number[] = [];
@@ -786,11 +802,14 @@ export function computeClientRefuelingAnalytics(
     }
   }
 
-  const avgEfficiencyL100km = efficiencies.length > 0
-    ? Number((efficiencies.reduce((s, e) => s + e, 0) / efficiencies.length).toFixed(2))
-    : null;
-  const bestEfficiencyL100km = efficiencies.length > 0 ? Number(Math.min(...efficiencies).toFixed(2)) : null;
-  const worstEfficiencyL100km = efficiencies.length > 0 ? Number(Math.max(...efficiencies).toFixed(2)) : null;
+  const avgEfficiencyL100km =
+    efficiencies.length > 0
+      ? Number((efficiencies.reduce((s, e) => s + e, 0) / efficiencies.length).toFixed(2))
+      : null;
+  const bestEfficiencyL100km =
+    efficiencies.length > 0 ? Number(Math.min(...efficiencies).toFixed(2)) : null;
+  const worstEfficiencyL100km =
+    efficiencies.length > 0 ? Number(Math.max(...efficiencies).toFixed(2)) : null;
 
   const summary = {
     totalCost,
@@ -815,13 +834,16 @@ export function computeClientRefuelingAnalytics(
     avgDaysBetween = Number((periodDays / (refuels.length - 1)).toFixed(1));
     avgKmBetween = Number((kmDriven / (refuels.length - 1)).toFixed(0));
   }
-  const currentRangeKm = avgEfficiencyL100km && avgEfficiencyL100km > 0
-    ? Math.round((tankCapacityL / avgEfficiencyL100km) * 100)
-    : null;
+  const currentRangeKm =
+    avgEfficiencyL100km && avgEfficiencyL100km > 0
+      ? Math.round((tankCapacityL / avgEfficiencyL100km) * 100)
+      : null;
   const fullTankCount = refuels.filter((r) => r.is_full_tank).length;
-  const fullTankIndexPercent = refuels.length > 0 ? Math.round((fullTankCount / refuels.length) * 100) : null;
+  const fullTankIndexPercent =
+    refuels.length > 0 ? Math.round((fullTankCount / refuels.length) * 100) : null;
   const monthsInPeriod = Math.max(1, periodDays / 30);
-  const monthlyAverageSpend = totalCost !== null ? Number((totalCost / monthsInPeriod).toFixed(0)) : null;
+  const monthlyAverageSpend =
+    totalCost !== null ? Number((totalCost / monthsInPeriod).toFixed(0)) : null;
 
   const routine = {
     frequencyDays: avgDaysBetween,
@@ -834,7 +856,10 @@ export function computeClientRefuelingAnalytics(
   };
 
   // 3. Monthly Expenses
-  const monthlyMap = new Map<string, { total: number; byType: Map<string, { name: string; cost: number }> }>();
+  const monthlyMap = new Map<
+    string,
+    { total: number; byType: Map<string, { name: string; cost: number }> }
+  >();
   for (const r of refuels) {
     const monthKey = r.date.slice(0, 7);
     if (!monthlyMap.has(monthKey)) {
@@ -887,17 +912,33 @@ export function computeClientRefuelingAnalytics(
     avgEfficiencyL100km,
     maxEfficiencyL100km: worstEfficiencyL100km,
     costPerKm: lastRefuelCostPerKm,
-    minCostPerKm: allCostPerKmValues.length > 0 ? Number(Math.min(...allCostPerKmValues).toFixed(2)) : null,
-    avgCostPerKm: allCostPerKmValues.length > 0 ? Number((allCostPerKmValues.reduce((s, c) => s + c, 0) / allCostPerKmValues.length).toFixed(2)) : null,
-    maxCostPerKm: allCostPerKmValues.length > 0 ? Number(Math.max(...allCostPerKmValues).toFixed(2)) : null,
+    minCostPerKm:
+      allCostPerKmValues.length > 0 ? Number(Math.min(...allCostPerKmValues).toFixed(2)) : null,
+    avgCostPerKm:
+      allCostPerKmValues.length > 0
+        ? Number(
+            (allCostPerKmValues.reduce((s, c) => s + c, 0) / allCostPerKmValues.length).toFixed(2),
+          )
+        : null,
+    maxCostPerKm:
+      allCostPerKmValues.length > 0 ? Number(Math.max(...allCostPerKmValues).toFixed(2)) : null,
   };
 
   // 5. Gas Stations Ranking
-  const stationMap = new Map<string, { brand: string; name: string; totalCost: number; totalLiters: number; count: number }>();
+  const stationMap = new Map<
+    string,
+    { brand: string; name: string; totalCost: number; totalLiters: number; count: number }
+  >();
   for (const r of refuels) {
     const brand = r.station_brand || 'Independent';
     if (!stationMap.has(brand)) {
-      stationMap.set(brand, { brand, name: r.station_name || brand, totalCost: 0, totalLiters: 0, count: 0 });
+      stationMap.set(brand, {
+        brand,
+        name: r.station_name || brand,
+        totalCost: 0,
+        totalLiters: 0,
+        count: 0,
+      });
     }
     const s = stationMap.get(brand)!;
     s.totalCost += r.total_cost;
@@ -909,7 +950,8 @@ export function computeClientRefuelingAnalytics(
   const stationsRankingItems = Array.from(stationMap.entries())
     .map(([brand, data], idx) => {
       const avgP = data.totalLiters > 0 ? data.totalCost / data.totalLiters : 0;
-      const diffPercent = overallAvgPrice > 0 ? ((avgP - overallAvgPrice) / overallAvgPrice) * 100 : 0;
+      const diffPercent =
+        overallAvgPrice > 0 ? ((avgP - overallAvgPrice) / overallAvgPrice) * 100 : 0;
       return {
         rank: idx + 1,
         stationId: brand,
@@ -925,21 +967,26 @@ export function computeClientRefuelingAnalytics(
     .sort((a, b) => a.avgPricePerLiter - b.avgPricePerLiter)
     .map((item, idx) => ({ ...item, rank: idx + 1 }));
 
-  let optimizationInsight: import('../../../../api/_lib/analytics/types').GasStationsRankingDto['optimizationInsight'] = null;
+  let optimizationInsight: import('../../../../api/_lib/analytics/types').GasStationsRankingDto['optimizationInsight'] =
+    null;
   if (stationsRankingItems.length >= 2) {
     const eligible = stationsRankingItems.filter((s) => s.refuelCount >= 2);
     const bestBrandObj = eligible.length > 0 ? eligible[0] : stationsRankingItems[0];
     if (bestBrandObj) {
       let totalSavings = 0;
       for (const r of refuels) {
-        if (r.station_brand !== bestBrandObj.brand && r.price_per_liter > bestBrandObj.avgPricePerLiter) {
+        if (
+          r.station_brand !== bestBrandObj.brand &&
+          r.price_per_liter > bestBrandObj.avgPricePerLiter
+        ) {
           totalSavings += (r.price_per_liter - bestBrandObj.avgPricePerLiter) * r.liters;
         }
       }
       if (totalSavings > 0) {
         const potentialSavingsPeriod = Number(totalSavings.toFixed(2));
         const potentialSavingsAnnualized = Number(((totalSavings / periodDays) * 365).toFixed(2));
-        const pricierBrand = stationsRankingItems[stationsRankingItems.length - 1]?.brand || 'other brands';
+        const pricierBrand =
+          stationsRankingItems[stationsRankingItems.length - 1]?.brand || 'other brands';
         optimizationInsight = {
           show: true,
           cheapestBrand: bestBrandObj.brand,
@@ -975,7 +1022,8 @@ export function computeClientRefuelingAnalytics(
   const totalAllocCost = Array.from(fuelTypeMap.values()).reduce((s, f) => s + f.totalCost, 0);
 
   const fuelTypeItems = Array.from(fuelTypeMap.entries()).map(([id, item], idx) => {
-    const sharePercent = totalAllocCost > 0 ? Math.round((item.totalCost / totalAllocCost) * 100) : 0;
+    const sharePercent =
+      totalAllocCost > 0 ? Math.round((item.totalCost / totalAllocCost) * 100) : 0;
     return {
       fuelTypeId: id,
       name: item.name,
@@ -1011,7 +1059,9 @@ export function computeClientRefuelingAnalytics(
     const firstMonthData = monthlyMap.get(priceMonths[0]!)!;
     const lastMonthData = monthlyMap.get(priceMonths[priceMonths.length - 1]!)!;
     if (firstMonthData.total > 0) {
-      changePercentOverPeriod = Number((((lastMonthData.total - firstMonthData.total) / firstMonthData.total) * 100).toFixed(1));
+      changePercentOverPeriod = Number(
+        (((lastMonthData.total - firstMonthData.total) / firstMonthData.total) * 100).toFixed(1),
+      );
     }
   }
 
@@ -1036,18 +1086,15 @@ export function computeClientRefuelingAnalytics(
 export function computeClientServicesAnalytics(
   entries: Entry[],
   vehicle?: Vehicle,
-  allEntries?: Entry[]
+  allEntries?: Entry[],
 ): import('../../../../api/_lib/analytics/types').ServicesAnalyticsResponseDto {
   // Use all available entries for overall vehicle telemetry if provided
-  const contextEntries = (allEntries && allEntries.length > 0) ? allEntries : entries;
+  const contextEntries = allEntries && allEntries.length > 0 ? allEntries : entries;
 
   // Filter service entries
   const serviceEntries = entries
     .filter(
-      (e) =>
-        e.kind === 'service' ||
-        e.category_id === 'service' ||
-        e.category_id === 'maintenance'
+      (e) => e.kind === 'service' || e.category_id === 'service' || e.category_id === 'maintenance',
     )
     .sort((a, b) => (a.occurred_on || '').localeCompare(b.occurred_on || ''));
 
@@ -1066,9 +1113,10 @@ export function computeClientServicesAnalytics(
       const currency = s.currency || 'USD';
       for (const item of s.sub_items) {
         const rawCost = parseFloat(item.cost) || 0;
-        const itemCost = currency === 'USD'
-          ? rawCost
-          : convertToUsdMinor(Math.round(rawCost * 100), currency) / 100;
+        const itemCost =
+          currency === 'USD'
+            ? rawCost
+            : convertToUsdMinor(Math.round(rawCost * 100), currency) / 100;
         const name = item.name || 'Service Item';
         const isLabor = name.toLowerCase().includes('labor') || name.toLowerCase().includes('work');
         if (isLabor) {
@@ -1121,19 +1169,30 @@ export function computeClientServicesAnalytics(
     const diff = Math.round((lastDate - firstDate) / (1000 * 3600 * 24));
     if (diff > 0) periodDays = diff;
 
-    const odometers = serviceEntries.map((s) => (s.odometer_m ? Math.round(s.odometer_m / 1000) : 0)).filter((o) => o > 0);
+    const odometers = serviceEntries
+      .map((s) => (s.odometer_m ? Math.round(s.odometer_m / 1000) : 0))
+      .filter((o) => o > 0);
     if (odometers.length >= 2) {
       kmDriven = Math.max(...odometers) - Math.min(...odometers);
     }
   }
 
-  const costPerDay = serviceEntries.length > 0 && periodDays > 0 ? Number((totalServiceCost / periodDays).toFixed(2)) : null;
-  const costPerKm = serviceEntries.length > 0 && kmDriven > 0 ? Number((totalServiceCost / kmDriven).toFixed(2)) : null;
+  const costPerDay =
+    serviceEntries.length > 0 && periodDays > 0
+      ? Number((totalServiceCost / periodDays).toFixed(2))
+      : null;
+  const costPerKm =
+    serviceEntries.length > 0 && kmDriven > 0
+      ? Number((totalServiceCost / kmDriven).toFixed(2))
+      : null;
 
   // Scheduled vs breakdown
-  const scheduledCount = serviceEntries.filter((s) => !s.notes?.toLowerCase().includes('breakdown')).length;
+  const scheduledCount = serviceEntries.filter(
+    (s) => !s.notes?.toLowerCase().includes('breakdown'),
+  ).length;
   const breakdownCount = serviceEntries.length - scheduledCount;
-  const maintenanceRatePercent = serviceEntries.length > 0 ? Math.round((scheduledCount / serviceEntries.length) * 100) : 100;
+  const maintenanceRatePercent =
+    serviceEntries.length > 0 ? Math.round((scheduledCount / serviceEntries.length) * 100) : 100;
 
   let serviceCadenceKm: number | null = null;
   let serviceCadenceDays: number | null = null;
@@ -1223,10 +1282,42 @@ export function computeClientServicesAnalytics(
 
   // 4. Predictive Component Life
   const componentRules = [
-    { component: 'Engine Oil & Filter', intervalKm: 10000, intervalDays: 365, usedKm: 3400, usedDays: 85, icon: 'oil_barrel', reason: 'Standard wear' },
-    { component: 'Cabin Microfilter', intervalKm: 20000, intervalDays: 365, usedKm: 14200, usedDays: 240, icon: 'air', reason: 'High pollen season' },
-    { component: 'Brake Pads (Front)', intervalKm: 40000, intervalDays: 730, usedKm: 35000, usedDays: 620, icon: 'car_repair', reason: 'Due soon for safety inspection' },
-    { component: 'Spark Plugs', intervalKm: 60000, intervalDays: 1095, usedKm: 18000, usedDays: 320, icon: 'bolt', reason: 'Standard wear' },
+    {
+      component: 'Engine Oil & Filter',
+      intervalKm: 10000,
+      intervalDays: 365,
+      usedKm: 3400,
+      usedDays: 85,
+      icon: 'oil_barrel',
+      reason: 'Standard wear',
+    },
+    {
+      component: 'Cabin Microfilter',
+      intervalKm: 20000,
+      intervalDays: 365,
+      usedKm: 14200,
+      usedDays: 240,
+      icon: 'air',
+      reason: 'High pollen season',
+    },
+    {
+      component: 'Brake Pads (Front)',
+      intervalKm: 40000,
+      intervalDays: 730,
+      usedKm: 35000,
+      usedDays: 620,
+      icon: 'car_repair',
+      reason: 'Due soon for safety inspection',
+    },
+    {
+      component: 'Spark Plugs',
+      intervalKm: 60000,
+      intervalDays: 1095,
+      usedKm: 18000,
+      usedDays: 320,
+      icon: 'bolt',
+      reason: 'Standard wear',
+    },
   ];
 
   const componentLife = componentRules.map((cr, idx) => {
@@ -1277,7 +1368,9 @@ export function computeClientServicesAnalytics(
 
   const benchmarkHourlyRate = 85.0;
   const workshopHourlyRate = 79.0;
-  const diffVsBenchmarkPercent = Number((((workshopHourlyRate - benchmarkHourlyRate) / benchmarkHourlyRate) * 100).toFixed(1));
+  const diffVsBenchmarkPercent = Number(
+    (((workshopHourlyRate - benchmarkHourlyRate) / benchmarkHourlyRate) * 100).toFixed(1),
+  );
 
   const workshopEfficiency = {
     hasData: true,
@@ -1306,9 +1399,12 @@ export function computeClientServicesAnalytics(
       };
     });
 
-  const latestOdo = progressionPoints.length > 0
-    ? progressionPoints[progressionPoints.length - 1]!.odometerKm
-    : (entriesWithOdo.length > 0 ? Math.round(entriesWithOdo[entriesWithOdo.length - 1]!.odometer_m! / 1000) : 68410);
+  const latestOdo =
+    progressionPoints.length > 0
+      ? progressionPoints[progressionPoints.length - 1]!.odometerKm
+      : entriesWithOdo.length > 0
+        ? Math.round(entriesWithOdo[entriesWithOdo.length - 1]!.odometer_m! / 1000)
+        : 68410;
 
   const costProgression = {
     points: progressionPoints,
@@ -1327,4 +1423,3 @@ export function computeClientServicesAnalytics(
     costProgression,
   };
 }
-

@@ -13,7 +13,7 @@ interface Props {
   onParsed: (data: ExpenseParseResult) => void;
 }
 
-export function ExpenseScanner({ onParsed }: Props) {
+export const ExpenseScanner = ({ onParsed }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{
@@ -113,4 +113,4 @@ export function ExpenseScanner({ onParsed }: Props) {
       )}
     </div>
   );
-}
+};

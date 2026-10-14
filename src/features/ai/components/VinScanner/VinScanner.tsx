@@ -17,7 +17,7 @@ interface Props {
   variant?: 'button' | 'icon-button';
 }
 
-export function VinScanner({ onParsed, variant = 'button' }: Props) {
+export const VinScanner = ({ onParsed, variant = 'button' }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{
@@ -146,4 +146,4 @@ export function VinScanner({ onParsed, variant = 'button' }: Props) {
       )}
     </div>
   );
-}
+};

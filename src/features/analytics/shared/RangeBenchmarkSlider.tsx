@@ -1,6 +1,6 @@
 import { styles } from './glacier.styles';
 
-export interface RangeBenchmarkSliderProps {
+export interface Props {
   label: string;
   unit?: string;
   currentValue: number | null;
@@ -10,7 +10,7 @@ export interface RangeBenchmarkSliderProps {
   lowerIsBetter?: boolean;
 }
 
-export function RangeBenchmarkSlider({
+export const RangeBenchmarkSlider = ({
   label,
   unit,
   currentValue,
@@ -18,7 +18,7 @@ export function RangeBenchmarkSlider({
   avgValue,
   maxValue,
   lowerIsBetter = true,
-}: RangeBenchmarkSliderProps) {
+}: Props) => {
   if (currentValue === null || minValue === null || maxValue === null || minValue >= maxValue) {
     return (
       <div style={{ marginBottom: '16px' }}>
@@ -38,8 +38,10 @@ export function RangeBenchmarkSlider({
   // Determine marker color
   let markerColor = '#38bdf8'; // neutral cyan
   if (lowerIsBetter) {
-    if (currentPercent < 35) markerColor = '#34d399'; // green (low consumption/cost)
-    else if (currentPercent < 70) markerColor = '#fbbf24'; // amber
+    if (currentPercent < 35)
+      markerColor = '#34d399'; // green (low consumption/cost)
+    else if (currentPercent < 70)
+      markerColor = '#fbbf24'; // amber
     else markerColor = '#f87171'; // red (high consumption/cost)
   } else {
     if (currentPercent > 65) markerColor = '#34d399';
@@ -49,13 +51,32 @@ export function RangeBenchmarkSlider({
 
   return (
     <div style={{ marginBottom: '18px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-        <span style={{ fontSize: '0.8rem', color: 'var(--mui-palette-text-secondary)', fontWeight: 500 }}>{label}</span>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          marginBottom: '8px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '0.8rem',
+            color: 'var(--mui-palette-text-secondary)',
+            fontWeight: 500,
+          }}
+        >
+          {label}
+        </span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
           <span style={{ fontSize: '1.05rem', fontWeight: 700, color: markerColor }}>
             {currentValue.toFixed(2)}
           </span>
-          {unit && <span style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)' }}>{unit}</span>}
+          {unit && (
+            <span style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)' }}>
+              {unit}
+            </span>
+          )}
         </div>
       </div>
 
@@ -102,7 +123,14 @@ export function RangeBenchmarkSlider({
       </div>
 
       {/* Min / Avg / Max labels */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--mui-palette-text-secondary)' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          fontSize: '0.7rem',
+          color: 'var(--mui-palette-text-secondary)',
+        }}
+      >
         <span>Min: {minValue.toFixed(2)}</span>
         <span>Avg: {avgValue?.toFixed(2) ?? '—'}</span>
         <span>Max: {maxValue.toFixed(2)}</span>

@@ -1,13 +1,13 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { MonthlyFuelExpenseBarDto } from '../../../../api/_lib/analytics/types';
 import { styles } from '../shared/glacier.styles';
 
-export interface MonthlyExpensesCardProps {
+interface Props {
   data: MonthlyFuelExpenseBarDto[];
 }
 
-export function MonthlyExpensesCard({ data }: MonthlyExpensesCardProps) {
+export const MonthlyExpensesCard = ({ data }: Props) => {
   // Collect all fuel type names to generate dynamic stacked bars
   const fuelTypeKeys = new Set<string>();
   const chartData = data.map((item) => {
@@ -67,7 +67,11 @@ export function MonthlyExpensesCard({ data }: MonthlyExpensesCardProps) {
               verticalAlign="top"
               align="right"
               iconType="circle"
-              wrapperStyle={{ fontSize: '11px', color: 'var(--mui-palette-text-secondary)', paddingBottom: '8px' }}
+              wrapperStyle={{
+                fontSize: '11px',
+                color: 'var(--mui-palette-text-secondary)',
+                paddingBottom: '8px',
+              }}
             />
             {keysArray.map((key, idx) => (
               <Bar

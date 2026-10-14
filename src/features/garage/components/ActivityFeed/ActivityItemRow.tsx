@@ -1,6 +1,9 @@
 import Typography from '@mui/material/Typography';
 import { type ReactNode, useMemo } from 'react';
-import { type CategoryItem, useExpenseCategories } from '@/features/entries/lib/useExpenseCategories';
+import {
+  type CategoryItem,
+  useExpenseCategories,
+} from '@/features/entries/lib/useExpenseCategories';
 import { formatAmount } from '@/shared/lib/currencies';
 import { formatDatePreference, useDateFormatPreference } from '@/shared/lib/date-format-preference';
 import { type FuelGrade, useAccountFuelGrades } from '@/shared/lib/fuel-grades';
@@ -85,11 +88,7 @@ export function ActivityItemRow({
     <button type="button" className={styles.item} onClick={() => onOpen(entry)}>
       <div className={`${styles.iconDisc} ${styles[entry.kind]}`}>{getIcon(entry.kind)}</div>
       <div className={styles.details} style={inlineStyles.details}>
-        <Typography
-          variant="body2"
-          title={title}
-          sx={getTitleStyle(title === entry.kind)}
-        >
+        <Typography variant="body2" title={title} sx={getTitleStyle(title === entry.kind)}>
           {title}
         </Typography>
         <Typography variant="caption" sx={inlineStyles.dateAndStats}>

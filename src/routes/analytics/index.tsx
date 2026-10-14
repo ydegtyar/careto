@@ -1,40 +1,37 @@
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useMemo } from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
 import { useAppStore } from '@/app/store';
-import { entriesQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
+import { BusinessDeductibleCard } from '@/features/analytics/components/BusinessDeductibleCard';
+import { ConsumptionAnomalyBanner } from '@/features/analytics/components/ConsumptionAnomalyBanner';
+import { CostDistributionCard } from '@/features/analytics/components/CostDistributionCard';
+import { EfficiencyTelemetryCard } from '@/features/analytics/components/EfficiencyTelemetryCard';
+import { OdometerProgressionCard } from '@/features/analytics/components/OdometerProgressionCard';
+import { PriceVolatilityCard } from '@/features/analytics/components/PriceVolatilityCard';
+import { SpendingTrendCard } from '@/features/analytics/components/SpendingTrendCard';
 
-// Shared Components
-import { AnalyticsTabs, type AnalyticsTab } from '@/features/analytics/shared/AnalyticsTabs';
-import { PeriodFilter, type PeriodPreset } from '@/features/analytics/shared/PeriodFilter';
-import { VehicleHeaderCard } from '@/features/analytics/shared/VehicleHeaderCard';
-
+// General Tab Cards
+import { TcoSummaryCard } from '@/features/analytics/components/TcoSummaryCard';
+import { TravelDistanceCard } from '@/features/analytics/components/TravelDistanceCard';
 // Hooks
 import {
   useRefuelingAnalytics,
   useServicesAnalytics,
 } from '@/features/analytics/hooks/useAnalyticsQueries';
-
-// Tabs
-import { RefuelingTabContent } from '@/features/analytics/refueling/RefuelingTabContent';
-import { ServicesTabContent } from '@/features/analytics/services/ServicesTabContent';
-
-// General Tab Cards
-import { TcoSummaryCard } from '@/features/analytics/components/TcoSummaryCard';
-import { ConsumptionAnomalyBanner } from '@/features/analytics/components/ConsumptionAnomalyBanner';
-import { CostDistributionCard } from '@/features/analytics/components/CostDistributionCard';
-import { SpendingTrendCard } from '@/features/analytics/components/SpendingTrendCard';
-import { EfficiencyTelemetryCard } from '@/features/analytics/components/EfficiencyTelemetryCard';
-import { PriceVolatilityCard } from '@/features/analytics/components/PriceVolatilityCard';
-import { BusinessDeductibleCard } from '@/features/analytics/components/BusinessDeductibleCard';
-import { TravelDistanceCard } from '@/features/analytics/components/TravelDistanceCard';
-import { OdometerProgressionCard } from '@/features/analytics/components/OdometerProgressionCard';
 import {
   computeClientRefuelingAnalytics,
   computeClientServicesAnalytics,
 } from '@/features/analytics/lib/analytics-math';
+// Tabs
+import { RefuelingTabContent } from '@/features/analytics/refueling/RefuelingTabContent';
+import { ServicesTabContent } from '@/features/analytics/services/ServicesTabContent';
+// Shared Components
+import { type AnalyticsTab, AnalyticsTabs } from '@/features/analytics/shared/AnalyticsTabs';
+import { PeriodFilter, type PeriodPreset } from '@/features/analytics/shared/PeriodFilter';
+import { VehicleHeaderCard } from '@/features/analytics/shared/VehicleHeaderCard';
+import { entriesQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 
 import { styles } from './-index.styles';
 
@@ -55,7 +52,9 @@ export const Route = createFileRoute('/analytics/')({
     const tab = VALID_TABS.includes(rawTab as AnalyticsTab) ? (rawTab as AnalyticsTab) : undefined;
 
     const rawPreset = typeof search.preset === 'string' ? search.preset : undefined;
-    const preset = VALID_PRESETS.includes(rawPreset as PeriodPreset) ? (rawPreset as PeriodPreset) : undefined;
+    const preset = VALID_PRESETS.includes(rawPreset as PeriodPreset)
+      ? (rawPreset as PeriodPreset)
+      : undefined;
 
     const from = typeof search.from === 'string' ? search.from : undefined;
     const to = typeof search.to === 'string' ? search.to : undefined;
@@ -201,7 +200,7 @@ function AnalyticsPage() {
         </>
       )}
 
-      {(currentTab === 'general') && (
+      {currentTab === 'general' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
           <TcoSummaryCard entries={filteredEntries} vehicle={activeVehicle} />
           <ConsumptionAnomalyBanner entries={rawEntries} vehicle={activeVehicle} />
@@ -209,7 +208,10 @@ function AnalyticsPage() {
           <div style={styles.grid}>
             <TravelDistanceCard entries={filteredEntries} vehicle={activeVehicle} />
             <CostDistributionCard entries={filteredEntries} />
-            <SpendingTrendCard entries={filteredEntries} timeRange={currentPreset === 'all' ? 'all' : '6months'} />
+            <SpendingTrendCard
+              entries={filteredEntries}
+              timeRange={currentPreset === 'all' ? 'all' : '6months'}
+            />
             <EfficiencyTelemetryCard entries={filteredEntries} vehicle={activeVehicle} />
             <PriceVolatilityCard entries={filteredEntries} />
             {activeVehicle?.used_by_business && (

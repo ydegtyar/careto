@@ -14,7 +14,14 @@ export function refuelingAnalyticsQueryOptions(params: AnalyticsFilterParams) {
   }).toString();
 
   return queryOptions<RefuelingAnalyticsResponseDto>({
-    queryKey: ['analytics', 'refueling', params.vehicleId, params.from, params.to, params.preset] as const,
+    queryKey: [
+      'analytics',
+      'refueling',
+      params.vehicleId,
+      params.from,
+      params.to,
+      params.preset,
+    ] as const,
     queryFn: async () => {
       const res = await fetch(`/api/analytics/refueling?${queryStr}`, {
         credentials: 'include',
@@ -38,7 +45,14 @@ export function servicesAnalyticsQueryOptions(params: AnalyticsFilterParams) {
   }).toString();
 
   return queryOptions<ServicesAnalyticsResponseDto>({
-    queryKey: ['analytics', 'services', params.vehicleId, params.from, params.to, params.preset] as const,
+    queryKey: [
+      'analytics',
+      'services',
+      params.vehicleId,
+      params.from,
+      params.to,
+      params.preset,
+    ] as const,
     queryFn: async () => {
       const res = await fetch(`/api/analytics/services?${queryStr}`, {
         credentials: 'include',

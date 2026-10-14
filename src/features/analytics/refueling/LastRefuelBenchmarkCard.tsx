@@ -1,19 +1,19 @@
 import TuneIcon from '@mui/icons-material/Tune';
 import type { RefuelBenchmarkDto } from '../../../../api/_lib/analytics/types';
-import { RangeBenchmarkSlider } from '../shared/RangeBenchmarkSlider';
 import { styles } from '../shared/glacier.styles';
+import { RangeBenchmarkSlider } from '../shared/RangeBenchmarkSlider';
 
-export interface LastRefuelBenchmarkCardProps {
+interface Props {
   benchmark: RefuelBenchmarkDto;
   efficiencyUnit?: string;
   distanceUnit?: string;
 }
 
-export function LastRefuelBenchmarkCard({
+export const LastRefuelBenchmarkCard = ({
   benchmark,
   efficiencyUnit = 'L/100km',
   distanceUnit = 'km',
-}: LastRefuelBenchmarkCardProps) {
+}: Props) => {
   return (
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>

@@ -37,7 +37,10 @@ export const PriceVolatilityCard: React.FC<Props> = ({ entries }) => {
               </Typography>
             </div>
           </div>
-          <Typography variant="body2" sx={{ fontWeight: 700, color: 'var(--mui-palette-primary-main)' }}>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 700, color: 'var(--mui-palette-primary-main)' }}
+          >
             ${priceVolatility.lowest?.price.toFixed(2)} / L
           </Typography>
         </div>
@@ -62,7 +65,9 @@ export const PriceVolatilityCard: React.FC<Props> = ({ entries }) => {
         <div style={styles.spreadText}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
             Station delta spread:{' '}
-            <strong style={{ color: 'var(--mui-palette-text-primary)' }}>+${priceVolatility.spread.toFixed(2)} / L</strong>
+            <strong style={{ color: 'var(--mui-palette-text-primary)' }}>
+              +${priceVolatility.spread.toFixed(2)} / L
+            </strong>
           </Typography>
         </div>
       </div>
