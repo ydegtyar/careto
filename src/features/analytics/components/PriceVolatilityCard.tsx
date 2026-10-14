@@ -27,7 +27,7 @@ export const PriceVolatilityCard: React.FC<Props> = ({ entries }) => {
       <div style={styles.list}>
         <div style={styles.item}>
           <div style={styles.itemLeft}>
-            <ArrowDownwardIcon sx={{ color: '#7dd3fc', fontSize: 18 }} />
+            <ArrowDownwardIcon sx={{ color: 'var(--mui-palette-primary-main)', fontSize: 18 }} />
             <div>
               <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.82rem' }}>
                 {priceVolatility.lowest?.station}
@@ -37,14 +37,14 @@ export const PriceVolatilityCard: React.FC<Props> = ({ entries }) => {
               </Typography>
             </div>
           </div>
-          <Typography variant="body2" sx={{ fontWeight: 700, color: '#7dd3fc' }}>
+          <Typography variant="body2" sx={{ fontWeight: 700, color: 'var(--mui-palette-primary-main)' }}>
             ${priceVolatility.lowest?.price.toFixed(2)} / L
           </Typography>
         </div>
 
         <div style={styles.item}>
           <div style={styles.itemLeft}>
-            <ArrowUpwardIcon sx={{ color: '#f87171', fontSize: 18 }} />
+            <ArrowUpwardIcon sx={{ color: '#ef4444', fontSize: 18 }} />
             <div>
               <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.82rem' }}>
                 {priceVolatility.highest?.station}
@@ -54,7 +54,7 @@ export const PriceVolatilityCard: React.FC<Props> = ({ entries }) => {
               </Typography>
             </div>
           </div>
-          <Typography variant="body2" sx={{ fontWeight: 700, color: '#f87171' }}>
+          <Typography variant="body2" sx={{ fontWeight: 700, color: '#ef4444' }}>
             ${priceVolatility.highest?.price.toFixed(2)} / L
           </Typography>
         </div>
@@ -62,7 +62,7 @@ export const PriceVolatilityCard: React.FC<Props> = ({ entries }) => {
         <div style={styles.spreadText}>
           <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem' }}>
             Station delta spread:{' '}
-            <strong style={{ color: '#ffffff' }}>+${priceVolatility.spread.toFixed(2)} / L</strong>
+            <strong style={{ color: 'var(--mui-palette-text-primary)' }}>+${priceVolatility.spread.toFixed(2)} / L</strong>
           </Typography>
         </div>
       </div>

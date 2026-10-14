@@ -57,11 +57,11 @@ export function DonutCard({ title, centerText, centerSubText, items, footer }: D
             pointerEvents: 'none',
           }}
         >
-          <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f8fafc' }}>
+          <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
             {centerText}
           </span>
           {centerSubText && (
-            <span style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--mui-palette-text-secondary)', textTransform: 'uppercase' }}>
               {centerSubText}
             </span>
           )}
@@ -73,12 +73,12 @@ export function DonutCard({ title, centerText, centerSubText, items, footer }: D
           <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: item.color }} />
-              <span style={{ color: '#e2e8f0', fontWeight: 500 }}>{item.name}</span>
+              <span style={{ color: 'var(--mui-palette-text-primary)', fontWeight: 500 }}>{item.name}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {item.subLabel && <span style={{ color: '#94a3b8' }}>{item.subLabel}</span>}
+              {item.subLabel && <span style={{ color: 'var(--mui-palette-text-secondary)' }}>{item.subLabel}</span>}
               {item.sharePercent !== undefined && (
-                <span style={{ color: '#7dd3fc', fontWeight: 600 }}>{item.sharePercent}%</span>
+                <span style={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}>{item.sharePercent}%</span>
               )}
             </div>
           </div>
@@ -86,7 +86,7 @@ export function DonutCard({ title, centerText, centerSubText, items, footer }: D
       </div>
 
       {footer && (
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: '14px', paddingTop: '10px' }}>
+        <div style={{ borderTop: '1px solid var(--mui-palette-divider)', marginTop: '14px', paddingTop: '10px' }}>
           {footer}
         </div>
       )}

@@ -18,12 +18,12 @@ export function LastRefuelBenchmarkCard({
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
         <div style={styles.titleGroup}>
-          <TuneIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+          <TuneIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           <h4 style={styles.title}>Last Refuel Benchmark</h4>
         </div>
 
         {benchmark.lastRefuelOdometerKm !== null && (
-          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)' }}>
             Tank 1 ({benchmark.lastRefuelOdometerKm.toLocaleString()} {distanceUnit})
           </span>
         )}

@@ -71,7 +71,7 @@ export function RefuelingTabContent({ data, vehicle, isLoading }: RefuelingTabCo
           value={summary.avgEfficiencyL100km !== null ? `${summary.avgEfficiencyL100km.toFixed(2)}` : null}
           unit={effUnit}
           isLoading={isLoading}
-          valueColor="#7dd3fc"
+          valueColor="var(--mui-palette-primary-main)"
           subMetrics={[
             { label: 'Best', value: summary.bestEfficiencyL100km !== null ? `${summary.bestEfficiencyL100km.toFixed(2)}` : null, highlightColor: 'green' },
             { label: 'Worst', value: summary.worstEfficiencyL100km !== null ? `${summary.worstEfficiencyL100km.toFixed(2)}` : null, highlightColor: 'red' },

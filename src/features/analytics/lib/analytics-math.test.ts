@@ -492,6 +492,31 @@ describe('analytics-math', () => {
       // Odometer progression
       expect(res.costProgression.points.length).toBe(2);
     });
+
+    it('converts sub-items in non-USD currencies (like UAH) to USD in allocation', () => {
+      const uahEntries: Entry[] = [
+        {
+          id: 'srv-uah-1',
+          kind: 'service',
+          occurred_on: '2026-05-10',
+          currency: 'UAH',
+          amount_minor: 415000, // 4150 UAH (~$100.00 USD at 41.5 rate)
+          usd_minor: 10000,
+          sub_items: [
+            { id: 'sub-1', name: 'Oil Filter', cost: '2075' }, // 2075 UAH -> ~$50 USD
+            { id: 'sub-2', name: 'Labor Service', cost: '2075' }, // 2075 UAH -> ~$50 USD
+          ],
+        },
+      ];
+
+      const res = computeClientServicesAnalytics(uahEntries, mockVehicle);
+
+      expect(res.allocation.taskCount).toBe(2);
+      expect(res.allocation.partsCost).toBe(50);
+      expect(res.allocation.laborCost).toBe(50);
+      expect(res.allocation.items[0]?.cost).toBe(50);
+      expect(res.allocation.items[1]?.cost).toBe(50);
+    });
   });
 });
 

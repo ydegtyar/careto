@@ -2,16 +2,16 @@ import type { CSSProperties } from 'react';
 
 export const styles: Record<string, CSSProperties> = {
   glassCard: {
-    background: 'rgba(15, 21, 36, 0.65)',
+    background: 'color-mix(in srgb, var(--mui-palette-background-paper) 70%, transparent)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(125, 211, 252, 0.12)',
+    border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 18%, transparent)',
     borderRadius: '20px',
     padding: '20px',
-    color: '#e0e8f0',
+    color: 'var(--mui-palette-text-primary)',
     display: 'flex',
     flexDirection: 'column',
-    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.12)',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -31,7 +31,7 @@ export const styles: Record<string, CSSProperties> = {
     fontWeight: 600,
     letterSpacing: '0.5px',
     textTransform: 'uppercase',
-    color: '#94a3b8',
+    color: 'var(--mui-palette-text-secondary)',
     margin: 0,
   },
   grid2x2: {
@@ -41,29 +41,29 @@ export const styles: Record<string, CSSProperties> = {
   },
   subMetricText: {
     fontSize: '0.75rem',
-    color: '#94a3b8',
+    color: 'var(--mui-palette-text-secondary)',
     display: 'flex',
     justifyContent: 'space-between',
     marginTop: '4px',
   },
   highlightCyan: {
-    color: '#7dd3fc',
+    color: 'var(--mui-palette-primary-main)',
     fontWeight: 600,
   },
   highlightPurple: {
-    color: '#c8a0f0',
+    color: 'var(--mui-palette-tertiary-main)',
     fontWeight: 600,
   },
   highlightGreen: {
-    color: '#34d399',
+    color: '#10b981',
     fontWeight: 600,
   },
   highlightAmber: {
-    color: '#fbbf24',
+    color: '#f59e0b',
     fontWeight: 600,
   },
   highlightRed: {
-    color: '#f87171',
+    color: '#ef4444',
     fontWeight: 600,
   },
 };

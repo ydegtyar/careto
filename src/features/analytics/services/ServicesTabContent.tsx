@@ -98,9 +98,9 @@ export function ServicesTabContent({ data, vehicle, isLoading }: ServicesTabCont
           subLabel: `$${i.cost}`,
         }))}
         footer={
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#94a3b8' }}>
-            <span>Parts: <strong style={{ color: '#f8fafc' }}>${allocation.partsCost}</strong></span>
-            <span>Labor: <strong style={{ color: '#f8fafc' }}>${allocation.laborCost}</strong></span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--mui-palette-text-secondary)' }}>
+            <span>Parts: <strong style={{ color: 'var(--mui-palette-text-primary)' }}>${allocation.partsCost}</strong></span>
+            <span>Labor: <strong style={{ color: 'var(--mui-palette-text-primary)' }}>${allocation.laborCost}</strong></span>
           </div>
         }
       />

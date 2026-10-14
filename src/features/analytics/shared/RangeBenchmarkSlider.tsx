@@ -50,12 +50,12 @@ export function RangeBenchmarkSlider({
   return (
     <div style={{ marginBottom: '18px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-        <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>{label}</span>
+        <span style={{ fontSize: '0.8rem', color: 'var(--mui-palette-text-secondary)', fontWeight: 500 }}>{label}</span>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
           <span style={{ fontSize: '1.05rem', fontWeight: 700, color: markerColor }}>
             {currentValue.toFixed(2)}
           </span>
-          {unit && <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{unit}</span>}
+          {unit && <span style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)' }}>{unit}</span>}
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export function RangeBenchmarkSlider({
         style={{
           position: 'relative',
           height: '6px',
-          background: 'rgba(255, 255, 255, 0.08)',
+          background: 'color-mix(in srgb, var(--mui-palette-text-primary) 8%, transparent)',
           borderRadius: '4px',
           margin: '12px 0 16px',
         }}
@@ -77,7 +77,7 @@ export function RangeBenchmarkSlider({
             top: '-3px',
             width: '2px',
             height: '12px',
-            backgroundColor: '#94a3b8',
+            backgroundColor: 'var(--mui-palette-text-secondary)',
             transform: 'translateX(-50%)',
             zIndex: 1,
           }}
@@ -93,7 +93,7 @@ export function RangeBenchmarkSlider({
             height: '16px',
             borderRadius: '50%',
             backgroundColor: markerColor,
-            border: '2px solid #0f172a',
+            border: '2px solid var(--mui-palette-background-paper)',
             boxShadow: `0 0 10px ${markerColor}`,
             transform: 'translateX(-50%)',
             zIndex: 2,
@@ -102,7 +102,7 @@ export function RangeBenchmarkSlider({
       </div>
 
       {/* Min / Avg / Max labels */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#64748b' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--mui-palette-text-secondary)' }}>
         <span>Min: {minValue.toFixed(2)}</span>
         <span>Avg: {avgValue?.toFixed(2) ?? '—'}</span>
         <span>Max: {maxValue.toFixed(2)}</span>

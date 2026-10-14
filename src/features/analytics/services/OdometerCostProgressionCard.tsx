@@ -22,15 +22,15 @@ export function OdometerCostProgressionCard({
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
         <div style={styles.titleGroup}>
-          <ShowChartIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+          <ShowChartIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           <h4 style={styles.title}>Odometer & Cost Progression</h4>
         </div>
 
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#7dd3fc' }}>
+          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--mui-palette-primary-main)' }}>
             ${data.currentCostPerKm?.toFixed(2) ?? '—'}/{distanceUnit}
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--mui-palette-text-secondary)' }}>
             Fleet avg: ${data.fleetAvgCostPerKm?.toFixed(2) ?? '—'}
           </div>
         </div>
@@ -39,9 +39,9 @@ export function OdometerCostProgressionCard({
       <div style={{ width: '100%', height: 160, marginTop: '8px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-            <XAxis dataKey="odometerLabel" stroke="#64748b" fontSize={11} tickLine={false} />
+            <XAxis dataKey="odometerLabel" stroke="var(--mui-palette-text-secondary)" fontSize={11} tickLine={false} />
             <YAxis
-              stroke="#64748b"
+              stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
               tickLine={false}
               axisLine={false}
@@ -50,21 +50,22 @@ export function OdometerCostProgressionCard({
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                borderColor: 'rgba(125, 211, 252, 0.2)',
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                borderColor: 'var(--mui-palette-divider)',
                 borderRadius: '8px',
-                color: '#f8fafc',
+                color: 'var(--mui-palette-text-primary)',
                 fontSize: '12px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               }}
               formatter={(value: any) => [`$${value}/${distanceUnit}`, 'Cost Rate']}
             />
             <Line
               type="monotone"
               dataKey="costPerKm"
-              stroke="#38bdf8"
+              stroke="var(--mui-palette-primary-main)"
               strokeWidth={2}
-              dot={{ fill: '#38bdf8', r: 3 }}
-              activeDot={{ r: 5, fill: '#7dd3fc' }}
+              dot={{ fill: 'var(--mui-palette-primary-main)', r: 3 }}
+              activeDot={{ r: 5, fill: 'var(--mui-palette-primary-main)' }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -76,12 +77,12 @@ export function OdometerCostProgressionCard({
           justifyContent: 'space-between',
           alignItems: 'center',
           marginTop: '12px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          borderTop: '1px solid var(--mui-palette-divider)',
           paddingTop: '10px',
           fontSize: '0.75rem',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--mui-palette-text-secondary)' }}>
           <span>• {data.currentOdometerKm?.toLocaleString()} {distanceUnit} Current</span>
           <span>• Service Point</span>
         </div>

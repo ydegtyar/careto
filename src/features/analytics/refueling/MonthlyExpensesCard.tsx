@@ -30,7 +30,7 @@ export function MonthlyExpensesCard({ data }: MonthlyExpensesCardProps) {
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
         <div style={styles.titleGroup}>
-          <BarChartIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+          <BarChartIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           <h4 style={styles.title}>Monthly Expenses</h4>
         </div>
       </div>
@@ -40,13 +40,13 @@ export function MonthlyExpensesCard({ data }: MonthlyExpensesCardProps) {
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <XAxis
               dataKey="monthLabel"
-              stroke="#64748b"
+              stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
               tickLine={false}
               interval={1}
             />
             <YAxis
-              stroke="#64748b"
+              stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
               tickLine={false}
               axisLine={false}
@@ -54,11 +54,12 @@ export function MonthlyExpensesCard({ data }: MonthlyExpensesCardProps) {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                borderColor: 'rgba(125, 211, 252, 0.2)',
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                borderColor: 'var(--mui-palette-divider)',
                 borderRadius: '8px',
-                color: '#f8fafc',
+                color: 'var(--mui-palette-text-primary)',
                 fontSize: '12px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               }}
               formatter={(value: any) => [`$${value}`, '']}
             />
@@ -66,7 +67,7 @@ export function MonthlyExpensesCard({ data }: MonthlyExpensesCardProps) {
               verticalAlign="top"
               align="right"
               iconType="circle"
-              wrapperStyle={{ fontSize: '11px', color: '#94a3b8', paddingBottom: '8px' }}
+              wrapperStyle={{ fontSize: '11px', color: 'var(--mui-palette-text-secondary)', paddingBottom: '8px' }}
             />
             {keysArray.map((key, idx) => (
               <Bar

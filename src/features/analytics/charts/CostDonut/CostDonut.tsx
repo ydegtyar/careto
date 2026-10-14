@@ -20,10 +20,11 @@ export function CostDonut({ data = [] }: { data?: CostSlice[] }) {
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: 'rgba(15, 21, 36, 0.9)',
-              borderColor: 'rgba(125, 211, 252, 0.3)',
+              backgroundColor: 'var(--mui-palette-background-paper)',
+              borderColor: 'var(--mui-palette-divider)',
               borderRadius: 8,
-              color: '#e0e8f0',
+              color: 'var(--mui-palette-text-primary)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             }}
             formatter={(value) => [`$${Number(value ?? 0).toFixed(2)}`, 'Cost']}
           />

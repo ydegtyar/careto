@@ -17,7 +17,7 @@ export const styles = {
     gap: 8,
     fontSize: '0.7rem',
   },
-  fuelLegend: { color: '#7dd3fc' },
-  serviceLegend: { color: '#88b4cc' },
-  adminLegend: { color: '#c8a0f0' },
+  fuelLegend: { color: 'var(--mui-palette-primary-main)' },
+  serviceLegend: { color: 'var(--mui-palette-secondary-main)' },
+  adminLegend: { color: 'var(--mui-palette-tertiary-main)' },
 } as const satisfies Record<string, CSSProperties>;

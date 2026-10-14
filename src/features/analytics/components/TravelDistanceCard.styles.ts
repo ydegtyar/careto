@@ -8,11 +8,11 @@ export const styles = {
     position: 'relative',
     overflow: 'hidden',
     borderRadius: '20px',
-    background: 'rgba(15, 21, 36, 0.65)',
+    background: 'color-mix(in srgb, var(--mui-palette-background-paper) 70%, transparent)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(125, 211, 252, 0.12)',
-    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+    border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 18%, transparent)',
+    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.12)',
   },
   header: {
     display: 'flex',
@@ -23,19 +23,19 @@ export const styles = {
   title: {
     fontSize: '0.9rem',
     fontWeight: 600,
-    color: '#94a3b8',
+    color: 'var(--mui-palette-text-secondary)',
     letterSpacing: '-0.2px',
   },
   iconBadge: {
     width: '36px',
     height: '36px',
     borderRadius: '12px',
-    background: 'rgba(56, 189, 248, 0.12)',
-    border: '1px solid rgba(56, 189, 248, 0.25)',
+    background: 'color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent)',
+    border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 25%, transparent)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: '#7dd3fc',
+    color: 'var(--mui-palette-primary-main)',
   },
   metricSection: {
     display: 'flex',
@@ -46,7 +46,7 @@ export const styles = {
   label: {
     fontSize: '0.95rem',
     fontWeight: 600,
-    color: '#cbd5e1',
+    color: 'var(--mui-palette-text-secondary)',
   },
   valueRow: {
     display: 'flex',
@@ -56,14 +56,14 @@ export const styles = {
   primaryValue: {
     fontSize: '1.85rem',
     fontWeight: 800,
-    color: '#7dd3fc',
+    color: 'var(--mui-palette-primary-main)',
     letterSpacing: '-0.5px',
     lineHeight: 1.1,
   },
   unit: {
     fontSize: '1.1rem',
     fontWeight: 600,
-    color: '#94a3b8',
+    color: 'var(--mui-palette-text-secondary)',
   },
   subMetricsContainer: {
     display: 'flex',
@@ -71,8 +71,8 @@ export const styles = {
     gap: '8px',
     padding: '10px 14px',
     borderRadius: '16px',
-    background: 'rgba(0, 0, 0, 0.25)',
-    border: '1px solid rgba(255, 255, 255, 0.04)',
+    background: 'color-mix(in srgb, var(--mui-palette-background-default) 60%, transparent)',
+    border: '1px solid var(--mui-palette-divider)',
   },
   subMetricRow: {
     display: 'flex',
@@ -81,11 +81,11 @@ export const styles = {
     fontSize: '0.85rem',
   },
   subMetricLabel: {
-    color: '#94a3b8',
+    color: 'var(--mui-palette-text-secondary)',
     fontWeight: 500,
   },
   subMetricValue: {
-    color: '#f8fafc',
+    color: 'var(--mui-palette-text-primary)',
     fontWeight: 700,
   },
 } as const satisfies Record<string, CSSProperties>;

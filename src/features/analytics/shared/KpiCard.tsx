@@ -25,7 +25,7 @@ export function KpiCard({
   unit,
   subMetrics,
   isLoading,
-  valueColor = '#ffffff',
+  valueColor = 'var(--mui-palette-text-primary)',
   onClick,
 }: KpiCardProps) {
   const cardStyle: CSSProperties = {
@@ -52,10 +52,10 @@ export function KpiCard({
   return (
     <div style={cardStyle} onClick={onClick}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+        <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--mui-palette-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
           {title}
         </Typography>
-        {icon && <div style={{ color: '#7dd3fc', opacity: 0.85 }}>{icon}</div>}
+        {icon && <div style={{ color: 'var(--mui-palette-primary-main)', opacity: 0.9 }}>{icon}</div>}
       </div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '8px' }}>
@@ -63,22 +63,22 @@ export function KpiCard({
           {formattedValue}
         </span>
         {unit && (
-          <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--mui-palette-text-secondary)', fontWeight: 500 }}>
             {unit}
           </span>
         )}
       </div>
 
       {subMetrics && subMetrics.length > 0 && (
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '6px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ borderTop: '1px solid var(--mui-palette-divider)', paddingTop: '6px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {subMetrics.map((sm, i) => {
             const smVal = sm.value !== null && sm.value !== undefined ? sm.value : '—';
-            let color = '#94a3b8';
-            if (sm.highlightColor === 'cyan') color = '#7dd3fc';
-            if (sm.highlightColor === 'purple') color = '#c8a0f0';
-            if (sm.highlightColor === 'green') color = '#34d399';
-            if (sm.highlightColor === 'amber') color = '#fbbf24';
-            if (sm.highlightColor === 'red') color = '#f87171';
+            let color = 'var(--mui-palette-text-secondary)';
+            if (sm.highlightColor === 'cyan') color = 'var(--mui-palette-primary-main)';
+            if (sm.highlightColor === 'purple') color = 'var(--mui-palette-tertiary-main)';
+            if (sm.highlightColor === 'green') color = '#10b981';
+            if (sm.highlightColor === 'amber') color = '#f59e0b';
+            if (sm.highlightColor === 'red') color = '#ef4444';
 
             return (
               <div key={i} style={styles.subMetricText}>

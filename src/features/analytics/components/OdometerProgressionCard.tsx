@@ -83,13 +83,13 @@ export const OdometerProgressionCard: React.FC<Props> = ({ entries, vehicle }) =
             </defs>
             <XAxis
               dataKey="monthLabel"
-              stroke="#64748b"
+              stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
               tickLine={false}
               interval="preserveStartEnd"
             />
             <YAxis
-              stroke="#64748b"
+              stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
               tickLine={false}
               axisLine={false}
@@ -98,18 +98,19 @@ export const OdometerProgressionCard: React.FC<Props> = ({ entries, vehicle }) =
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                borderColor: 'rgba(125, 211, 252, 0.25)',
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                borderColor: 'var(--mui-palette-divider)',
                 borderRadius: '8px',
-                color: '#f8fafc',
+                color: 'var(--mui-palette-text-primary)',
                 fontSize: '12px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               }}
               formatter={(value: any) => [`${Number(value).toLocaleString()} ${distanceUnit}`, 'Odometer']}
             />
             <Area
               type="monotone"
               dataKey="odometer"
-              stroke="#38bdf8"
+              stroke="var(--mui-palette-primary-main)"
               strokeWidth={3}
               fillOpacity={1}
               fill="url(#odometerGradient)"

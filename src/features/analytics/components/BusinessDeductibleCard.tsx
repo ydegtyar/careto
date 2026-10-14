@@ -29,7 +29,7 @@ export const BusinessDeductibleCard: React.FC<Props> = ({ entries, vehicle }) =>
         <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.25 }}>
           {businessDeductible.distanceKm} km logged for business purposes this period.
         </Typography>
-        <Typography variant="body1" sx={{ fontWeight: 800, color: '#7dd3fc', mt: 0.5 }}>
+        <Typography variant="body1" sx={{ fontWeight: 800, color: 'primary.main', mt: 0.5 }}>
           ${businessDeductible.potentialWriteOffUsd.toFixed(2)}{' '}
           <span style={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 400 }}>
             potential tax write-off

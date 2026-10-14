@@ -30,12 +30,12 @@ const containerStyle: CSSProperties = {
 
 const pillsStyle: CSSProperties = {
   display: 'flex',
-  background: 'rgba(15, 23, 42, 0.45)',
+  background: 'color-mix(in srgb, var(--mui-palette-background-paper) 60%, transparent)',
   backdropFilter: 'blur(12px)',
   WebkitBackdropFilter: 'blur(12px)',
   borderRadius: '16px',
   padding: '3px',
-  border: '1px solid rgba(125, 211, 252, 0.08)',
+  border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 14%, transparent)',
   gap: '2px',
 };
 export function PeriodFilter({ currentPreset, from, to, onChange }: PeriodFilterProps) {
@@ -81,12 +81,12 @@ export function PeriodFilter({ currentPreset, from, to, onChange }: PeriodFilter
                 fontSize: '0.75rem',
                 fontWeight: isActive ? 600 : 500,
                 textTransform: 'none',
-                backgroundColor: isActive ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
-                color: isActive ? '#7dd3fc' : '#94a3b8',
-                border: isActive ? '1px solid rgba(125, 211, 252, 0.3)' : '1px solid transparent',
+                backgroundColor: isActive ? 'color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent)' : 'transparent',
+                color: isActive ? 'var(--mui-palette-primary-main)' : 'var(--mui-palette-text-secondary)',
+                border: isActive ? '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 35%, transparent)' : '1px solid transparent',
                 '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  color: '#f8fafc',
+                  backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent)',
+                  color: 'var(--mui-palette-text-primary)',
                 },
               }}
             >
@@ -102,15 +102,15 @@ export function PeriodFilter({ currentPreset, from, to, onChange }: PeriodFilter
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            background: 'rgba(15, 23, 42, 0.45)',
+            background: 'color-mix(in srgb, var(--mui-palette-background-paper) 60%, transparent)',
             padding: '4px 10px',
             borderRadius: '12px',
-            border: '1px solid rgba(125, 211, 252, 0.08)',
+            border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 14%, transparent)',
             fontSize: '0.75rem',
-            color: '#94a3b8',
+            color: 'var(--mui-palette-text-secondary)',
           }}
         >
-          <CalendarTodayIcon sx={{ fontSize: 13, color: '#7dd3fc' }} />
+          <CalendarTodayIcon sx={{ fontSize: 13, color: 'var(--mui-palette-primary-main)' }} />
           <span>{formattedFrom} — {formattedTo}</span>
         </div>
       )}

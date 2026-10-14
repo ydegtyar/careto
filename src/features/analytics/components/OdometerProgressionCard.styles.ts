@@ -8,11 +8,11 @@ export const styles = {
     position: 'relative',
     overflow: 'hidden',
     borderRadius: '20px',
-    background: 'rgba(15, 21, 36, 0.65)',
+    background: 'color-mix(in srgb, var(--mui-palette-background-paper) 70%, transparent)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(125, 211, 252, 0.12)',
-    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+    border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 18%, transparent)',
+    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.12)',
     gridColumn: '1 / -1', // Span full width in grid if layout allows
   },
   header: {
@@ -27,7 +27,7 @@ export const styles = {
     gap: '10px',
   },
   icon: {
-    color: '#38bdf8',
+    color: 'var(--mui-palette-primary-main)',
     fontSize: 22,
   },
   titleTextGroup: {
@@ -37,28 +37,28 @@ export const styles = {
   title: {
     fontSize: '1rem',
     fontWeight: 700,
-    color: '#f8fafc',
+    color: 'var(--mui-palette-text-primary)',
     margin: 0,
   },
   subTitle: {
     fontSize: '0.75rem',
-    color: '#94a3b8',
+    color: 'var(--mui-palette-text-secondary)',
     marginTop: '2px',
   },
   deltaDistance: {
     fontSize: '1.05rem',
     fontWeight: 700,
-    color: '#38bdf8',
+    color: 'var(--mui-palette-primary-main)',
   },
   currentBadge: {
     alignSelf: 'flex-end',
-    background: 'rgba(192, 132, 252, 0.25)',
-    border: '1px solid rgba(192, 132, 252, 0.5)',
+    background: 'color-mix(in srgb, var(--mui-palette-tertiary-main) 20%, transparent)',
+    border: '1px solid color-mix(in srgb, var(--mui-palette-tertiary-main) 45%, transparent)',
     borderRadius: '12px',
     padding: '3px 10px',
     fontSize: '0.72rem',
     fontWeight: 700,
-    color: '#e9d5ff',
+    color: 'var(--mui-palette-tertiary-main)',
     marginBottom: '4px',
   },
   chartContainer: {
@@ -72,21 +72,21 @@ export const styles = {
     alignItems: 'center',
     marginTop: '12px',
     paddingTop: '10px',
-    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+    borderTop: '1px solid var(--mui-palette-divider)',
     fontSize: '0.8rem',
   },
   rollingPace: {
     display: 'flex',
     alignItems: 'center',
     gap: '6px',
-    color: '#94a3b8',
+    color: 'var(--mui-palette-text-secondary)',
   },
   paceHighlight: {
-    color: '#f8fafc',
+    color: 'var(--mui-palette-text-primary)',
     fontWeight: 700,
   },
   nextMilestone: {
-    color: '#38bdf8',
+    color: 'var(--mui-palette-primary-main)',
     fontWeight: 600,
   },
 } as const satisfies Record<string, CSSProperties>;

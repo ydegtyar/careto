@@ -14,11 +14,11 @@ export function WorkshopEfficiencyCard({ data }: WorkshopEfficiencyCardProps) {
       <div style={styles.glassCard}>
         <div style={styles.headerRow}>
           <div style={styles.titleGroup}>
-            <StorefrontIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+            <StorefrontIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
             <h4 style={styles.title}>Workshop Efficiency</h4>
           </div>
         </div>
-        <div style={{ color: '#64748b', fontSize: '0.85rem' }}>No workshop data for this period.</div>
+        <div style={{ color: 'var(--mui-palette-text-secondary)', fontSize: '0.85rem' }}>No workshop data for this period.</div>
       </div>
     );
   }
@@ -32,7 +32,7 @@ export function WorkshopEfficiencyCard({ data }: WorkshopEfficiencyCardProps) {
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
         <div style={styles.titleGroup}>
-          <StorefrontIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+          <StorefrontIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           <h4 style={styles.title}>Workshop Efficiency</h4>
         </div>
 
@@ -42,9 +42,9 @@ export function WorkshopEfficiencyCard({ data }: WorkshopEfficiencyCardProps) {
             fontWeight: 700,
             padding: '2px 8px',
             borderRadius: '12px',
-            background: isUnder ? 'rgba(52, 211, 153, 0.15)' : 'rgba(248, 113, 113, 0.15)',
-            color: isUnder ? '#34d399' : '#f87171',
-            border: `1px solid ${isUnder ? 'rgba(52, 211, 153, 0.3)' : 'rgba(248, 113, 113, 0.3)'}`,
+            background: isUnder ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            color: isUnder ? '#10b981' : '#ef4444',
+            border: `1px solid ${isUnder ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
           }}
         >
           {diffLabel}
@@ -58,27 +58,27 @@ export function WorkshopEfficiencyCard({ data }: WorkshopEfficiencyCardProps) {
           justifyContent: 'space-between',
           padding: '12px',
           borderRadius: '16px',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
+          background: 'color-mix(in srgb, var(--mui-palette-background-default) 50%, transparent)',
+          border: '1px solid var(--mui-palette-divider)',
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc' }}>
+            <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
               {data.workshopName}
             </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#fbbf24', fontSize: '0.8rem', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#f59e0b', fontSize: '0.8rem', fontWeight: 600 }}>
               <StarIcon sx={{ fontSize: 14 }} />
               <span>{data.rating?.toFixed(1) ?? '5.0'}</span>
             </div>
           </div>
 
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '2px' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)', marginTop: '2px' }}>
             {data.specialization}
           </div>
 
-          <div style={{ fontSize: '0.75rem', color: '#7dd3fc', marginTop: '6px' }}>
-            Rate: <strong style={{ color: '#f8fafc' }}>${data.hourlyRate}/hr</strong> • Avg Reg: ${data.benchmarkHourlyRate}/hr
+          <div style={{ fontSize: '0.75rem', color: 'var(--mui-palette-primary-main)', marginTop: '6px' }}>
+            Rate: <strong style={{ color: 'var(--mui-palette-text-primary)' }}>${data.hourlyRate}/hr</strong> • Avg Reg: ${data.benchmarkHourlyRate}/hr
           </div>
         </div>
       </div>

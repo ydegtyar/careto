@@ -17,7 +17,7 @@ export function PredictiveComponentLifeCard({
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
         <div style={styles.titleGroup}>
-          <PrecisionManufacturingIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+          <PrecisionManufacturingIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           <h4 style={styles.title}>Predictive Component Life</h4>
         </div>
 
@@ -30,9 +30,9 @@ export function PredictiveComponentLifeCard({
             fontWeight: 700,
             padding: '2px 8px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(56, 189, 248, 0.2))',
-            color: '#c8a0f0',
-            border: '1px solid rgba(192, 132, 252, 0.3)',
+            background: 'linear-gradient(135deg, color-mix(in srgb, var(--mui-palette-tertiary-main) 20%, transparent), color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent))',
+            color: 'var(--mui-palette-tertiary-main)',
+            border: '1px solid color-mix(in srgb, var(--mui-palette-tertiary-main) 30%, transparent)',
           }}
         >
           <AutoAwesomeIcon sx={{ fontSize: 12 }} />
@@ -42,18 +42,18 @@ export function PredictiveComponentLifeCard({
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {items.map((item) => {
-          let progressColor = '#38bdf8'; // green/cyan (OK >= 60%)
-          let badgeBg = 'rgba(56, 189, 248, 0.15)';
-          let badgeColor = '#7dd3fc';
+          let progressColor = 'var(--mui-palette-primary-main)'; // green/cyan (OK >= 60%)
+          let badgeBg = 'color-mix(in srgb, var(--mui-palette-primary-main) 15%, transparent)';
+          let badgeColor = 'var(--mui-palette-primary-main)';
 
           if (item.status === 'due_soon') {
-            progressColor = '#fbbf24'; // amber
-            badgeBg = 'rgba(251, 191, 36, 0.15)';
-            badgeColor = '#fbbf24';
+            progressColor = '#f59e0b'; // amber
+            badgeBg = 'rgba(245, 158, 11, 0.15)';
+            badgeColor = '#f59e0b';
           } else if (item.status === 'critical') {
-            progressColor = '#f87171'; // red
-            badgeBg = 'rgba(248, 113, 113, 0.15)';
-            badgeColor = '#f87171';
+            progressColor = '#ef4444'; // red
+            badgeBg = 'rgba(239, 68, 68, 0.15)';
+            badgeColor = '#ef4444';
           }
 
           return (
@@ -62,13 +62,13 @@ export function PredictiveComponentLifeCard({
               style={{
                 padding: '10px 12px',
                 borderRadius: '14px',
-                background: item.status === 'due_soon' ? 'rgba(251, 191, 36, 0.05)' : 'rgba(255, 255, 255, 0.02)',
-                border: `1px solid ${item.status === 'due_soon' ? 'rgba(251, 191, 36, 0.25)' : 'rgba(255, 255, 255, 0.05)'}`,
+                background: item.status === 'due_soon' ? 'rgba(245, 158, 11, 0.05)' : 'color-mix(in srgb, var(--mui-palette-background-default) 50%, transparent)',
+                border: `1px solid ${item.status === 'due_soon' ? 'rgba(245, 158, 11, 0.25)' : 'var(--mui-palette-divider)'}`,
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#f8fafc' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--mui-palette-text-primary)' }}>
                     {item.component}
                   </span>
                   {item.status === 'due_soon' && (
@@ -100,7 +100,7 @@ export function PredictiveComponentLifeCard({
                 sx={{
                   height: 6,
                   borderRadius: 3,
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  backgroundColor: 'color-mix(in srgb, var(--mui-palette-text-primary) 8%, transparent)',
                   '& .MuiLinearProgress-bar': {
                     backgroundColor: progressColor,
                     borderRadius: 3,
@@ -108,9 +108,9 @@ export function PredictiveComponentLifeCard({
                 }}
               />
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#94a3b8', marginTop: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--mui-palette-text-secondary)', marginTop: '6px' }}>
                 <span>{item.reason}</span>
-                <span style={{ fontWeight: 600, color: '#e2e8f0' }}>
+                <span style={{ fontWeight: 600, color: 'var(--mui-palette-text-primary)' }}>
                   ~{item.remainingKm.toLocaleString()} {distanceUnit} or {item.remainingDays} days left
                 </span>
               </div>

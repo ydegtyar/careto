@@ -24,12 +24,12 @@ export function VehicleHeaderCard({ vehicle, currentOdometerKm, refuelCount = 12
               width: '42px',
               height: '42px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2))',
-              border: '1px solid rgba(125, 211, 252, 0.25)',
+              background: 'linear-gradient(135deg, color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent), color-mix(in srgb, var(--mui-palette-tertiary-main) 20%, transparent))',
+              border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 25%, transparent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#7dd3fc',
+              color: 'var(--mui-palette-primary-main)',
             }}
           >
             <DirectionsCarIcon />
@@ -37,7 +37,7 @@ export function VehicleHeaderCard({ vehicle, currentOdometerKm, refuelCount = 12
 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc' }}>
+              <span style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
                 {vehicle?.name || 'Honda CR-V Touring'}
               </span>
               <span
@@ -46,28 +46,28 @@ export function VehicleHeaderCard({ vehicle, currentOdometerKm, refuelCount = 12
                   fontWeight: 700,
                   padding: '2px 6px',
                   borderRadius: '6px',
-                  background: 'rgba(56, 189, 248, 0.15)',
-                  color: '#7dd3fc',
-                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  background: 'color-mix(in srgb, var(--mui-palette-primary-main) 15%, transparent)',
+                  color: 'var(--mui-palette-primary-main)',
+                  border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
                 }}
               >
                 AWD
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '2px', fontSize: '0.75rem', color: '#94a3b8' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#34d399' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '2px', fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#10b981' }}>
                 <SensorsIcon sx={{ fontSize: 13 }} />
                 <span>OBD-II Live</span>
               </div>
               <span>•</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                <SpeedIcon sx={{ fontSize: 13, color: '#7dd3fc' }} />
+                <SpeedIcon sx={{ fontSize: 13, color: 'var(--mui-palette-primary-main)' }} />
                 <span>{odoKm.toLocaleString()} {distanceUnit}</span>
               </div>
               <span>•</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                <LocalGasStationIcon sx={{ fontSize: 13, color: '#c8a0f0' }} />
+                <LocalGasStationIcon sx={{ fontSize: 13, color: 'var(--mui-palette-tertiary-main)' }} />
                 <span>{refuelCount} fills</span>
               </div>
             </div>

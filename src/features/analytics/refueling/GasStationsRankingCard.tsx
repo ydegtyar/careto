@@ -15,10 +15,10 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
         <div style={styles.titleGroup}>
-          <LocalGasStationIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+          <LocalGasStationIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           <h4 style={styles.title}>Gas Stations Ranking</h4>
         </div>
-        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)' }}>
           {stations.length} brands
         </span>
       </div>
@@ -38,8 +38,8 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
                 justifyContent: 'space-between',
                 padding: '10px 12px',
                 borderRadius: '14px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
+                background: 'color-mix(in srgb, var(--mui-palette-background-default) 50%, transparent)',
+                border: '1px solid var(--mui-palette-divider)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -47,7 +47,7 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
                   style={{
                     fontSize: '0.9rem',
                     fontWeight: 700,
-                    color: s.rank === 1 ? '#34d399' : '#94a3b8',
+                    color: s.rank === 1 ? '#10b981' : 'var(--mui-palette-text-secondary)',
                     minWidth: '20px',
                   }}
                 >
@@ -56,7 +56,7 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
 
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#f8fafc' }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--mui-palette-text-primary)' }}>
                       {s.brand}
                     </span>
                     <span
@@ -65,25 +65,25 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
                         fontWeight: 600,
                         padding: '1px 5px',
                         borderRadius: '6px',
-                        background: isCheaper ? 'rgba(52, 211, 153, 0.15)' : 'rgba(248, 113, 113, 0.15)',
-                        color: isCheaper ? '#34d399' : '#f87171',
+                        background: isCheaper ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        color: isCheaper ? '#10b981' : '#ef4444',
                       }}
                     >
                       {diffText}
                     </span>
                   </div>
 
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--mui-palette-text-secondary)', marginTop: '2px' }}>
                     {s.refuelCount} refuels • {s.totalLiters} {volumeUnit}
                   </div>
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc' }}>
+                <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
                   ${s.totalSpend.toFixed(2)}
                 </div>
-                <div style={{ fontSize: '0.7rem', color: '#7dd3fc', fontWeight: 500 }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--mui-palette-primary-main)', fontWeight: 500 }}>
                   ${s.avgPricePerLiter.toFixed(2)}/{volumeUnit}
                 </div>
               </div>
@@ -99,16 +99,16 @@ export function GasStationsRankingCard({ data, volumeUnit = 'L' }: GasStationsRa
             marginTop: '14px',
             padding: '12px 14px',
             borderRadius: '14px',
-            background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(56, 189, 248, 0.1))',
-            border: '1px solid rgba(52, 211, 153, 0.25)',
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent))',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
             display: 'flex',
             alignItems: 'flex-start',
             gap: '10px',
           }}
         >
-          <SavingsIcon sx={{ fontSize: 20, color: '#34d399', mt: '2px' }} />
-          <div style={{ fontSize: '0.75rem', color: '#e2e8f0', lineHeight: 1.4 }}>
-            <span style={{ fontWeight: 700, color: '#34d399' }}>Optimization Insight: </span>
+          <SavingsIcon sx={{ fontSize: 20, color: '#10b981', mt: '2px' }} />
+          <div style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-primary)', lineHeight: 1.4 }}>
+            <span style={{ fontWeight: 700, color: '#10b981' }}>Optimization Insight: </span>
             {optimizationInsight.message}
           </div>
         </div>

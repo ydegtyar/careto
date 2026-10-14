@@ -19,7 +19,7 @@ export function RefuelingRoutineCard({
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
         <div style={styles.titleGroup}>
-          <AutorenewIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+          <AutorenewIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           <h4 style={styles.title}>Refueling Routine</h4>
         </div>
 
@@ -29,9 +29,9 @@ export function RefuelingRoutineCard({
             fontWeight: 700,
             padding: '2px 8px',
             borderRadius: '12px',
-            background: 'rgba(56, 189, 248, 0.15)',
-            color: '#7dd3fc',
-            border: '1px solid rgba(56, 189, 248, 0.3)',
+            background: 'color-mix(in srgb, var(--mui-palette-primary-main) 15%, transparent)',
+            color: 'var(--mui-palette-primary-main)',
+            border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
           }}
         >
           {fullTankIndex}% Full-Tank Index
@@ -45,42 +45,42 @@ export function RefuelingRoutineCard({
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '8px',
           padding: '12px 0',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: '1px solid var(--mui-palette-divider)',
           textAlign: 'center',
         }}
       >
         <div>
-          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc' }}>
+          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
             {routine.frequencyDays !== null ? `${routine.frequencyDays}d` : '—'}
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--mui-palette-text-secondary)', textTransform: 'uppercase', marginTop: '2px' }}>
             Frequency
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc' }}>
+          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--mui-palette-text-primary)' }}>
             {routine.intervalKm !== null ? `${routine.intervalKm} ${distanceUnit}` : '—'}
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--mui-palette-text-secondary)', textTransform: 'uppercase', marginTop: '2px' }}>
             Interval
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#38bdf8' }}>
+          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--mui-palette-primary-main)' }}>
             {routine.currentRangeKm !== null ? `${routine.currentRangeKm} ${distanceUnit}` : '—'}
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--mui-palette-text-secondary)', textTransform: 'uppercase', marginTop: '2px' }}>
             Est. Range
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#c8a0f0' }}>
+          <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--mui-palette-tertiary-main)' }}>
             {routine.monthlyAverageSpend !== null ? `$${routine.monthlyAverageSpend}` : '—'}
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--mui-palette-text-secondary)', textTransform: 'uppercase', marginTop: '2px' }}>
             Monthly
           </div>
         </div>
@@ -89,8 +89,8 @@ export function RefuelingRoutineCard({
       {/* Full tank consistency progress bar */}
       <div style={{ marginTop: '12px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '6px' }}>
-          <span style={{ color: '#94a3b8' }}>Full Tank Consistency</span>
-          <span style={{ color: '#7dd3fc', fontWeight: 600 }}>{routine.fullTankRatioText}</span>
+          <span style={{ color: 'var(--mui-palette-text-secondary)' }}>Full Tank Consistency</span>
+          <span style={{ color: 'var(--mui-palette-primary-main)', fontWeight: 600 }}>{routine.fullTankRatioText}</span>
         </div>
 
         <LinearProgress
@@ -99,15 +99,15 @@ export function RefuelingRoutineCard({
           sx={{
             height: 6,
             borderRadius: 3,
-            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            backgroundColor: 'color-mix(in srgb, var(--mui-palette-text-primary) 8%, transparent)',
             '& .MuiLinearProgress-bar': {
-              backgroundColor: '#38bdf8',
+              backgroundColor: 'var(--mui-palette-primary-main)',
               borderRadius: 3,
             },
           }}
         />
 
-        <div style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '8px', fontStyle: 'italic' }}>
+        <div style={{ fontSize: '0.65rem', color: 'var(--mui-palette-text-secondary)', marginTop: '8px', fontStyle: 'italic' }}>
           {routine.footnote}
         </div>
       </div>

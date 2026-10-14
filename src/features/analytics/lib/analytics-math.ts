@@ -1,4 +1,5 @@
 import type { Entry, Vehicle } from '@/data/client/types';
+import { convertToUsdMinor } from '@/shared/lib/currencies';
 
 export interface TcoSummary {
   totalSpentUsd: number;
@@ -1062,8 +1063,12 @@ export function computeClientServicesAnalytics(
     const totalEntryCost = (s.usd_minor ?? s.amount_minor ?? 0) / 100;
     if (s.sub_items && s.sub_items.length > 0) {
       taskCount += s.sub_items.length;
+      const currency = s.currency || 'USD';
       for (const item of s.sub_items) {
-        const itemCost = parseFloat(item.cost) || 0;
+        const rawCost = parseFloat(item.cost) || 0;
+        const itemCost = currency === 'USD'
+          ? rawCost
+          : convertToUsdMinor(Math.round(rawCost * 100), currency) / 100;
         const name = item.name || 'Service Item';
         const isLabor = name.toLowerCase().includes('labor') || name.toLowerCase().includes('work');
         if (isLabor) {

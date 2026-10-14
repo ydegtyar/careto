@@ -25,10 +25,10 @@ export function FuelPriceTrajectoryCard({ data, volumeUnit = 'L' }: FuelPriceTra
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
         <div style={styles.titleGroup}>
-          <ShowChartIcon sx={{ fontSize: 18, color: '#7dd3fc' }} />
+          <ShowChartIcon sx={{ fontSize: 18, color: 'var(--mui-palette-primary-main)' }} />
           <h4 style={styles.title}>Fuel Price Trajectory</h4>
         </div>
-        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--mui-palette-text-secondary)' }}>
           ${data.overallWeightedAvgPrice?.toFixed(2) ?? '—'}/{volumeUnit}
         </span>
       </div>
@@ -38,13 +38,13 @@ export function FuelPriceTrajectoryCard({ data, volumeUnit = 'L' }: FuelPriceTra
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
             <defs>
               <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.0} />
+                <stop offset="5%" stopColor="var(--mui-palette-primary-main)" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="var(--mui-palette-primary-main)" stopOpacity={0.0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="monthLabel" stroke="#64748b" fontSize={11} tickLine={false} />
+            <XAxis dataKey="monthLabel" stroke="var(--mui-palette-text-secondary)" fontSize={11} tickLine={false} />
             <YAxis
-              stroke="#64748b"
+              stroke="var(--mui-palette-text-secondary)"
               fontSize={11}
               tickLine={false}
               axisLine={false}
@@ -53,18 +53,19 @@ export function FuelPriceTrajectoryCard({ data, volumeUnit = 'L' }: FuelPriceTra
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                borderColor: 'rgba(125, 211, 252, 0.2)',
+                backgroundColor: 'var(--mui-palette-background-paper)',
+                borderColor: 'var(--mui-palette-divider)',
                 borderRadius: '8px',
-                color: '#f8fafc',
+                color: 'var(--mui-palette-text-primary)',
                 fontSize: '12px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               }}
               formatter={(value: any) => [`$${value}/${volumeUnit}`, 'Price']}
             />
             <Area
               type="monotone"
               dataKey="avgPrice"
-              stroke="#38bdf8"
+              stroke="var(--mui-palette-primary-main)"
               strokeWidth={2}
               fillOpacity={1}
               fill="url(#priceGradient)"
@@ -80,17 +81,17 @@ export function FuelPriceTrajectoryCard({ data, volumeUnit = 'L' }: FuelPriceTra
           justifyContent: 'space-between',
           alignItems: 'center',
           marginTop: '12px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          borderTop: '1px solid var(--mui-palette-divider)',
           paddingTop: '10px',
           fontSize: '0.75rem',
         }}
       >
-        <span style={{ color: '#94a3b8' }}>
-          Weighted Avg: <strong style={{ color: '#f8fafc' }}>${data.overallWeightedAvgPrice?.toFixed(2) ?? '—'}</strong>
+        <span style={{ color: 'var(--mui-palette-text-secondary)' }}>
+          Weighted Avg: <strong style={{ color: 'var(--mui-palette-text-primary)' }}>${data.overallWeightedAvgPrice?.toFixed(2) ?? '—'}</strong>
         </span>
 
         {change !== null && (
-          <span style={{ color: isUp ? '#f87171' : '#34d399', fontWeight: 600 }}>
+          <span style={{ color: isUp ? '#ef4444' : '#10b981', fontWeight: 600 }}>
             {isUp ? `+${change}%` : `${change}%`} over period
           </span>
         )}
