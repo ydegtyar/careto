@@ -89,10 +89,12 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  min-width: 0;
 }
 
 .amount {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  flex-shrink: 0;
 }
