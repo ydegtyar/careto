@@ -28,7 +28,9 @@ export const EntryKindSelector: React.FC<Props> = ({ value, onChange, disabled }
 
   const refuelLabel =
     (isEv && 'Charge') ||
-    (['ice', 'hybrid'].includes(activeVehicle?.powertrain!) && 'Refuel') ||
+    (activeVehicle?.powertrain &&
+      ['ice', 'hybrid'].includes(activeVehicle.powertrain) &&
+      'Refuel') ||
     'Refuel / Charge';
   const RefuelIcon = isEv ? EvStationIcon : LocalGasStationIcon;
 
@@ -64,5 +66,3 @@ export const EntryKindSelector: React.FC<Props> = ({ value, onChange, disabled }
     </ToggleButtonGroup>
   );
 };
-
-export default EntryKindSelector;

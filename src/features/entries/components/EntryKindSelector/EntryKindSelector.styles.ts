@@ -6,11 +6,13 @@ export const styles: Record<string, SxProps<Theme>> = {
     gap: 1.25,
     width: '100%',
     '& .MuiToggleButtonGroup-grouped': {
-      border: '1px solid rgba(125, 211, 252, 0.18) !important',
+      border:
+        '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent) !important',
       borderRadius: '16px !important',
       margin: '0 !important',
       '&:not(:first-of-type)': {
-        borderLeft: '1px solid rgba(125, 211, 252, 0.18) !important',
+        borderLeft:
+          '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent) !important',
       },
     },
     '& .MuiToggleButton-root': {
@@ -26,7 +28,7 @@ export const styles: Record<string, SxProps<Theme>> = {
       fontWeight: 600,
       fontSize: '0.875rem',
       color: 'text.secondary',
-      backgroundColor: 'rgba(15, 21, 36, 0.4)',
+      backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-paper) 70%, transparent)',
       backdropFilter: 'blur(8px)',
       transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
       '& svg': {
@@ -35,8 +37,9 @@ export const styles: Record<string, SxProps<Theme>> = {
         color: 'text.secondary',
       },
       '&:hover': {
-        backgroundColor: 'rgba(125, 211, 252, 0.12)',
-        borderColor: 'rgba(125, 211, 252, 0.35) !important',
+        backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent)',
+        borderColor:
+          'color-mix(in srgb, var(--mui-palette-primary-main) 35%, transparent) !important',
         color: 'text.primary',
         transform: 'translateY(-1px)',
         '& svg': {
@@ -45,17 +48,21 @@ export const styles: Record<string, SxProps<Theme>> = {
         },
       },
       '&.Mui-selected': {
-        backgroundColor: 'rgba(125, 211, 252, 0.18) !important',
+        backgroundColor:
+          'color-mix(in srgb, var(--mui-palette-primary-main) 16%, transparent) !important',
         color: 'primary.main',
-        borderColor: 'rgba(125, 211, 252, 0.45) !important',
-        boxShadow: '0 0 12px rgba(125, 211, 252, 0.15)',
+        borderColor:
+          'color-mix(in srgb, var(--mui-palette-primary-main) 45%, transparent) !important',
+        boxShadow: '0 0 12px color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent)',
         '& svg': {
           color: 'primary.main',
           transform: 'scale(1.05)',
         },
         '&:hover': {
-          backgroundColor: 'rgba(125, 211, 252, 0.25) !important',
-          borderColor: 'rgba(125, 211, 252, 0.6) !important',
+          backgroundColor:
+            'color-mix(in srgb, var(--mui-palette-primary-main) 24%, transparent) !important',
+          borderColor:
+            'color-mix(in srgb, var(--mui-palette-primary-main) 60%, transparent) !important',
         },
       },
       '&:active': {
