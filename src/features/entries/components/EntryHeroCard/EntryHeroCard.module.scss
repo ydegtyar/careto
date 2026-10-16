@@ -1,0 +1,166 @@
+@use "mixins" as *;
+
+.heroCard {
+  @include glass(24px, 0.75);
+
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent);
+  padding: 20px;
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--mui-palette-text-primary) 8%, transparent);
+}
+
+.heroGlowTop {
+  position: absolute;
+  top: -48px;
+  right: -48px;
+  width: 140px;
+  height: 140px;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--mui-palette-primary-main) 15%, transparent);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.heroGlowBottom {
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 110px;
+  height: 110px;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--mui-palette-tertiary-main) 12%, transparent);
+  filter: blur(32px);
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.heroTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kindBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+
+  &.refuel,
+  &.charge,
+  &.service {
+    background-color: color-mix(in srgb, var(--mui-palette-primary-main) 15%, transparent);
+    color: var(--mui-palette-primary-main);
+    border-color: color-mix(in srgb, var(--mui-palette-primary-main) 25%, transparent);
+  }
+
+  &.note {
+    background-color: color-mix(in srgb, var(--mui-palette-tertiary-main) 15%, transparent);
+    color: var(--mui-palette-tertiary-main);
+    border-color: color-mix(in srgb, var(--mui-palette-tertiary-main) 25%, transparent);
+  }
+
+  &.expense {
+    background-color: color-mix(in srgb, var(--mui-palette-secondary-main) 15%, transparent);
+    color: var(--mui-palette-secondary-main);
+    border-color: color-mix(in srgb, var(--mui-palette-secondary-main) 25%, transparent);
+  }
+}
+
+.heroTopBadges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.businessPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent);
+  color: var(--mui-palette-primary-main);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.paymentPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background-color: var(--mui-palette-surfaceContainer);
+  border: 1px solid color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent);
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.currencyText {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--mui-palette-primary-main);
+}
+
+.usdEquivPill {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--mui-palette-text-secondary);
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: var(--mui-palette-surfaceContainer);
+  border: 1px solid var(--mui-palette-divider);
+}
+
+.telemetryGrid {
+  display: grid;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent);
+}
+
+.telemetryCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background-color: var(--mui-palette-surfaceContainer);
+  border: 1px solid var(--mui-palette-divider);
+}
+
+.telemetryIconWell {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mui-palette-primary-main);
+  flex-shrink: 0;
+
+  &.secondary {
+    background-color: color-mix(in srgb, var(--mui-palette-secondary-main) 12%, transparent);
+    color: var(--mui-palette-secondary-main);
+  }
+}

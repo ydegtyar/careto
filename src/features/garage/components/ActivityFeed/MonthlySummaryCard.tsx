@@ -1,9 +1,9 @@
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { Link } from '@tanstack/react-router';
 import type { CostCategorySlice } from '@/features/analytics/lib/analytics-math';
+import { CategoryBreakdownPill } from './CategoryBreakdownPill';
+import { CategoryBreakdownSegment } from './CategoryBreakdownSegment';
+import { MonthlyComparisonBadge } from './MonthlyComparisonBadge';
 import styles from './MonthlySummaryCard.module.scss';
 
 export interface MonthlyStats {
@@ -34,42 +34,8 @@ export const MonthlySummaryCard = ({ stats }: Props) => {
     categoryBreakdown,
   } = stats;
 
-  const renderComparison = () => {
-    if (costDiffPercent === null) {
-      return (
-        <span className={`${styles.comparisonBadge} ${styles.neutral}`}>
-          <TrendingFlatIcon sx={{ fontSize: 13 }} />
-          <span>No prior data</span>
-        </span>
-      );
-    }
-
-    if (costDiffPercent === 0) {
-      return (
-        <span className={`${styles.comparisonBadge} ${styles.neutral}`}>
-          <TrendingFlatIcon sx={{ fontSize: 13 }} />
-          <span>0% vs last mo</span>
-        </span>
-      );
-    }
-
-    const isHigherCost = costDiffPercent > 0;
-    const badgeClass = isHigherCost ? styles.up : styles.down;
-    const Icon = isHigherCost ? TrendingUpIcon : TrendingDownIcon;
-    const formattedSign = isHigherCost ? `+${costDiffPercent}%` : `${costDiffPercent}%`;
-
-    return (
-      <span
-        className={`${styles.comparisonBadge} ${badgeClass}`}
-        title={`${formattedSign} spend vs previous month`}
-      >
-        <Icon sx={{ fontSize: 13 }} />
-        <span>{formattedSign} vs last mo</span>
-      </span>
-    );
-  };
-
-  const hasBreakdown = categoryBreakdown.length > 0;
+  const visibleCategories = categoryBreakdown.filter((cat) => cat.percentage > 0 || cat.value > 0);
+  const hasBreakdown = visibleCategories.length > 0;
 
   // Derive start and end date for the card's month (e.g., monthKey = "2026-10" -> "2026-10-01" to "2026-10-31")
   const [yearStr = '2026', monthStr = '01'] = stats.monthKey.split('-');
@@ -84,7 +50,7 @@ export const MonthlySummaryCard = ({ stats }: Props) => {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.monthTitle}>{monthLabel}</span>
-          {renderComparison()}
+          <MonthlyComparisonBadge costDiffPercent={costDiffPercent} />
         </div>
         <div className={styles.headerRight}>
           <Link
@@ -134,26 +100,14 @@ export const MonthlySummaryCard = ({ stats }: Props) => {
           </div>
 
           <div className={styles.breakdownBar}>
-            {categoryBreakdown.map((cat) => (
-              <div
-                key={cat.name}
-                className={styles.breakdownSegment}
-                style={{
-                  width: `${cat.percentage}%`,
-                  backgroundColor: cat.color,
-                }}
-                title={`${cat.name}: ${cat.percentage}% ($${cat.value.toFixed(2)})`}
-              />
+            {visibleCategories.map((cat) => (
+              <CategoryBreakdownSegment key={cat.name} category={cat} />
             ))}
           </div>
 
           <div className={styles.breakdownPills}>
-            {categoryBreakdown.map((cat) => (
-              <div key={cat.name} className={styles.breakdownPill}>
-                <span className={styles.breakdownDot} style={{ backgroundColor: cat.color }} />
-                <span className={styles.breakdownCategory}>{cat.name}</span>
-                <span className={styles.breakdownAmount}>{cat.percentage}%</span>
-              </div>
+            {visibleCategories.map((cat) => (
+              <CategoryBreakdownPill key={cat.name} category={cat} />
             ))}
           </div>
         </div>

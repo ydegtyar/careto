@@ -179,4 +179,4 @@ export const RefuelingRoutineCard = ({ routine, distanceUnit = 'km' }: Props) =>
       </div>
     </div>
   );
-}
+};

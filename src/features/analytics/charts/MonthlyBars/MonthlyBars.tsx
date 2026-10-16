@@ -51,4 +51,4 @@ export const MonthlyBars = ({ data = [] }: Props) => {
       </ResponsiveContainer>
     </div>
   );
-}
+};

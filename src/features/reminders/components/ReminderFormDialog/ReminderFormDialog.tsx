@@ -12,6 +12,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import type { Reminder, ReminderModeType } from '@/data/client/types';
+import { TriggerModeCard } from './TriggerModeCard';
 
 export const DEFAULT_MAINTENANCE_TYPES = [
   { id: 'service', label: 'Service & General' },
@@ -342,69 +343,14 @@ export function ReminderFormDialog({
               Trigger Mode
             </Typography>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {TRIGGER_MODES.map((item) => {
-                const isSelected = mode === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setMode(item.id)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      padding: 12,
-                      borderRadius: 12,
-                      border: isSelected
-                        ? '2px solid var(--mui-palette-primary-main, #7dd3fc)'
-                        : '1px solid var(--mui-palette-divider, rgba(255, 255, 255, 0.12))',
-                      backgroundColor: isSelected ? 'rgba(125, 211, 252, 0.08)' : 'transparent',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                        marginBottom: 4,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 700,
-                          color: isSelected ? '#7dd3fc' : 'inherit',
-                        }}
-                      >
-                        {item.title}
-                      </span>
-                      {item.recommended && (
-                        <span
-                          style={{
-                            fontSize: 9,
-                            fontWeight: 700,
-                            textTransform: 'uppercase',
-                            color: '#7dd3fc',
-                            backgroundColor: 'rgba(125, 211, 252, 0.15)',
-                            padding: '2px 6px',
-                            borderRadius: 4,
-                          }}
-                        >
-                          Rec
-                        </span>
-                      )}
-                    </div>
-                    <span
-                      style={{ fontSize: 11, color: 'rgba(255, 255, 255, 0.6)', lineHeight: 1.3 }}
-                    >
-                      {item.desc}
-                    </span>
-                  </button>
-                );
-              })}
+              {TRIGGER_MODES.map((item) => (
+                <TriggerModeCard
+                  key={item.id}
+                  item={item}
+                  isSelected={mode === item.id}
+                  onSelect={setMode}
+                />
+              ))}
             </div>
           </div>
 

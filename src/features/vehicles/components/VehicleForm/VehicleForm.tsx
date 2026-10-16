@@ -567,6 +567,7 @@ export function VehicleForm({ initialVehicle, onSubmit, onCancel, submitting = f
               }}
               fullWidth
               sx={{
+                gap: 1,
                 '& .MuiToggleButton-root': {
                   borderRadius: '12px !important',
                   textTransform: 'uppercase',

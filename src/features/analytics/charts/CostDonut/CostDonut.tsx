@@ -36,4 +36,4 @@ export const CostDonut = ({ data = [] }: Props) => {
       </ResponsiveContainer>
     </div>
   );
-}
+};

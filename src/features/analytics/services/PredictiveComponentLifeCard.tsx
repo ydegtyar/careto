@@ -9,10 +9,7 @@ interface Props {
   distanceUnit?: string;
 }
 
-export const PredictiveComponentLifeCard = ({
-  items,
-  distanceUnit = 'km',
-}: Props) => {
+export const PredictiveComponentLifeCard = ({ items, distanceUnit = 'km' }: Props) => {
   return (
     <div style={styles.glassCard}>
       <div style={styles.headerRow}>
@@ -150,4 +147,4 @@ export const PredictiveComponentLifeCard = ({
       </div>
     </div>
   );
-}
+};

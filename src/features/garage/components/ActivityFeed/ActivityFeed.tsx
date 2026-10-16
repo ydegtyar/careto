@@ -1,8 +1,3 @@
-import BuildIcon from '@mui/icons-material/Build';
-import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import SpeedIcon from '@mui/icons-material/Speed';
-import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
@@ -301,22 +296,6 @@ export const ActivityFeed = ({ entries }: Props) => {
     return Array.from(map.entries());
   }, [sortedEntries]);
 
-  const getIcon = (kind: string) => {
-    switch (kind) {
-      case 'refuel':
-      case 'charge':
-        return <LocalGasStationIcon sx={{ fontSize: 18 }} />;
-      case 'service':
-        return <BuildIcon sx={{ fontSize: 18 }} />;
-      case 'odometer':
-        return <SpeedIcon sx={{ fontSize: 18 }} />;
-      case 'note':
-        return <StickyNote2Icon sx={{ fontSize: 18 }} />;
-      default:
-        return <ReceiptIcon sx={{ fontSize: 18 }} />;
-    }
-  };
-
   const handleOpenDetail = (entry: Entry) => {
     navigate({ to: `/entries/${entry.id}` });
   };
@@ -354,7 +333,6 @@ export const ActivityFeed = ({ entries }: Props) => {
                     volumeUnit={defaultVolumeUnit}
                     distanceUnit={defaultDistanceUnit}
                     onOpen={handleOpenDetail}
-                    getIcon={getIcon}
                   />
                 ))}
               </div>

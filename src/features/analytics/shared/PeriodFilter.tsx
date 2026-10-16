@@ -126,4 +126,4 @@ export const PeriodFilter = ({ currentPreset, from, to, onChange }: Props) => {
       )}
     </div>
   );
-}
+};

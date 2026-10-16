@@ -110,4 +110,4 @@ export const AnalyticsTabs = ({ currentTab, onChange }: Props) => {
       })}
     </div>
   );
-}
+};

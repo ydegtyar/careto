@@ -87,4 +87,4 @@ export const MonthlyExpensesCard = ({ data }: Props) => {
       </div>
     </div>
   );
-}
+};

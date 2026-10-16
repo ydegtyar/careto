@@ -1,0 +1,66 @@
+@use "mixins" as *;
+
+.verifiedBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--mui-palette-primary-main);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent);
+}
+
+.attachmentDeleteBtn {
+  color: var(--mui-palette-error-main) !important;
+  padding: 4px !important;
+  background-color: color-mix(in srgb, var(--mui-palette-error-main) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--mui-palette-error-main) 25%, transparent) !important;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--mui-palette-error-main) 22%, transparent) !important;
+  }
+}
+
+.receiptCard {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 12px;
+  background-color: var(--mui-palette-surfaceContainer);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--mui-palette-divider);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent);
+  }
+}
+
+.receiptThumbWell {
+  position: relative;
+  width: 56px;
+  height: 64px;
+  border-radius: 8px;
+  background-color: var(--mui-palette-surface2);
+  border: 1px solid var(--mui-palette-divider);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.receiptThumbOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: color-mix(in srgb, var(--mui-palette-primary-main) 25%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

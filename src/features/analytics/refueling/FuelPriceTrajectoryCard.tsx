@@ -106,4 +106,4 @@ export const FuelPriceTrajectoryCard = ({ data, volumeUnit = 'L' }: Props) => {
       </div>
     </div>
   );
-}
+};

@@ -8,10 +8,7 @@ interface Props {
   distanceUnit?: string;
 }
 
-export const OdometerCostProgressionCard = ({
-  data,
-  distanceUnit = 'km',
-}: Props) => {
+export const OdometerCostProgressionCard = ({ data, distanceUnit = 'km' }: Props) => {
   const chartData = data.points.map((p) => ({
     odometerLabel: `${(p.odometerKm / 1000).toFixed(0)}k`,
     costPerKm: p.costPerKm,
@@ -122,4 +119,4 @@ export const OdometerCostProgressionCard = ({
       </div>
     </div>
   );
-}
+};

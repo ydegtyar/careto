@@ -116,4 +116,4 @@ export const ReceiptCapture = ({ initialImage, onImageReady }: Props) => {
       )}
     </div>
   );
-}
+};

@@ -34,43 +34,16 @@ export const KpiCard = ({
     cursor: onClick ? 'pointer' : 'default',
   };
 
-  if (isLoading) {
-    return (
-      <div style={cardStyle}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <Skeleton
-            variant="text"
-            width={80}
-            height={20}
-            sx={{ bgcolor: 'rgba(255,255,255,0.06)' }}
-          />
-          <Skeleton
-            variant="circular"
-            width={20}
-            height={20}
-            sx={{ bgcolor: 'rgba(255,255,255,0.06)' }}
-          />
-        </div>
-        <Skeleton
-          variant="text"
-          width={100}
-          height={36}
-          sx={{ bgcolor: 'rgba(255,255,255,0.06)' }}
-        />
-        <Skeleton
-          variant="text"
-          width={120}
-          height={16}
-          sx={{ bgcolor: 'rgba(255,255,255,0.06)', mt: 1 }}
-        />
-      </div>
-    );
-  }
-
   const formattedValue = value !== null && value !== undefined ? value : '—';
 
   return (
-    <div style={cardStyle} onClick={onClick}>
+    <div
+      style={cardStyle}
+      onClick={onClick}
+      onKeyDown={onClick ? (e) => (e.key === 'Enter' || e.key === ' ') && onClick() : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      role={onClick ? 'button' : undefined}
+    >
       <div
         style={{
           display: 'flex',
@@ -96,16 +69,28 @@ export const KpiCard = ({
       </div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '8px' }}>
-        <span
-          style={{
-            fontSize: '1.35rem',
-            fontWeight: 700,
-            color: valueColor,
-            letterSpacing: '-0.5px',
-          }}
-        >
-          {formattedValue}
-        </span>
+        {isLoading ? (
+          <Skeleton
+            variant="rounded"
+            width={72}
+            height={26}
+            sx={{
+              bgcolor: 'color-mix(in srgb, var(--mui-palette-text-primary) 10%, transparent)',
+              borderRadius: '4px',
+            }}
+          />
+        ) : (
+          <span
+            style={{
+              fontSize: '1.35rem',
+              fontWeight: 700,
+              color: valueColor,
+              letterSpacing: '-0.5px',
+            }}
+          >
+            {formattedValue}
+          </span>
+        )}
         {unit && (
           <span
             style={{
@@ -141,7 +126,20 @@ export const KpiCard = ({
             return (
               <div key={i} style={styles.subMetricText}>
                 <span>{sm.label}</span>
-                <span style={{ color, fontWeight: 600 }}>{smVal}</span>
+                {isLoading ? (
+                  <Skeleton
+                    variant="rounded"
+                    width={44}
+                    height={14}
+                    sx={{
+                      bgcolor:
+                        'color-mix(in srgb, var(--mui-palette-text-primary) 10%, transparent)',
+                      borderRadius: '3px',
+                    }}
+                  />
+                ) : (
+                  <span style={{ color, fontWeight: 600 }}>{smVal}</span>
+                )}
               </div>
             );
           })}
@@ -149,4 +147,4 @@ export const KpiCard = ({
       )}
     </div>
   );
-}
+};

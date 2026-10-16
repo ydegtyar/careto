@@ -72,4 +72,4 @@ export const MonthlyServiceTrajectoryCard = ({ data }: Props) => {
       </div>
     </div>
   );
-}
+};

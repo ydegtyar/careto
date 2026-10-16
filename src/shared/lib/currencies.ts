@@ -17,13 +17,21 @@ export const ALL_CURRENCIES: CurrencyInfo[] = [
 
 export const DEFAULT_FAVORITE_CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'UAH', 'ALL'];
 export const DEFAULT_CURRENCY = 'EUR';
+export const DEFAULT_BASE_CURRENCY = 'USD';
 
 export const FAVORITE_CURRENCIES_KEY = 'careto_favorite_currencies';
+export const BASE_CURRENCY_KEY = 'careto_base_currency';
 export const LAST_USED_CURRENCY_KEY = 'careto_last_used_currency';
 export const LAST_USED_PAYMENT_METHOD_KEY = 'careto_last_used_payment_method';
 
 export function useFavoriteCurrencies() {
   return useLocalStorage<string[]>(FAVORITE_CURRENCIES_KEY, DEFAULT_FAVORITE_CURRENCIES, {
+    initializeWithValue: false,
+  });
+}
+
+export function useBaseCurrency() {
+  return useLocalStorage<string>(BASE_CURRENCY_KEY, DEFAULT_BASE_CURRENCY, {
     initializeWithValue: false,
   });
 }
@@ -68,6 +76,24 @@ export function convertToUsdMinor(
   const rate = USD_FALLBACK_RATES[currencyCode.toUpperCase()] ?? 1.0;
   // rate is (Foreign Currency / USD). USD = Foreign Amount / rate
   return Math.round(amountMinor / rate);
+}
+
+/**
+ * Converts minor units in a given currency to target base currency minor units based on fallback exchange rates.
+ */
+export function convertToBaseCurrencyMinor(
+  amountMinor: number,
+  fromCurrency: string,
+  baseCurrency = DEFAULT_BASE_CURRENCY,
+): number {
+  if (!amountMinor || Number.isNaN(amountMinor)) return 0;
+  const from = fromCurrency.toUpperCase();
+  const to = baseCurrency.toUpperCase();
+  if (from === to) return Math.round(amountMinor);
+
+  const amount = amountMinor / 100;
+  const convertedAmount = convertCurrency(amount, from, to);
+  return Math.round(convertedAmount * 100);
 }
 
 /**

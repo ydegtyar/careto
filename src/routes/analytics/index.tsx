@@ -1,5 +1,4 @@
-import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useMemo } from 'react';
@@ -28,9 +27,9 @@ import {
 import { RefuelingTabContent } from '@/features/analytics/refueling/RefuelingTabContent';
 import { ServicesTabContent } from '@/features/analytics/services/ServicesTabContent';
 // Shared Components
+import { AnalyticsEmptyState } from '@/features/analytics/shared/AnalyticsEmptyState';
 import { type AnalyticsTab, AnalyticsTabs } from '@/features/analytics/shared/AnalyticsTabs';
 import { PeriodFilter, type PeriodPreset } from '@/features/analytics/shared/PeriodFilter';
-import { VehicleHeaderCard } from '@/features/analytics/shared/VehicleHeaderCard';
 import { entriesQueryOptions, vehiclesQueryOptions } from '@/features/garage/queries/vehicles';
 
 import { styles } from './-index.styles';
@@ -112,6 +111,12 @@ function AnalyticsPage() {
     });
   };
 
+  const isAllTime = currentPreset === 'all' && !fromDate && !toDate;
+
+  const handleSelectAllPeriod = () => {
+    handlePeriodChange('all', undefined, undefined);
+  };
+
   // Queries for server analytics
   const refuelingQuery = useRefuelingAnalytics({
     vehicleId,
@@ -169,58 +174,62 @@ function AnalyticsPage() {
 
       {/* 4. Tab Views */}
       {currentTab === 'refueling' && (
-        <>
-          {refuelingQuery.isLoading && !effectiveRefuelingData ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
-              <CircularProgress sx={{ color: '#38bdf8' }} />
-            </div>
-          ) : (
-            <RefuelingTabContent
-              data={effectiveRefuelingData}
-              vehicle={activeVehicle}
-              isLoading={refuelingQuery.isFetching}
-            />
-          )}
-        </>
+        <RefuelingTabContent
+          data={effectiveRefuelingData}
+          vehicle={activeVehicle}
+          isLoading={refuelingQuery.isFetching}
+          isAllTime={isAllTime}
+          onSelectAllPeriod={handleSelectAllPeriod}
+        />
       )}
 
       {currentTab === 'services' && (
-        <>
-          {servicesQuery.isLoading && !effectiveServicesData ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
-              <CircularProgress sx={{ color: '#c8a0f0' }} />
+        <ServicesTabContent
+          data={effectiveServicesData}
+          vehicle={activeVehicle}
+          isLoading={servicesQuery.isFetching}
+          isAllTime={isAllTime}
+          onSelectAllPeriod={handleSelectAllPeriod}
+        />
+      )}
+
+      {currentTab === 'general' &&
+        (filteredEntries.length === 0 ? (
+          <AnalyticsEmptyState
+            icon={<QueryStatsIcon sx={{ fontSize: 32 }} />}
+            title={
+              isAllTime ? 'No historical activity records' : 'No activity records in this period'
+            }
+            description={
+              isAllTime
+                ? 'No records have been logged for this vehicle yet. Start adding fuel, service, or expense entries to track telemetry and costs.'
+                : 'There are no entries logged for the selected date range. Switch to "All Time" to view all recorded vehicle activity.'
+            }
+            isAllTime={isAllTime}
+            onSelectAllPeriod={handleSelectAllPeriod}
+            accentColor="var(--mui-palette-primary-main)"
+          />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
+            <TcoSummaryCard entries={filteredEntries} vehicle={activeVehicle} />
+            <ConsumptionAnomalyBanner entries={rawEntries} vehicle={activeVehicle} />
+
+            <div style={styles.grid}>
+              <TravelDistanceCard entries={filteredEntries} vehicle={activeVehicle} />
+              <CostDistributionCard entries={filteredEntries} />
+              <SpendingTrendCard
+                entries={filteredEntries}
+                timeRange={currentPreset === 'all' ? 'all' : '6months'}
+              />
+              <EfficiencyTelemetryCard entries={filteredEntries} vehicle={activeVehicle} />
+              <PriceVolatilityCard entries={filteredEntries} />
+              {activeVehicle?.used_by_business && (
+                <BusinessDeductibleCard entries={filteredEntries} vehicle={activeVehicle} />
+              )}
+              <OdometerProgressionCard entries={filteredEntries} vehicle={activeVehicle} />
             </div>
-          ) : (
-            <ServicesTabContent
-              data={effectiveServicesData}
-              vehicle={activeVehicle}
-              isLoading={servicesQuery.isFetching}
-            />
-          )}
-        </>
-      )}
-
-      {currentTab === 'general' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
-          <TcoSummaryCard entries={filteredEntries} vehicle={activeVehicle} />
-          <ConsumptionAnomalyBanner entries={rawEntries} vehicle={activeVehicle} />
-
-          <div style={styles.grid}>
-            <TravelDistanceCard entries={filteredEntries} vehicle={activeVehicle} />
-            <CostDistributionCard entries={filteredEntries} />
-            <SpendingTrendCard
-              entries={filteredEntries}
-              timeRange={currentPreset === 'all' ? 'all' : '6months'}
-            />
-            <EfficiencyTelemetryCard entries={filteredEntries} vehicle={activeVehicle} />
-            <PriceVolatilityCard entries={filteredEntries} />
-            {activeVehicle?.used_by_business && (
-              <BusinessDeductibleCard entries={filteredEntries} vehicle={activeVehicle} />
-            )}
-            <OdometerProgressionCard entries={filteredEntries} vehicle={activeVehicle} />
           </div>
-        </div>
-      )}
+        ))}
     </div>
   );
 }

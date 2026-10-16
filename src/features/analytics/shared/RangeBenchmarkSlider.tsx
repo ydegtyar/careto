@@ -137,4 +137,4 @@ export const RangeBenchmarkSlider = ({
       </div>
     </div>
   );
-}
+};

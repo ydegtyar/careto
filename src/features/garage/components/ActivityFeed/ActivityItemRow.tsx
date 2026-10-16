@@ -10,6 +10,7 @@ import { type FuelGrade, useAccountFuelGrades } from '@/shared/lib/fuel-grades';
 import type { EntryRecord } from './ActivityFeed';
 import styles from './ActivityFeed.module.scss';
 import { getTitleStyle, styles as inlineStyles } from './ActivityItemRow.styles';
+import { KindIcon } from './KindIcon';
 
 export interface Props {
   entry: EntryRecord;
@@ -17,7 +18,7 @@ export interface Props {
   volumeUnit?: string;
   distanceUnit?: string;
   onOpen: (entry: EntryRecord) => void;
-  getIcon: (kind: string) => ReactNode;
+  getIcon?: (kind: string) => ReactNode;
 }
 
 export function getPrimaryTitle(
@@ -86,7 +87,9 @@ export function ActivityItemRow({
 
   return (
     <button type="button" className={styles.item} onClick={() => onOpen(entry)}>
-      <div className={`${styles.iconDisc} ${styles[entry.kind]}`}>{getIcon(entry.kind)}</div>
+      <div className={`${styles.iconDisc} ${styles[entry.kind]}`}>
+        {getIcon ? getIcon(entry.kind) : <KindIcon kind={entry.kind} />}
+      </div>
       <div className={styles.details} style={inlineStyles.details}>
         <Typography variant="body2" title={title} sx={getTitleStyle(title === entry.kind)}>
           {title}

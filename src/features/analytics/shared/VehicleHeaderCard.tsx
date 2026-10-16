@@ -11,11 +11,7 @@ export interface Props {
   refuelCount?: number;
 }
 
-export const VehicleHeaderCard = ({
-  vehicle,
-  currentOdometerKm,
-  refuelCount = 12,
-}: Props) => {
+export const VehicleHeaderCard = ({ vehicle, currentOdometerKm, refuelCount = 12 }: Props) => {
   const odoKm =
     currentOdometerKm ?? (vehicle ? Math.round(vehicle.initial_odometer_m / 1000) : 55450);
   const distanceUnit = vehicle?.distance_unit || 'km';
@@ -104,4 +100,4 @@ export const VehicleHeaderCard = ({
       </div>
     </div>
   );
-}
+};

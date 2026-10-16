@@ -140,4 +140,4 @@ export const DonutCard = ({ title, centerText, centerSubText, items, footer }: P
       )}
     </div>
   );
-}
+};

@@ -5,6 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import type { Reminder } from '@/data/client/types';
+import { formatDatePreference, useDateFormatPreference } from '@/shared/lib/date-format-preference';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 import { type StatusLevel, StatusPill } from '@/shared/ui/StatusPill/StatusPill';
 import { computeDue } from '../../lib/compute-due';
@@ -25,6 +26,7 @@ export function ReminderCard({
   onComplete,
   onEdit,
 }: Props) {
+  const [dateFormat] = useDateFormatPreference();
   const dueResult = computeDue(
     {
       id: reminder.id,
@@ -71,7 +73,7 @@ export function ReminderCard({
               component="div"
               sx={{ color: 'text.secondary', fontSize: '0.7rem', mt: 0.2 }}
             >
-              Last done: {reminder.base_date}
+              Last done: {formatDatePreference(reminder.base_date, dateFormat)}
               {reminder.base_odometer_m
                 ? ` (${Math.round(reminder.base_odometer_m / 1000).toLocaleString()} km)`
                 : ''}

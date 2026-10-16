@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_CURRENCIES, convertCurrency, convertToUsdMinor } from './currencies';
+import {
+  ALL_CURRENCIES,
+  convertCurrency,
+  convertToBaseCurrencyMinor,
+  convertToUsdMinor,
+} from './currencies';
 
 describe('currencies module', () => {
   it('includes UAH and ALL in ALL_CURRENCIES', () => {
@@ -34,5 +39,18 @@ describe('currencies module', () => {
 
     // EUR to UAH: 1 EUR -> (1 / 0.925) * 41.5 ~ 44.86 UAH
     expect(convertCurrency(1, 'EUR', 'UAH')).toBeCloseTo(44.86, 1);
+  });
+
+  it('converts minor amounts to base currency correctly using convertToBaseCurrencyMinor', () => {
+    // Identity conversion
+    expect(convertToBaseCurrencyMinor(10000, 'USD', 'USD')).toBe(10000);
+    expect(convertToBaseCurrencyMinor(10000, 'EUR', 'EUR')).toBe(10000);
+
+    // Default target is USD
+    expect(convertToBaseCurrencyMinor(10000, 'USD')).toBe(10000);
+    expect(convertToBaseCurrencyMinor(10000, 'EUR')).toBe(10811);
+
+    // Converting between non-USD: 10000 EUR minor to UAH (100 EUR = 100/0.925*41.5 = 4486.48 UAH = 448649 minor)
+    expect(convertToBaseCurrencyMinor(10000, 'EUR', 'UAH')).toBe(448649);
   });
 });

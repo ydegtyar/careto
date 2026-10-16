@@ -142,4 +142,4 @@ export const WorkshopEfficiencyCard = ({ data }: Props) => {
       )}
     </div>
   );
-}
+};

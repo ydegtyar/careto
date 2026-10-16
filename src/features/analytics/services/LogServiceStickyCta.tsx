@@ -40,4 +40,4 @@ export const LogServiceStickyCta = () => {
       </Button>
     </div>
   );
-}
+};

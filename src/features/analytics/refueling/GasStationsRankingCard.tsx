@@ -149,4 +149,4 @@ export const GasStationsRankingCard = ({ data, volumeUnit = 'L' }: Props) => {
       )}
     </div>
   );
-}
+};

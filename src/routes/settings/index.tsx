@@ -3,7 +3,6 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import PaidIcon from '@mui/icons-material/Paid';
 import SecurityIcon from '@mui/icons-material/Security';
 import SendIcon from '@mui/icons-material/Send';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -26,15 +25,10 @@ import {
   unsubscribeFromPush,
 } from '@/features/reminders/lib/push-client';
 import { ApiKeysSettingsCard } from '@/features/settings/components/ApiKeysSettingsCard/ApiKeysSettingsCard';
-import { CurrencyChip } from '@/features/settings/components/CurrencyChip/CurrencyChip';
+import { CurrenciesPreferenceCard } from '@/features/settings/components/CurrenciesPreferenceCard/CurrenciesPreferenceCard';
 import { DateTimePreferenceCard } from '@/features/settings/components/DateTimePreferenceCard/DateTimePreferenceCard';
 import { SyncStatusCard } from '@/features/settings/components/SyncStatusCard/SyncStatusCard';
 import { ThemeSelectionCard } from '@/features/settings/components/ThemeSelectionCard/ThemeSelectionCard';
-import {
-  ALL_CURRENCIES,
-  useFavoriteCurrencies,
-  useLastUsedCurrency,
-} from '@/shared/lib/currencies';
 import { clearQueryCacheStorage, getQueryCacheStorageType } from '@/shared/lib/queryPersister';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 
@@ -44,22 +38,6 @@ export const Route = createFileRoute('/settings/')({
 
 function SettingsPage() {
   const queryClient = useQueryClient();
-
-  const [favoriteCurrencies, setFavoriteCurrencies] = useFavoriteCurrencies();
-  const [lastUsedCurrency, setLastUsedCurrency] = useLastUsedCurrency();
-
-  const handleToggleFavoriteCurrency = (code: string) => {
-    if (favoriteCurrencies.includes(code)) {
-      if (favoriteCurrencies.length === 1) return; // keep at least one
-      const updated = favoriteCurrencies.filter((c) => c !== code);
-      setFavoriteCurrencies(updated);
-      if (lastUsedCurrency === code && updated.length > 0) {
-        setLastUsedCurrency(updated[0]!);
-      }
-    } else {
-      setFavoriteCurrencies([...favoriteCurrencies, code]);
-    }
-  };
 
   const [_offlineSync, _setOfflineSync] = useState(true);
 
@@ -310,30 +288,7 @@ function SettingsPage() {
         </GlassCard>
 
         {/* Favorite Currencies Selection Card */}
-        <GlassCard style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <PaidIcon sx={{ color: 'primary.main', fontSize: 22 }} />
-            <div>
-              <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                Favorite Currencies
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Select currencies available in expense forms (USD reporting auto-converted)
-              </Typography>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-            {ALL_CURRENCIES.map((item) => (
-              <CurrencyChip
-                key={item.code}
-                item={item}
-                isFav={favoriteCurrencies.includes(item.code)}
-                onToggle={handleToggleFavoriteCurrency}
-              />
-            ))}
-          </div>
-        </GlassCard>
+        <CurrenciesPreferenceCard />
 
         {/* AI Vision & LLM Waterfall Settings */}
         <AiSettingsCard />
