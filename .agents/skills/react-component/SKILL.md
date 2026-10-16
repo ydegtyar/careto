@@ -10,7 +10,7 @@ When creating or refactoring React components in TypeScript/JavaScript, follow t
 ## Core Rules
 
 1. **Arrow Component Functions**: Declare functional components using arrow functions (`const Component = (...) => { ... }`).
-2. **Named Exports**: Use named exports (`export const Component = ...`) rather than default exports.
+2. **Named Exports over Default Exports**: Avoid default exports. Always prefer named exports (`export const Component = ...`), except for pages or route modules (where framework conventions or router file-system conventions require default exports). When exposing a component or module as a default export for external APIs/libraries requiring it, prefer attaching or aliasing with `.default` (e.g., `Component.default = Component` or exporting named first and providing `.default` for external API compatibility).
 3. **Props Type Naming**: Name component prop types/interfaces simply `Props` (or `Props` scoped locally to the component file), avoiding verbose suffixes like `ComponentProps`.
 4. **Avoid `render...` Helper Functions**: Do not use inner render functions like `const renderHeader = () => { ... }` or `renderItem(...)` inside components. Extract them into distinct, standalone React components instead.
 
@@ -38,7 +38,7 @@ export const Header = ({ title, subtitle, onClick }: Props) => {
 ## Guidelines
 
 - **Prop Types**: Keep the interface/type name as `Props` when defined in the component file.
-- **Exports**: Prefer exporting component functions directly at declaration time: `export const MyComponent = ...`.
+- **Exports**: Avoid default exports. Prefer exporting component functions directly at declaration time: `export const MyComponent = ...`. Reserve default exports strictly for page or route components where routing frameworks dictate it. For external API/consumer compatibility that expects default imports, attach or use `.default` (e.g. `export default Object.assign(Component, { ... })` or `Component.default = Component`).
 - **Children Prop**: Explicitly define `children?: React.ReactNode` in `Props` when the component accepts children.
 - **No Inline `renderSomething` Helpers**: Avoid declaring helper functions like `const renderCard = () => { ... }` within component bodies. Inline JSX directly or extract a separate component (e.g. `Card`, `HeaderItem`) with its own `Props`.
 
