@@ -64,9 +64,7 @@ export const CopyableStatCard: React.FC<Props> = ({ label, value, isMonospace = 
 
         {hasValue && (
           <div
-            className={classNames(styles.iconIndicator, {
-              [styles.copied]: copied,
-            })}
+            className={classNames(styles.iconIndicator, copied && styles.copied)}
           >
             {copied ? (
               <CheckIcon sx={{ fontSize: 14 }} />

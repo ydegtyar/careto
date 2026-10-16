@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 export const getIconContainerStyle = (color?: string): CSSProperties => ({
   color: color || 'var(--mui-palette-primary-main, #0284c7)',
