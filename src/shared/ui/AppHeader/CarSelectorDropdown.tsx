@@ -3,10 +3,10 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import ElectricCarIcon from '@mui/icons-material/ElectricCar';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Stack } from '@mui/material';
-import CircularProgress from '@mui/material/CircularProgress';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Skeleton from '@mui/material/Skeleton';
 import { useRouter } from '@tanstack/react-router';
 import type React from 'react';
 import { useState } from 'react';
@@ -14,12 +14,14 @@ import { useAppStore } from '@/app/store';
 import type { Vehicle } from '@/data/client/types';
 import styles from './AppHeader.module.scss';
 import { VehicleMenuItem } from './VehicleMenuItem';
+import { VehicleMenuItemSkeleton } from './VehicleMenuItemSkeleton';
 
 interface Props {
   vehicles: Vehicle[];
   activeVehicle?: Vehicle | null;
   isLoading?: boolean;
 }
+
 export const CarSelectorDropdown: React.FC<Props> = ({
   vehicles,
   activeVehicle,
@@ -79,27 +81,32 @@ export const CarSelectorDropdown: React.FC<Props> = ({
           sx={{ justifyContent: 'space-between', width: 1, alignItems: 'center', gap: 2 }}
         >
           <Stack direction={'row'} sx={{ gap: 1, alignItems: 'center' }}>
-            <div className={styles.avatarBox}>
-              {isLoading ? (
-                <CircularProgress size={16} sx={{ color: 'primary.main' }} />
-              ) : (
-                getVehicleIcon(activeVehicle)
-              )}
-            </div>
-            <div className={styles.titleArea}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span className={styles.carName}>
-                  {isLoading
-                    ? 'Loading vehicles...'
-                    : activeVehicle
-                      ? activeVehicle.name
-                      : 'Select vehicle'}
-                </span>
-              </div>
-              <span className={styles.carSubtext}>
-                {isLoading ? 'Connecting...' : getSubtext(activeVehicle)}
-              </span>
-            </div>
+            {isLoading ? (
+              <>
+                <Skeleton
+                  variant="rounded"
+                  width={32}
+                  height={32}
+                  sx={{ borderRadius: '10px', flexShrink: 0 }}
+                />
+                <div className={styles.titleArea}>
+                  <Skeleton variant="text" width={90} height={18} />
+                  <Skeleton variant="text" width={60} height={14} />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={styles.avatarBox}>{getVehicleIcon(activeVehicle)}</div>
+                <div className={styles.titleArea}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span className={styles.carName}>
+                      {activeVehicle ? activeVehicle.name : 'Select vehicle'}
+                    </span>
+                  </div>
+                  <span className={styles.carSubtext}>{getSubtext(activeVehicle)}</span>
+                </div>
+              </>
+            )}
           </Stack>
           <KeyboardArrowDownIcon
             className={styles.arrowIcon}
@@ -125,24 +132,17 @@ export const CarSelectorDropdown: React.FC<Props> = ({
           },
         }}
       >
-        {isLoading ? (
-          <MenuItem disabled sx={{ justifyContent: 'center', py: 2, gap: 1.5 }}>
-            <CircularProgress size={18} sx={{ color: 'primary.main' }} />
-            <span style={{ fontSize: '0.85rem', color: 'var(--mui-palette-text-secondary)' }}>
-              Loading garage vehicles...
-            </span>
-          </MenuItem>
-        ) : (
-          vehicles.map((v) => (
-            <VehicleMenuItem
-              key={v.id}
-              vehicle={v}
-              activeVehicle={activeVehicle}
-              onSelect={handleSelectVehicle}
-              onEdit={handleEditVehicle}
-            />
-          ))
-        )}
+        {isLoading
+          ? [0, 1].map((key) => <VehicleMenuItemSkeleton key={key} />)
+          : vehicles.map((v) => (
+              <VehicleMenuItem
+                key={v.id}
+                vehicle={v}
+                activeVehicle={activeVehicle}
+                onSelect={handleSelectVehicle}
+                onEdit={handleEditVehicle}
+              />
+            ))}
 
         <MenuItem
           onClick={() => {
@@ -154,11 +154,11 @@ export const CarSelectorDropdown: React.FC<Props> = ({
             color: 'var(--mui-palette-primary-main)',
             fontWeight: 600,
             borderRadius: '12px',
-            mt: !isLoading && vehicles.length > 0 ? '8px' : 0,
+            mt: isLoading || vehicles.length > 0 ? '8px' : 0,
             py: 1,
             px: 1.5,
             borderTop:
-              !isLoading && vehicles.length > 0 ? '1px solid var(--mui-palette-divider)' : 'none',
+              isLoading || vehicles.length > 0 ? '1px solid var(--mui-palette-divider)' : 'none',
             '&:hover': {
               backgroundColor:
                 'color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent) !important',
