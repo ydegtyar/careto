@@ -73,7 +73,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             },
             serverInfo: {
               name: 'Careto MCP Server',
-              version: '1.0.0',
+              version: '1.1.0',
             },
           },
           id,

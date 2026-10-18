@@ -458,7 +458,7 @@ Stitch: `b6135099397e4e70808808f61cdead74` + `1b1126734d304cd8aae6b69015675d52` 
 - [x] `/api/keys/create`, `/api/keys/list`, `/api/keys/revoke` endpoints (`api/keys/[action].ts`)
 - [x] `ApiKeysSettingsCard` UI component on Settings Page with one-click copy & pre-formatted MCP client config snippets
 - [x] MCP HTTP SSE (`/api/mcp/sse`) and JSON-RPC (`/api/mcp/messages`) server implementation (`api/mcp/[action].ts`)
-- [x] 13 MCP Tools implemented in `api/_lib/mcp/tools.ts`:
+- [x] 14 MCP Tools implemented in `api/_lib/mcp/tools.ts` (Careto MCP Server v1.1.0):
   - `careto_list_vehicles`
   - `careto_get_vehicle_details`
   - `careto_analyze_spendings`
@@ -468,6 +468,7 @@ Stitch: `b6135099397e4e70808808f61cdead74` + `1b1126734d304cd8aae6b69015675d52` 
   - `careto_delete_reminder` (Tombstone reminder deletion with vehicle permission verification and history preservation)
   - `careto_complete_reminder` (Advance baseline odometer/date, reset snooze, and optionally log service expense entry)
   - `careto_add_entry`
+  - `careto_update_entry` (Selectively update fields on expense, refuel, charge, service, or note entry while preserving omitted fields)
   - `careto_delete_entry` (Tombstone deletion with implicit user consent confirmation)
   - `careto_analyze_image_and_create_entry` (Vision AI OCR integration)
   - `careto_manage_grades`

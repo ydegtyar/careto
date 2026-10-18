@@ -233,6 +233,55 @@ export const CARETO_MCP_TOOLS: MCPToolDefinition[] = [
     },
   },
   {
+    name: 'careto_update_entry',
+    description: 'Update an existing entry (expense, refuel, charge, service entry, or note) on a vehicle timeline. Selectively updates provided fields while preserving omitted fields.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        vehicleId: { type: 'string', description: 'UUID of the vehicle' },
+        entryId: { type: 'string', description: 'UUID of the entry / record to update' },
+        tbl: { 
+          type: 'string', 
+          enum: ['entries', 'notes'], 
+          description: 'Target table of record: "entries" (for all expenses, refuels, charges, and services) or "notes". Defaults to "entries".' 
+        },
+        kind: {
+          type: 'string',
+          enum: ['expense', 'refuel', 'charge', 'service'],
+          description: 'Updated entry kind (expense, refuel, charge, service)',
+        },
+        amount: { type: 'number', description: 'Updated total cost / amount in currency (e.g. 52.00)' },
+        currency: { type: 'string', description: 'Updated currency code (e.g. USD, EUR, UAH)' },
+        date: { type: 'string', description: 'Updated ISO date string YYYY-MM-DD' },
+        category: { type: 'string', description: 'Updated expense category: fuel, service, wash, parking, fine, insurance, or custom' },
+        notes: { type: 'string', description: 'Updated notes or service description' },
+        odometerKm: { type: 'number', description: 'Updated odometer reading in kilometers' },
+        merchant: { type: 'string', description: 'Updated vendor, workshop, or gas station name' },
+        fuelVolumeL: { type: 'number', description: 'Updated liters / gallons of fuel or kWh charged' },
+        pricePerUnit: { type: 'number', description: 'Updated price per unit/liter/kWh' },
+        fuelGrade: { type: 'string', description: 'Updated fuel grade name e.g. "Gasoline", "95 Octane", "Diesel"' },
+        isBusiness: { type: 'boolean', description: 'Updated business mileage / business expense flag' },
+        isFullTank: { type: 'boolean', description: 'Updated full tank indicator for refuels' },
+        subItems: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              cost: { type: 'number' },
+              partNumber: { type: 'string' },
+              quantity: { type: 'number' },
+            },
+            required: ['name', 'cost'],
+          },
+          description: 'Updated itemized breakdown of services or parts',
+        },
+      },
+      required: ['vehicleId', 'entryId'],
+    },
+  },
+  {
     name: 'careto_delete_entry',
     description: 'Delete or tombstone an entry (expense/refuel/service entry, note, or reminder) from a vehicle timeline. Requires implicit user consent: the caller must specify confirmed=true with confirmationReason describing user approval.',
     inputSchema: {
@@ -1099,6 +1148,168 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         latestOdometerKm: maxOdometer,
         recentMerchants: Array.from(merchants),
         lastFuelPrice,
+      };
+    }
+
+    case 'careto_update_entry': {
+      const {
+        vehicleId,
+        entryId,
+        tbl: rawTbl,
+        kind,
+        amount,
+        currency,
+        date,
+        category,
+        notes,
+        odometerKm,
+        merchant,
+        fuelVolumeL,
+        pricePerUnit,
+        fuelGrade,
+        isBusiness,
+        isFullTank,
+        subItems,
+      } = args;
+
+      if (!vehicleId) throw new Error('vehicleId is required');
+      if (!entryId) throw new Error('entryId is required');
+
+      const tbl = rawTbl === 'expenses' || !rawTbl ? 'entries' : rawTbl;
+
+      const canEdit = await hasRole(userId, vehicleId, 'editor');
+      if (!canEdit) throw new Error('Forbidden: Editor permission required for vehicle');
+
+      const existing = await sql`
+        SELECT data, col_hlc
+        FROM records
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${entryId}::uuid
+          AND tbl = ${tbl}
+          AND deleted = false
+        LIMIT 1
+      `;
+
+      if (existing.length === 0) {
+        throw new Error(`Entry ${entryId} not found in ${tbl} for vehicle ${vehicleId}`);
+      }
+
+      const currentData = (existing[0]!.data as Record<string, any>) || {};
+      const currentColHlc = (existing[0]!.col_hlc as Record<string, string>) || {};
+      const hlc = `${Date.now()}-0000-0000`;
+
+      const updatedData = { ...currentData };
+      const updatedColHlc = { ...currentColHlc };
+
+      const setField = (field: string, val: any) => {
+        if (val !== undefined) {
+          updatedData[field] = val;
+          updatedColHlc[field] = hlc;
+        }
+      };
+
+      if (tbl === 'entries') {
+        if (kind !== undefined) setField('kind', kind);
+
+        if (amount !== undefined) {
+          const amountMinor = amount !== null ? Math.round(Number(amount) * 100) : null;
+          setField('amount_minor', amountMinor);
+          setField('usd_minor', amountMinor);
+          setField('amount', amount !== null ? Number(amount) : null);
+          setField('cost', amount !== null ? Number(amount) : null);
+        }
+
+        if (currency !== undefined) setField('currency', currency);
+
+        if (date !== undefined) {
+          setField('occurred_on', date);
+          setField('date', date);
+        }
+
+        if (category !== undefined) setField('category', category);
+        if (notes !== undefined) setField('notes', notes);
+
+        if (odometerKm !== undefined) {
+          const odoM = odometerKm !== null ? Math.round(Number(odometerKm) * 1000) : null;
+          setField('odometer_m', odoM);
+          setField('odometerKm', odometerKm !== null ? Number(odometerKm) : null);
+        }
+
+        if (merchant !== undefined) {
+          setField('vendor_name', merchant);
+          setField('merchant', merchant);
+        }
+
+        if (fuelVolumeL !== undefined) {
+          setField('fuel_volume', fuelVolumeL !== null ? Number(fuelVolumeL) : null);
+          setField('fuelVolume', fuelVolumeL !== null ? Number(fuelVolumeL) : null);
+        }
+
+        if (pricePerUnit !== undefined) {
+          setField('unit_price', pricePerUnit !== null ? Number(pricePerUnit) : null);
+          setField('pricePerUnit', pricePerUnit !== null ? Number(pricePerUnit) : null);
+        }
+
+        if (fuelGrade !== undefined) setField('fuel_grade', fuelGrade);
+
+        if (isBusiness !== undefined) {
+          setField('business', isBusiness ? 1 : 0);
+        }
+
+        if (isFullTank !== undefined) {
+          setField('is_full_tank', Boolean(isFullTank));
+        }
+
+        if (subItems !== undefined) {
+          const mappedSubItems = Array.isArray(subItems)
+            ? subItems.map((item: any) => ({
+                id: item.id || crypto.randomUUID(),
+                name: item.name,
+                cost: String(item.cost),
+                partNumber: item.partNumber,
+                quantity: item.quantity,
+              }))
+            : [];
+          setField('sub_items', mappedSubItems);
+          setField('subItems', mappedSubItems);
+        }
+      } else {
+        if (notes !== undefined) {
+          setField('notes', notes);
+          setField('body', notes);
+        }
+        if (date !== undefined) {
+          setField('date', date);
+        }
+      }
+
+      const v = await sql`SELECT seq FROM vehicles WHERE id = ${vehicleId}::uuid FOR UPDATE LIMIT 1`;
+      if (v.length === 0) throw new Error('Vehicle not found');
+      const nextSeq = (Number(v[0]?.seq) || 0) + 1;
+
+      await sql`
+        UPDATE records
+        SET 
+          data = ${JSON.stringify(updatedData)}::jsonb,
+          col_hlc = ${JSON.stringify(updatedColHlc)}::jsonb,
+          seq = ${nextSeq},
+          updated_by = ${userId}::uuid,
+          updated_at = now()
+        WHERE vehicle_id = ${vehicleId}::uuid
+          AND id = ${entryId}::uuid
+          AND tbl = ${tbl}
+      `;
+
+      await sql`UPDATE vehicles SET seq = ${nextSeq} WHERE id = ${vehicleId}::uuid`;
+
+      return {
+        ok: true,
+        entryId,
+        vehicleId,
+        tbl,
+        seq: nextSeq,
+        entry: updatedData,
+        message: `Successfully updated ${tbl} entry ${entryId}.`,
       };
     }
 
