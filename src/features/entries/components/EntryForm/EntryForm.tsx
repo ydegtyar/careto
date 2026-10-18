@@ -41,6 +41,7 @@ import {
   useLastUsedCurrency,
   useLastUsedPaymentMethod,
 } from '@/shared/lib/currencies';
+import { useGeolocation } from '@/shared/lib/use-geolocation';
 import { GlassCard } from '@/shared/ui/GlassCard/GlassCard';
 
 export interface Props {
@@ -49,6 +50,7 @@ export interface Props {
   onCancel: () => void;
   submitLabel?: string;
   disableKindChange?: boolean;
+  autoUseLocation?: boolean;
 }
 
 export const EntryForm: React.FC<Props> = ({
@@ -57,6 +59,7 @@ export const EntryForm: React.FC<Props> = ({
   onCancel,
   submitLabel,
   disableKindChange = false,
+  autoUseLocation = false,
 }) => {
   const isEditMode = Boolean(initialEntry);
   const { activeVehicleId } = useAppStore();
@@ -167,9 +170,30 @@ export const EntryForm: React.FC<Props> = ({
   const [useSinkingFund, setUseSinkingFund] = useState(false);
   const [notes, setNotes] = useState(initialEntry?.notes || '');
   const [vendorName, setVendorName] = useState(initialEntry?.vendor_name || '');
-  const [vendorLocation, setVendorLocation] = useState('City Center Garage - Floor 2B');
+  const [vendorLocation, setVendorLocation] = useState('');
   const [lat, setLat] = useState<number | null>(initialEntry?.lat ?? null);
   const [lon, setLon] = useState<number | null>(initialEntry?.lon ?? null);
+
+  const { getCurrentLocation } = useGeolocation();
+
+  useEffect(() => {
+    if (!autoUseLocation || isEditMode) return;
+    let isCancelled = false;
+
+    getCurrentLocation().then((loc) => {
+      if (isCancelled || !loc) return;
+      setVendorLocation((prev) => (prev ? prev : loc.address));
+      if (loc.placeName) {
+        setVendorName((prev) => (prev ? prev : loc.placeName!));
+      }
+      setLat((prev) => (prev !== null ? prev : loc.latitude));
+      setLon((prev) => (prev !== null ? prev : loc.longitude));
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [autoUseLocation, isEditMode]);
   const [subItems, setSubItems] = useState<EditableSubItem[]>(
     initialEntry?.sub_items
       ? initialEntry.sub_items.map((sub) => ({

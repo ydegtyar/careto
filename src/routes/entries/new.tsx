@@ -61,6 +61,7 @@ function NewEntryPage() {
       onSave={handleSave}
       onCancel={handleCancel}
       submitLabel="Save Entry"
+      autoUseLocation
     />
   );
 }

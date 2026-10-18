@@ -4,6 +4,7 @@ export interface LocationDetails {
   address: string;
   latitude: number;
   longitude: number;
+  placeName?: string;
 }
 
 export interface UseGeolocationResult {
@@ -36,6 +37,7 @@ export function useGeolocation(): UseGeolocationResult {
               : 'https://nominatim.openstreetmap.org';
 
             let address = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            let closestPoi: { name: string; display_name: string; dist: number } | null = null;
             try {
               // Attempt to fetch closest car-related place (fuel, car_repair, car_wash, parking) within ~1km
               const deltaLat = 0.01;
@@ -52,8 +54,6 @@ export function useGeolocation(): UseGeolocationResult {
                 `${nominatimUrl}/search?format=jsonv2&q=%5Bshop%3Dcar_repair%5D&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
                 `${nominatimUrl}/search?format=jsonv2&amenity=parking&viewbox=${viewbox}&bounded=1&limit=5&addressdetails=1`,
               ];
-
-              let closestPoi: { name: string; display_name: string; dist: number } | null = null;
 
               for (const queryUrl of carQueries) {
                 try {
@@ -118,8 +118,10 @@ export function useGeolocation(): UseGeolocationResult {
               // Gracefully fallback to coordinates string if lookups fail or rate limited
             }
 
-            setLoading(false);
-            resolve({ address, latitude, longitude });
+              const placeName = closestPoi?.name || undefined;
+
+              setLoading(false);
+              resolve({ address, latitude, longitude, placeName });
           } catch (err: unknown) {
             const message = err instanceof Error ? err.message : 'Error fetching location address.';
             setError(message);

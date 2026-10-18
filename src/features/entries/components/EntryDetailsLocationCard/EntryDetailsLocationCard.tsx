@@ -1,3 +1,4 @@
+import ClearIcon from '@mui/icons-material/Clear';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -65,6 +66,9 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
     const loc = await getCurrentLocation();
     if (loc) {
       onVendorLocationChange(loc.address);
+      if (loc.placeName && onVendorNameChange) {
+        onVendorNameChange(loc.placeName);
+      }
       if (onCoordsChange) {
         onCoordsChange(loc.latitude, loc.longitude);
       }
@@ -113,6 +117,24 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
           onChange={(e) => onVendorNameChange(e.target.value)}
           fullWidth
           sx={styles.inputRoot}
+          slotProps={{
+            input: {
+              endAdornment: vendorName ? (
+                <InputAdornment position="end">
+                  <Tooltip title="Clear vendor / place">
+                    <IconButton
+                      onClick={() => onVendorNameChange('')}
+                      size="small"
+                      aria-label="clear vendor / place"
+                      edge="end"
+                    >
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </InputAdornment>
+              ) : undefined,
+            },
+          }}
         />
       )}
 
@@ -129,6 +151,23 @@ export const EntryDetailsLocationCard: React.FC<Props> = ({
           input: {
             endAdornment: (
               <InputAdornment position="end" sx={{ gap: 0.5 }}>
+                {vendorLocation ? (
+                  <Tooltip title="Clear location">
+                    <IconButton
+                      onClick={() => {
+                        onVendorLocationChange('');
+                        if (onCoordsChange) {
+                          onCoordsChange(null, null);
+                        }
+                      }}
+                      size="small"
+                      aria-label="clear location"
+                    >
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                ) : null}
+
                 <Tooltip title="Use current location">
                   <IconButton
                     onClick={handleFetchLocation}
