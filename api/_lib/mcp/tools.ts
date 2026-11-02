@@ -2,6 +2,7 @@ import { sql } from '../db.js';
 import { runWaterfallParse } from '../ai/waterfall.js';
 import { computeDue } from '../../../src/features/reminders/lib/compute-due.js';
 import { hasRole } from '../acl.js';
+import { convertToUsdMinorAsync } from '../fx.js';
 
 export interface MCPToolDefinition {
   name: string;
@@ -365,7 +366,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
       }
 
       const totalCost = items.reduce((sum, item) => {
-        const amt = item.amount ?? (item.amount_minor ? item.amount_minor / 100 : item.cost) ?? 0;
+        const amt = item.usd_minor ? item.usd_minor / 100 : (item.amount ?? (item.amount_minor ? item.amount_minor / 100 : item.cost) ?? 0);
         return sum + (Number(amt) || 0);
       }, 0);
 
@@ -379,7 +380,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
       const byCategory: Record<string, number> = {};
       for (const item of items) {
         const cat = item.category || item.category_id || item.kind || 'other';
-        const cost = item.amount ?? (item.amount_minor ? item.amount_minor / 100 : item.cost) ?? 0;
+        const cost = item.usd_minor ? item.usd_minor / 100 : (item.amount ?? (item.amount_minor ? item.amount_minor / 100 : item.cost) ?? 0);
         byCategory[cat] = (byCategory[cat] || 0) + (Number(cost) || 0);
       }
 
@@ -855,6 +856,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         const costNum = cost !== undefined && cost !== null ? Number(cost) : undefined;
         const amountMinor = costNum !== undefined ? Math.round(costNum * 100) : undefined;
         const odoM = completedOdometerKm !== undefined && completedOdometerKm !== null ? Math.round(Number(completedOdometerKm) * 1000) : undefined;
+        const usdMinor = amountMinor !== undefined ? await convertToUsdMinorAsync(amountMinor, currency, completedDate) : undefined;
 
         const entryPatch = {
           id: createdEntryId,
@@ -862,7 +864,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
           occurred_on: completedDate,
           amount_minor: amountMinor,
           currency,
-          usd_minor: amountMinor,
+          usd_minor: usdMinor,
           driver_id: userId,
           odometer_m: odoM,
           vendor_name: merchant,
@@ -949,6 +951,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
 
         const amountMinor = amount !== undefined && amount !== null ? Math.round(Number(amount) * 100) : undefined;
         const odometerM = odometerKm !== undefined && odometerKm !== null ? Math.round(Number(odometerKm) * 1000) : undefined;
+        const usdMinor = amountMinor !== undefined ? await convertToUsdMinorAsync(amountMinor, currency, date) : undefined;
 
         patch = {
           id: recordId,
@@ -956,7 +959,7 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
           occurred_on: date,
           amount_minor: amountMinor,
           currency,
-          usd_minor: amountMinor, // fallback 1:1 if no FX converter present
+          usd_minor: usdMinor,
           driver_id: userId,
           odometer_m: odometerM,
           vendor_name: merchant,
@@ -1044,15 +1047,18 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         if (tbl === 'entries') {
           const rawAmount = extracted.amount || extracted.cost;
           const amountMinor = rawAmount ? Math.round(Number(rawAmount) * 100) : undefined;
+          const entryDate = extracted.date || new Date().toISOString().slice(0, 10);
+          const entryCurrency = extracted.currency || 'USD';
+          const usdMinor = amountMinor !== undefined ? await convertToUsdMinorAsync(amountMinor, entryCurrency, entryDate) : undefined;
           const inferredKind = extracted.fuelVolume ? 'refuel' : (extracted.subItems && extracted.subItems.length > 0 ? 'service' : 'expense');
 
           patch = {
             id: recordId,
             kind: inferredKind,
-            occurred_on: extracted.date || new Date().toISOString().slice(0, 10),
+            occurred_on: entryDate,
             amount_minor: amountMinor,
-            currency: extracted.currency || 'USD',
-            usd_minor: amountMinor,
+            currency: entryCurrency,
+            usd_minor: usdMinor,
             driver_id: userId,
             vendor_name: extracted.merchant || extracted.vendorName,
             notes: extracted.notes || extracted.rawText,
@@ -1214,7 +1220,6 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         if (amount !== undefined) {
           const amountMinor = amount !== null ? Math.round(Number(amount) * 100) : null;
           setField('amount_minor', amountMinor);
-          setField('usd_minor', amountMinor);
           setField('amount', amount !== null ? Number(amount) : null);
           setField('cost', amount !== null ? Number(amount) : null);
         }
@@ -1224,6 +1229,18 @@ export async function executeMCPTool(userId: string, name: string, args: Record<
         if (date !== undefined) {
           setField('occurred_on', date);
           setField('date', date);
+        }
+
+        if (amount !== undefined || currency !== undefined || date !== undefined) {
+          const finalAmtMinor = updatedData.amount_minor;
+          const finalCurrency = updatedData.currency;
+          const finalDate = updatedData.occurred_on || updatedData.date;
+          if (finalAmtMinor !== undefined && finalAmtMinor !== null) {
+            const usdMinor = await convertToUsdMinorAsync(finalAmtMinor, finalCurrency, finalDate);
+            setField('usd_minor', usdMinor);
+          } else if (finalAmtMinor === null) {
+            setField('usd_minor', null);
+          }
         }
 
         if (category !== undefined) setField('category', category);

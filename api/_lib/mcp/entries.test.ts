@@ -203,5 +203,79 @@ describe('MCP Entry Management Tools', () => {
         }),
       ).rejects.toThrow(/not found/);
     });
+
+    it('correctly recalculates usd_minor when updating currency and amount', async () => {
+      const existingEntry = {
+        id: entryId,
+        kind: 'expense',
+        occurred_on: '2026-10-24',
+        amount_minor: 1000,
+        currency: 'USD',
+        usd_minor: 1000,
+      };
+
+      mockSql.mockImplementation((strings: TemplateStringsArray) => {
+        const query = strings.join('');
+        if (query.includes('FROM records') && query.includes('SELECT data, col_hlc')) {
+          return Promise.resolve([{ data: existingEntry, col_hlc: {} }]);
+        }
+        if (query.includes('FROM fx_rates')) {
+          return Promise.resolve([{ date: '2026-10-24', rates: { ALL: 80.814474 } }]);
+        }
+        if (query.includes('SELECT seq FROM vehicles')) {
+          return Promise.resolve([{ seq: 10 }]);
+        }
+        return Promise.resolve([]);
+      });
+
+      const res = await executeMCPTool(userId, 'careto_update_entry', {
+        vehicleId,
+        entryId,
+        amount: 500,
+        currency: 'ALL',
+      });
+
+      expect(res.ok).toBe(true);
+      expect(res.entry!.amount_minor).toBe(50000);
+      expect(res.entry!.currency).toBe('ALL');
+      // 50000 / 80.814474 ~ 619 USD minor ($6.19)
+      expect(res.entry!.usd_minor).toBe(619);
+    });
+  });
+
+  describe('careto_add_entry currency conversion', () => {
+    it('converts non-USD currency to usd_minor using exchange rates', async () => {
+      mockSql.mockImplementation((strings: TemplateStringsArray) => {
+        const query = strings.join('');
+        if (query.includes('FROM fx_rates')) {
+          return Promise.resolve([{ date: '2026-10-24', rates: { ALL: 80.814474 } }]);
+        }
+        if (query.includes('SELECT seq FROM vehicles')) {
+          return Promise.resolve([{ seq: 100 }]);
+        }
+        if (query.includes('INSERT INTO records')) {
+          return Promise.resolve([]);
+        }
+        if (query.includes('UPDATE vehicles SET seq')) {
+          return Promise.resolve([]);
+        }
+        return Promise.resolve([]);
+      });
+
+      const res = await executeMCPTool(userId, 'careto_add_entry', {
+        vehicleId,
+        amount: 500,
+        currency: 'ALL',
+        date: '2026-10-24',
+        notes: 'Parking in Berat',
+        category: 'parking',
+      });
+
+      expect(res.ok).toBe(true);
+      expect(res.entry!.amount_minor).toBe(50000);
+      expect(res.entry!.currency).toBe('ALL');
+      // 50000 / 80.814474 ~ 619 USD minor ($6.19), NOT 50000 ($500)
+      expect(res.entry!.usd_minor).toBe(619);
+    });
   });
 });
