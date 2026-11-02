@@ -109,11 +109,31 @@ async function handleGetSession(req: VercelRequest, res: VercelResponse) {
     if (req.headers['cookie']) upHeaders['cookie'] = req.headers['cookie'] as string;
     if (req.headers['authorization']) upHeaders['authorization'] = req.headers['authorization'] as string;
 
-    const upRes = await fetch(`${NEON_AUTH_BASE}/get-session`, {
-      method: 'GET',
+    const fetchInit: RequestInit = {
+      method: req.method || 'GET',
       headers: upHeaders,
       redirect: 'manual',
-    });
+    };
+
+    if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
+      fetchInit.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+    }
+
+    const upRes = await fetch(`${NEON_AUTH_BASE}/get-session`, fetchInit);
+
+    // Forward any set-cookie headers (e.g. refreshed session tokens)
+    const rawCookies =
+      typeof upRes.headers.getSetCookie === 'function' ? upRes.headers.getSetCookie() : null;
+
+    if (rawCookies && rawCookies.length > 0) {
+      const sanitized = rawCookies.map(sanitizeCookie);
+      res.setHeader('set-cookie', sanitized);
+    } else {
+      const singleCookie = upRes.headers.get('set-cookie');
+      if (singleCookie) {
+        res.setHeader('set-cookie', sanitizeCookie(singleCookie));
+      }
+    }
 
     // No active session (4xx/5xx) — forward as-is
     if (!upRes.ok) {
@@ -181,8 +201,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       subpath = '/' + subpath;
     }
 
-    // Intercept GET /get-session — enrich response with name/email from DB
-    if (subpath === '/get-session' && req.method === 'GET') {
+    // Intercept GET/POST /get-session — enrich response with name/email from DB and forward refresh cookies
+    if (subpath === '/get-session' && (req.method === 'GET' || req.method === 'POST')) {
       return await handleGetSession(req, res);
     }
 

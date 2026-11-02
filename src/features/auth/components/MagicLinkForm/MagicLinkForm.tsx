@@ -11,7 +11,11 @@ import type React from 'react';
 import { useState } from 'react';
 import styles from '../EmailPasswordForm/EmailPasswordForm.module.scss';
 
-export function MagicLinkForm() {
+type Props = {
+  redirectTarget?: string;
+};
+
+export const MagicLinkForm = ({ redirectTarget = '/garage' }: Props) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -23,7 +27,7 @@ export function MagicLinkForm() {
     setError(null);
 
     try {
-      const callbackURL = `${window.location.origin}/garage`;
+      const callbackURL = `${window.location.origin}${redirectTarget}`;
       const res = await fetch('/api/auth/sign-in/magic-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

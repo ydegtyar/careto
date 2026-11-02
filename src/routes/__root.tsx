@@ -1,4 +1,5 @@
 import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router';
+import { AuthGuard } from '@/features/auth/components/AuthGuard';
 import { AppHeader } from '@/shared/ui/AppHeader/AppHeader';
 import { BottomNav } from '@/shared/ui/BottomNav/BottomNav';
 
@@ -29,22 +30,24 @@ function RootComponent() {
   }
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
-      <AppHeader />
-      <main
-        style={{
-          flex: 1,
-          paddingTop: 60,
-          paddingBottom: 96,
-          width: '100%',
-          maxWidth: 1024,
-          margin: '0 auto',
-          boxSizing: 'border-box',
-        }}
-      >
-        <Outlet />
-      </main>
-      <BottomNav />
-    </div>
+    <AuthGuard>
+      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+        <AppHeader />
+        <main
+          style={{
+            flex: 1,
+            paddingTop: 60,
+            paddingBottom: 96,
+            width: '100%',
+            maxWidth: 1024,
+            margin: '0 auto',
+            boxSizing: 'border-box',
+          }}
+        >
+          <Outlet />
+        </main>
+        <BottomNav />
+      </div>
+    </AuthGuard>
   );
 }

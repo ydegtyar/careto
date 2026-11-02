@@ -12,6 +12,11 @@ import { CaretoLogo } from '@/shared/ui/CaretoLogo/CaretoLogo';
 import styles from './SignIn.module.scss';
 
 export const Route = createFileRoute('/sign-in/')({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
+    return {
+      redirect: typeof search.redirect === 'string' ? search.redirect : undefined,
+    };
+  },
   component: () => (
     <OnlyGuestGuard>
       <SignInPage />
@@ -24,10 +29,18 @@ import { GoogleOneTap } from '@/features/auth/components/GoogleOneTap/GoogleOneT
 
 function SignInPage() {
   const [tab, setTab] = useState<'password' | 'magic'>('password');
+  const search = Route.useSearch();
+
+  const redirectTarget =
+    typeof search?.redirect === 'string' &&
+    search.redirect.startsWith('/') &&
+    !search.redirect.startsWith('//')
+      ? search.redirect
+      : '/garage';
 
   return (
     <div className={styles.pageWrapper} data-color-scheme="dark">
-      <GoogleOneTap />
+      <GoogleOneTap redirectTarget={redirectTarget} />
       {/* Ambient background glows */}
       <div className={styles.ambientGlowTop} aria-hidden="true" />
       <div className={styles.ambientGlowBottom} aria-hidden="true" />
@@ -96,7 +109,11 @@ function SignInPage() {
 
           {/* Tab Panel */}
           <div role="tabpanel">
-            {tab === 'password' ? <EmailPasswordForm /> : <MagicLinkForm />}
+            {tab === 'password' ? (
+              <EmailPasswordForm redirectTarget={redirectTarget} />
+            ) : (
+              <MagicLinkForm redirectTarget={redirectTarget} />
+            )}
           </div>
 
           {/* Social Login Divider */}
@@ -110,14 +127,15 @@ function SignInPage() {
             fullWidth
             startIcon={<GoogleLogo />}
             onClick={async () => {
+              const callbackURL = `${window.location.origin}${redirectTarget}`;
               try {
                 const { signIn } = await import('@/lib/auth-client');
                 await signIn.social({
                   provider: 'google',
-                  callbackURL: `${window.location.origin}/garage`,
+                  callbackURL,
                 });
               } catch {
-                window.location.href = `/api/auth/sign-in/social?provider=google&callbackURL=${encodeURIComponent(`${window.location.origin}/garage`)}`;
+                window.location.href = `/api/auth/sign-in/social?provider=google&callbackURL=${encodeURIComponent(callbackURL)}`;
               }
             }}
             className={styles.googleBtn}

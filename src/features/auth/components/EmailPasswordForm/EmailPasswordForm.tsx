@@ -18,7 +18,11 @@ import { useState } from 'react';
 import { signIn, signUp } from '@/lib/auth-client';
 import styles from './EmailPasswordForm.module.scss';
 
-export function EmailPasswordForm() {
+type Props = {
+  redirectTarget?: string;
+};
+
+export const EmailPasswordForm = ({ redirectTarget = '/garage' }: Props) => {
   const router = useRouter();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [name, setName] = useState('');
@@ -52,7 +56,7 @@ export function EmailPasswordForm() {
           throw new Error(signUpError.message || 'Failed to create account.');
         }
 
-        router.navigate({ to: '/garage' });
+        window.location.href = redirectTarget;
         return;
       }
 
@@ -78,7 +82,7 @@ export function EmailPasswordForm() {
         }
       }
 
-      router.navigate({ to: '/garage' });
+      window.location.href = redirectTarget;
     } catch (err: unknown) {
       const errorObj = err as Error;
       setError(errorObj.message || 'Authentication failed. Please verify your details.');

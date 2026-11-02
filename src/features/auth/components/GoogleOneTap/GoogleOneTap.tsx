@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { oneTap } from '@/lib/auth-client';
 
-export function GoogleOneTap() {
+type Props = {
+  redirectTarget?: string;
+};
+
+export const GoogleOneTap = ({ redirectTarget = '/garage' }: Props) => {
   useEffect(() => {
     let unmounted = false;
 
@@ -17,7 +21,7 @@ export function GoogleOneTap() {
         await oneTap({
           fetchOptions: {
             onSuccess: () => {
-              window.location.href = '/garage';
+              window.location.href = redirectTarget;
             },
           },
         });
