@@ -128,6 +128,20 @@ function SignInPage() {
             startIcon={<GoogleLogo />}
             onClick={async () => {
               const callbackURL = `${window.location.origin}${redirectTarget}`;
+              const google = typeof window !== 'undefined' ? (window as any).google : undefined;
+              if (google?.accounts?.id?.prompt) {
+                google.accounts.id.prompt((notification: any) => {
+                  if (notification.isNotDisplayed?.() || notification.isSkippedMoment?.()) {
+                    import('@/lib/auth-client').then(({ signIn }) => {
+                      signIn.social({ provider: 'google', callbackURL }).catch(() => {
+                        window.location.href = `/api/auth/sign-in/social?provider=google&callbackURL=${encodeURIComponent(callbackURL)}`;
+                      });
+                    });
+                  }
+                });
+                return;
+              }
+
               try {
                 const { signIn } = await import('@/lib/auth-client');
                 await signIn.social({

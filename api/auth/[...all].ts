@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'node:crypto';
+import { extractSessionToken, getSession } from '../_lib/auth.js';
 import { sql } from '../_lib/db.js';
 
 const NEON_AUTH_BASE = process.env.NEON_AUTH_BASE_URL || 'https://ep-old-queen-b2swdkvy.neonauth.c-6.eu-central-1.aws.neon.tech/neondb/auth';
@@ -96,6 +97,31 @@ async function handleGoogleOneTap(req: VercelRequest, res: VercelResponse) {
 
 async function handleGetSession(req: VercelRequest, res: VercelResponse) {
   try {
+    // 1. Check local Neon Postgres session first (handles Google One Tap, direct sessions, and API tokens)
+    const dbSession = await getSession(req.headers);
+    if (dbSession) {
+      res.setHeader('content-type', 'application/json');
+      return res.status(200).json({
+        user: {
+          id: dbSession.user.id,
+          email: dbSession.user.email,
+          name: dbSession.user.name ?? null,
+          image: dbSession.user.image ?? null,
+          emailVerified: dbSession.user.emailVerified ?? true,
+          createdAt: dbSession.user.createdAt ? dbSession.user.createdAt.toISOString() : new Date().toISOString(),
+          updatedAt: dbSession.user.updatedAt ? dbSession.user.updatedAt.toISOString() : new Date().toISOString(),
+        },
+        session: {
+          id: dbSession.session.id,
+          token: dbSession.session.token,
+          userId: dbSession.session.userId ?? dbSession.user.id,
+          expiresAt: dbSession.session.expiresAt.toISOString(),
+          createdAt: dbSession.session.createdAt ? dbSession.session.createdAt.toISOString() : new Date().toISOString(),
+          updatedAt: dbSession.session.updatedAt ? dbSession.session.updatedAt.toISOString() : new Date().toISOString(),
+        },
+      });
+    }
+
     const reqOrigin =
       (req.headers['origin'] as string) ||
       (req.headers['referer']
@@ -209,6 +235,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Intercept one-tap callback endpoints
     if (subpath.includes('one-tap') && req.method === 'POST') {
       return await handleGoogleOneTap(req, res);
+    }
+
+    // Intercept sign-out: clear local DB session
+    if (subpath === '/sign-out' && req.method === 'POST') {
+      try {
+        const token = extractSessionToken(req.headers);
+        if (token) {
+          await sql`DELETE FROM neon_auth.session WHERE token = ${token}`.catch(() => {});
+        }
+      } catch (err) {
+        console.warn('Sign-out DB cleanup notice:', err);
+      }
     }
 
     // Build query string, omitting internal routing parameters

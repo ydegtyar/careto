@@ -6,11 +6,18 @@ export interface UserSession {
     id: string;
     email: string;
     name?: string | null;
+    image?: string | null;
+    emailVerified?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
   };
   session: {
     id: string;
     token: string;
+    userId?: string;
     expiresAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
   };
 }
 
@@ -103,10 +110,17 @@ export async function getSession(headers: Headers | Record<string, any>): Promis
           SELECT 
             s.id as session_id,
             s.token as session_token,
+            s."userId" as session_user_id,
             s."expiresAt" as session_expires_at,
+            s."createdAt" as session_created_at,
+            s."updatedAt" as session_updated_at,
             u.id as user_id,
             u.email as user_email,
-            u.name as user_name
+            u.name as user_name,
+            u.image as user_image,
+            u."emailVerified" as user_email_verified,
+            u."createdAt" as user_created_at,
+            u."updatedAt" as user_updated_at
           FROM neon_auth.session s
           JOIN neon_auth."user" u ON s."userId" = u.id
           WHERE s.token = ${token} AND s."expiresAt" > now()
@@ -120,11 +134,18 @@ export async function getSession(headers: Headers | Record<string, any>): Promis
               id: row.user_id,
               email: row.user_email,
               name: row.user_name,
+              image: row.user_image,
+              emailVerified: row.user_email_verified,
+              createdAt: row.user_created_at ? new Date(row.user_created_at) : undefined,
+              updatedAt: row.user_updated_at ? new Date(row.user_updated_at) : undefined,
             },
             session: {
               id: row.session_id,
               token: row.session_token,
+              userId: row.session_user_id,
               expiresAt: new Date(row.session_expires_at),
+              createdAt: row.session_created_at ? new Date(row.session_created_at) : undefined,
+              updatedAt: row.session_updated_at ? new Date(row.session_updated_at) : undefined,
             },
           };
         }
